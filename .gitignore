@@ -1,0 +1,11 @@
+inst/application/data
+data
+*.Rproj
+.Rproj*
+.Rhistory
+inst/doc
+geodata
+vignette/geodata
+vignette/GSE19188
+tests/testthat/testdata
+tests/testthat/plots

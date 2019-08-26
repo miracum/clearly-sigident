@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^data-raw$
+^LICENSE\.md$
+^docker$
+^data$
+^geodata$
+^vignette/geodata$
+^vignette/GSE19188$
+^tests/testthat/testdata$
+^tests/testthat/plots$

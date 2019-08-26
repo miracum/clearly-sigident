@@ -1,0 +1,46 @@
+Package: sigident
+Title: Signature Analyses in Genomic Expression Sets
+Version: 0.0.0.9000
+Authors@R: 
+    c(person(given = "Lorenz A.",
+             family = "Kapsner",
+             role = c("cre", "aut"),
+             email = "lorenz.kapsner@uk-erlangen.de"),
+      person(given = "Johannes",
+             family = "Vey",
+             role = "aut"))
+Description: Identify diagnostic and prognostic signatures from gene expression datasets.
+License: GPL-3
+LazyData: true
+URL: https://gitlab.miracum.org/clearly/sigident
+BugReports: https://gitlab.miracum.org/clearly/sigident/issues
+Encoding: UTF-8
+Copyright: Universitätsklinikum Erlangen
+Date/Publication: 2019-08-26 11:13:10 UTC
+biocViews: Expressionanalysis
+Imports: 
+    data.table,
+    shinyjs,
+    ggplot2,
+    gplots,
+    grDevices,
+    magrittr,
+    methods,
+    stats,
+    graphics,
+    DT,
+    jsonlite,
+    gPCA,
+    caret,
+    glmnet,
+    pROC,
+    utils,
+    BiocManager,
+    Biobase,
+    sva,
+    GEOquery,
+    limma,
+    affy,
+    gcrma
+Suggests: 
+    testthat
