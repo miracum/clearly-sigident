@@ -57,7 +57,7 @@ usethis::use_gpl3_license(name="Universitätsklinikum Erlangen")
 
 # Imports (CRAN packages)
 usethis::use_package("data.table", type="Imports")
-usethis::use_package("shinyjs", type="Imports")
+usethis::use_package("shiny", type="Imports")
 usethis::use_package("ggplot2", type="Imports")
 usethis::use_package("gplots", type="Imports")
 usethis::use_package("grDevices", type="Imports")
@@ -73,6 +73,7 @@ usethis::use_package("glmnet", type="Imports")
 usethis::use_package("pROC", type="Imports")
 usethis::use_package("utils", type="Imports")
 usethis::use_package("methods", type="Imports")
+usethis::use_package("caret", type="Imports")
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700

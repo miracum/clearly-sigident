@@ -205,6 +205,8 @@ species <- "Hs"
 OrgDb <- "org.Hs.eg.db"
 organism <- "hsa"
 pathwayid <- "hsa04110"
+seed <- 111
+traintest.split <- 0.8
 ```
 
 
@@ -342,6 +344,33 @@ createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg, type = "KEGG", filena
 ```
 ```{r}
 knitr::include_graphics(filename)
+```
+
+
+# Identification of diagnostic signatures 
+
+## Split data into training and test dataset
+
+```{r}
+training_list <- createTrainingTest_(diagnosis, combat, split = traintest.split, seed = seed)
+```
+
+## Lasso regression
+
+```{r}
+diagnostic_lasso <- glmnetSignature_(traininglist = training_list, alpha = 1, nfolds = 10, seed = seed)
+createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_lasso.png"))
+createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_Lasso.min.png"))
+createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_Lasso.1se.png"))
+```
+
+## Elastic net regression 
+
+```{r}
+diagnostic_elasticnet <- glmnetSignature_(traininglist = training_list, alpha = 0.9, nfolds = 10, seed = seed)
+createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_lasso.png"))
+createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_Lasso.min.png"))
+createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_Lasso.1se.png"))
 ```
 
 

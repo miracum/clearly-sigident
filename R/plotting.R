@@ -100,3 +100,31 @@ colorHeatmap_ <- function(mergeset, targetcol, controlname){
   )
 }
 
+createROCplot_ <- function(roc, filename){
+  shiny::plotPNG({
+    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
+    return(print({graphics::plot(roc)
+                 graphics::text(0.4, 0, paste0("AUC: ", round(roc$auc, 4)))
+                 }
+    ))
+  },
+  filename = filename,
+  height = 1000,
+  width = 1500)
+}
+
+
+createCVPlot_ <- function(cv_obj, filename){
+  # time == "before" or "after"
+  shiny::plotPNG({
+    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
+    return(print(
+      graphics::plot(cv_obj)
+    ))
+  },
+  filename = filename,
+  height = 400,
+  width = 450)
+}
+
+

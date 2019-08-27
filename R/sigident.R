@@ -11,7 +11,7 @@
 #'
 #' @export
 
-sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targetname, species, deg.q.selection = NULL){
+sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targetname, species, deg.q.selection = NULL, seed = 111, traintest.split = 0.8){
   #TODO only for debugging
   plotdir <- "./tests/testthat/plots"
   csvdir <- "./tests/testthat/csvs"
@@ -23,6 +23,8 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
   OrgDb <- "org.Hs.eg.db"
   organism <- "hsa"
   pathwayid <- "hsa04110"
+  seed <- 111
+  traintest.split <- 0.8
 
   #TODO only for debugging
   load("./tests/testthat/testdata/esets.RData")
@@ -38,7 +40,10 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
     is.character(targetname),
     is.character(targetcol),
     is.character(species),
-    is.numeric(deg.q.selection) | is.null(deg.q.selection)
+    is.numeric(deg.q.selection) | is.null(deg.q.selection),
+    is.numeric(seed),
+    is.numeric(traintest.split),
+    traintest.split < 1 & traintest.split > 0
   )
 
   # create internal list for storage
@@ -62,6 +67,10 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
   # create output directories
   dir.create(rv$plotdir)
   dir.create(rv$csvdir)
+
+  # store seed, traintest.split
+  rv$seed <- seed
+  rv$traintest.split <- traintest.split
 
   ### Fileimport ###
   # add mergedset to list
@@ -144,4 +153,21 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
   createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$kegg, type = "KEGG", filename = paste0(rv$plotdir, "Enriched_KEGG.png"))
 
 
+  # identification of Diagnostic Signature
+  # first, create training_list
+  rv$training_list <- createTrainingTest_(rv$diagnosis, rv$combat, split = rv$traintest.split, seed = rv$seed)
+
+
+  # Lasso regression
+  rv$diagnostic_lasso <- glmnetSignature_(traininglist = rv$training_list, alpha = 1, nfolds = 10, seed = rv$seed)
+  createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV, filename = paste0(rv$plotdir, "CV_lasso.png"))
+  createROCplot_(roc = rv$diagnostic_lasso$roc.min, filename = paste0(rv$plotdir, "ROC_Lasso.min.png"))
+  createROCplot_(roc = rv$diagnostic_lasso$roc.1se, filename = paste0(rv$plotdir, "ROC_Lasso.1se.png"))
+
+
+  # Elastic net regression
+  rv$diagnostic_elasticnet <- glmnetSignature_(traininglist = rv$training_list, alpha = 0.9, nfolds = 10, seed = rv$seed)
+  createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV, filename = paste0(rv$plotdir, "CV_lasso.png"))
+  createROCplot_(roc = rv$diagnostic_lasso$roc.min, filename = paste0(rv$plotdir, "ROC_Lasso.min.png"))
+  createROCplot_(roc = rv$diagnostic_lasso$roc.1se, filename = paste0(rv$plotdir, "ROC_Lasso.1se.png"))
 }
