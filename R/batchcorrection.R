@@ -1,11 +1,12 @@
 # create design
-createDiagnosisDesign_ <- function(mergeset, controlname, targetname){
+createDiagnosisDesign_ <- function(mergeset, controlname, targetname, targetcol){
   stopifnot(
     is.character(controlname),
-    is.character(targetname)
+    is.character(targetname),
+    is.character(targetcol)
   )
 
-  diag <- as.vector(mergeset$Tumor)
+  diag <- as.vector(mergeset[[targetcol]])
 
   diagnosis <- gsub(controlname, "0", diag)
   diagnosis <- gsub(targetname, "1", diagnosis)

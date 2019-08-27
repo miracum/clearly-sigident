@@ -73,7 +73,7 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
 
   ### Batchcorrection ###
   # get diagnosis and design
-  dd <- createDiagnosisDesign_(mergeset = rv$mergeset, controlname = rv$controlname, targetname = rv$targetname)
+  dd <- createDiagnosisDesign_(mergeset = rv$mergeset, controlname = rv$controlname, targetname = rv$targetname, targetcol = rv$targetcol)
   rv$diagnosis <- dd$diagnosis
   rv$design <- dd$design
 

@@ -211,7 +211,7 @@ pathwayid <- "hsa04110"
 # Discovering Batch Effects  
 
 ```{r}
-dd <- sigident::createDiagnosisDesign_(mergeset, controlname, targetname)
+dd <- sigident::createDiagnosisDesign_(mergeset, controlname, targetname, targetcol)
 diagnosis <- dd$diagnosis
 design <- dd$design
 
