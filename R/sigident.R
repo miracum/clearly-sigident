@@ -11,7 +11,7 @@
 #'
 #' @export
 
-sigident <- function(mergedset, plotdir, csvdir, controlname, deg.q.selection = NULL){
+sigidentDNA <- function(mergedset, plotdir, csvdir, controlname, deg.q.selection = NULL){
   #TODO only for debugging
   plotdir <- "./tests/testthat/plots"
 

@@ -51,7 +51,7 @@ eset2 <- GSE19804[[1]]
 # actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
 
 GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
-utils::untar("./GSE19188/GSE19188_RAW.tar", exdir="./geodata")
+utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir="./geodata")
 cels <- list.files("./geodata/", pattern = "[gz]")
 sapply(paste("./geodata", cels, sep="/"), GEOquery::gunzip)
 cels
@@ -63,7 +63,7 @@ system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
 ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file. 
 ## After this step the normalization can be started. 
 
-celfiles <- affy::ReadAffy(filenames = cels, celfile.path = filePath) 
+celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata") 
 esetC <- gcrma::gcrma(celfiles, fast = TRUE)
 
 # esetC = now is a normalized expressionSet, but without f- and pData

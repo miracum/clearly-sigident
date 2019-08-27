@@ -83,6 +83,8 @@ usethis::use_package("GEOquery", type="Imports")
 usethis::use_package("limma", type="Imports")
 usethis::use_package("affy", type="Imports")
 usethis::use_package("gcrma", type="Imports")
+usethis::use_package("hgu133plus2cdf", type="Imports")
+
 
 # Suggests
 usethis::use_package("testthat", type = "Suggests")
