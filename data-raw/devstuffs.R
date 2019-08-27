@@ -113,3 +113,4 @@ usethis::use_git_ignore(".Rhistory")
 usethis::use_git_ignore(".RData")
 usethis::use_git_ignore("tests/testthat/testdata")
 usethis::use_git_ignore("tests/testthat/plots")
+

@@ -24,23 +24,22 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
   organism <- "hsa"
   pathwayid <- "hsa04110"
 
+  #TODO only for debugging
+  load("./tests/testthat/testdata/esets.RData")
+  esets <- c(eset1b, eset2b, eset3b)
+  mergedset <- mergeEsets_(esets)
+
 
   stopifnot(
-    is.data.frame(mergedset) | data.table::is.data.table(mergedset),
+    class(mergedset) == "ExpressionSet",
     is.character(plotdir),
     is.character(csvdir),
     is.character(controlname),
     is.character(targetname),
     is.character(targetcol),
     is.character(species),
-    is.numeric(deg.q.selection)
+    is.numeric(deg.q.selection) | is.null(deg.q.selection)
   )
-
-
-  #TODO only for debugging
-  load("./tests/testthat/testdata/esets.RData")
-  esets <- c(eset1b, eset2b, eset3b)
-  mergedset <- mergeEsets_(esets)
 
   # create internal list for storage
   rv <- list()

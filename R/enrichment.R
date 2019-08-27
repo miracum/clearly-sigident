@@ -72,11 +72,15 @@ goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, spe
   geneFC$ID <- NULL
 
   # pathview
+  # https://github.com/egeulgen/pathfindR/issues/10
+  require(pathfindR)
+  # workaround to set correct workingdir for pathview
+  oldwd <- getwd()
+  setwd(paste0(oldwd, "/", plotdir))
   p.out1 <- pathview::pathview(gene.data = geneFC,
                                pathway.id = pathwayid,
-                               species = species,
-                               kegg.dir = plotdir,
-                               out.suffix = "image1")
+                               species = species)
+  setwd(oldwd)
 
   return(list(go = ego, kegg = kk, geneFC = geneFC, pathview = p.out1))
 }
