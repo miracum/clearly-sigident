@@ -170,4 +170,7 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
   createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV, filename = paste0(rv$plotdir, "CV_elasticNet.png"))
   createROCplot_(roc = rv$diagnostic_lasso$roc.min, filename = paste0(rv$plotdir, "ROC_elasticNet.min.png"))
   createROCplot_(roc = rv$diagnostic_lasso$roc.1se, filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png"))
+
+  # with both calculated hyperparameters alpha and lambda applying grid search
+
 }

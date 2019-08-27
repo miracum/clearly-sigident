@@ -223,7 +223,7 @@ combat <- sigident::createCombat_(DF, batch, design)
 
 gPCA_before <- sigident::batchCorrection_(DF, batch)
 filename <- paste0(plotdir, "PCplot_before.png")
-createBatchPlot_(gPCA_before, filename, "before")
+sigident::createBatchPlot_(gPCA_before, filename, "before")
 ```
 
 ```{r}
@@ -233,7 +233,7 @@ knitr::include_graphics(filename)
 ```{r}
 gPCA_after <- sigident::batchCorrection_(combat, batch)
 filename <- paste0(plotdir, "PCplot_after.png")
-createBatchPlot_(gPCA_after, filename, "after")
+sigident::createBatchPlot_(gPCA_after, filename, "after")
 ```
 
 ```{r}
@@ -251,8 +251,8 @@ genes <- sigident::identify.DEGs(BatchRemovedExprs = combat, design = design, qV
 # heatmap creation
 filename <- paste0(plotdir, "DEG_heatmap.png")
 # create colors for map
-ht_colors <- colorHeatmap_(mergeset, targetcol, controlname)
-createDEGheatmap_(combat, genes, ht_colors, filename)
+ht_colors <- sigident::colorHeatmap_(mergeset, targetcol, controlname)
+sigident::createDEGheatmap_(combat, genes, ht_colors, filename)
 ```
 
 ```{r}
@@ -260,8 +260,8 @@ knitr::include_graphics(filename)
 ```
 
 ```{r}
-genelist <- geneMapping_(mergeset, genes)
-deg_info <- exportDEGannotations_(mergeset, genes)
+genelist <- sigident::geneMapping_(mergeset, genes)
+deg_info <- sigident::exportDEGannotations_(mergeset, genes)
 data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
@@ -270,7 +270,7 @@ knitr::kable(deg_info)
 ```
 
 ```{r}
-deg_results <- limmaTopTable_(BatchRemovedExprs = combat, design = design, qValue = deg_q)
+deg_results <- sigident::limmaTopTable_(BatchRemovedExprs = combat, design = design, qValue = deg_q)
 data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
@@ -281,33 +281,33 @@ knitr::kable(deg_results)
 # Gene enrichment 
 
 ```{r}
-deg_entrez <- enrichmentDataSelection_(mergeset, genes)
+deg_entrez <- sigident::enrichmentDataSelection_(mergeset, genes)
 ```
 
 
 ## Test for over-representation 
 
 ```{r}
-enr_topgo <- extractGOterms_(entrez = deg_entrez, species = species)
+enr_topgo <- sigident::extractGOterms_(entrez = deg_entrez, species = species)
 ```
 ```{r}
 knitr::kable(enr_topgo)
 ```
 
 ```{r}
-enr_topkegg <- extractKEGGterms_(entrez = deg_entrez, species = species)
+enr_topkegg <- sigident::extractKEGGterms_(entrez = deg_entrez, species = species)
 ```
 ```{r}
 knitr::kable(enr_topkegg)
 ```
 
 ```{r}
-enr_fitlm <- goDiffReg_(mergeset = mergeset, BatchRemovedExprs = combat, design = design)
+enr_fitlm <- sigident::goDiffReg_(mergeset = mergeset, BatchRemovedExprs = combat, design = design)
 
-enr_fitlm_topgo <- extractGOterms_(entrez = enr_fitlm, species = species, FDR = 0.01)
+enr_fitlm_topgo <- sigident::extractGOterms_(entrez = enr_fitlm, species = species, FDR = 0.01)
 data.table::fwrite(enr_fitlm_topgo, paste0(csvdir, "Top_GO_fitlm.csv"))
 
-enr_fitlm_topkegg <- extractKEGGterms_(entrez = enr_fitlm, species = species)
+enr_fitlm_topkegg <- sigident::extractKEGGterms_(entrez = enr_fitlm, species = species)
 data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 ```
 
@@ -315,24 +315,30 @@ data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 ## GO Analysis
 
 ```{r}
-enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez,
-                                      OrgDB = orgdb,
-                                      organism = organism,
-                                      fitlm = enr_fitlm,
-                                      pathwayid = pathwayid,
-                                      species = organism,
-                                      plotdir = plotdir)
+enr_analysis <- sigident::goEnrichmentAnalysis_(entrez = deg_entrez,
+                                                OrgDB = orgdb,
+                                                organism = organism,
+                                                fitlm = enr_fitlm,
+                                                pathwayid = pathwayid,
+                                                species = organism,
+                                                plotdir = plotdir)
 ```
 ```{r}
 filename <- paste0(plotdir, "/", organism, ".png")
 ```
 ```{r}
+knitr::include_graphics(filename)
+```
+```{r}
 filename <- paste0(plotdir, "/", organism, ".image1.png")
+```
+```{r}
+knitr::include_graphics(filename)
 ```
 
 ```{r}
 filename <- paste0(plotdir, "Enriched_GO.png")
-createEnrichtedBarplot_(enrichmentobj = enr_analysis$go, type = "GO", filename = filename)
+sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$go, type = "GO", filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -340,7 +346,7 @@ knitr::include_graphics(filename)
 
 ```{r}
 filename <- paste0(plotdir, "Enriched_KEGG.png")
-createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg, type = "KEGG", filename = filename)
+sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg, type = "KEGG", filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -352,25 +358,25 @@ knitr::include_graphics(filename)
 ## Split data into training and test dataset
 
 ```{r}
-training_list <- createTrainingTest_(diagnosis, combat, split = traintest.split, seed = seed)
+training_list <- sigident::createTrainingTest_(diagnosis, combat, split = traintest.split, seed = seed)
 ```
 
 ## Lasso regression
 
 ```{r}
-diagnostic_lasso <- glmnetSignature_(traininglist = training_list, alpha = 1, nfolds = 10, seed = seed)
-createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_lasso.png"))
-createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_Lasso.min.png"))
-createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_Lasso.1se.png"))
+diagnostic_lasso <- sigident::glmnetSignature_(traininglist = training_list, alpha = 1, nfolds = 10, seed = seed)
+sigident::createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_lasso.png"))
+sigident::createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_Lasso.min.png"))
+sigident::createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_Lasso.1se.png"))
 ```
 
 ## Elastic net regression 
 
 ```{r}
-diagnostic_elasticnet <- glmnetSignature_(traininglist = training_list, alpha = 0.9, nfolds = 10, seed = seed)
-createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_elasticNet.png"))
-createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_elasticNet.min.png"))
-createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_elasticNet.1se.png"))
+diagnostic_elasticnet <- sigident::glmnetSignature_(traininglist = training_list, alpha = 0.9, nfolds = 10, seed = seed)
+sigident::createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_elasticNet.png"))
+sigident::createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_elasticNet.min.png"))
+sigident::createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_elasticNet.1se.png"))
 ```
 
 
