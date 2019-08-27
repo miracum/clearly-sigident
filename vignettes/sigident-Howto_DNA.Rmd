@@ -30,10 +30,6 @@ This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which 
 # initialize filePath:
 filePath <- tempdir()
 dir.create("./geodata/")
-plotdir <- "./plots/"
-dir.create(plotdir)
-csvdir <- "./csv/"
-dir.create(csvdir)
 
 #--------------#
 ###### 1. Download of GEO datasets & Normalization #####
@@ -192,13 +188,32 @@ knitr::include_graphics(filename)
 ```
 
 
+# Preparations for utilizing the package 
+
+These variables need to be defined for the package functions to work. One could use them also as arguments directly in the respective function. However, we think it is more clearly to define them here at the beginning and to refer at each function to the respective variable.  
+
+
+```{r}
+plotdir <- "./plots/"
+dir.create(plotdir)
+csvdir <- "./csv/"
+dir.create(csvdir)
+targetcol <- "Tumor"
+controlname <- "Control"
+targetname <- "Lung Cancer"
+species <- "Hs"
+OrgDb <- "org.Hs.eg.db"
+organism <- "hsa"
+pathwayid <- "hsa04110"
+```
+
 
 # Discovering Batch Effects  
 
 ```{r}
-dd <- sigident::createDiagnosisDesign_(mergeset, controlname = "Control", targetname = "Lung Cancer")
-diagnosis <- dd[["diagnosis"]]
-design <- dd[["design"]]
+dd <- sigident::createDiagnosisDesign_(mergeset, controlname, targetname)
+diagnosis <- dd$diagnosis
+design <- dd$design
 
 DF <- sigident::createDataMatrix_(mergeset)
 batch <- sigident::createBatch_(eset1b, eset2b, eset3b)
@@ -234,7 +249,7 @@ genes <- sigident::identify.DEGs(BatchRemovedExprs = combat, design = design, qV
 # heatmap creation
 filename <- paste0(plotdir, "DEG_heatmap.png")
 # create colors for map
-ht_colors <- unlist(lapply(mergeset$Tumor, colorHeatmap_, controlname)) # cancer = red
+ht_colors <- colorHeatmap_(mergeset, targetcol, controlname)
 createDEGheatmap_(combat, genes, ht_colors, filename)
 ```
 
@@ -249,7 +264,7 @@ data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
 ```{r}
-head(deg_info)
+knitr::kable(deg_info)
 ```
 
 ```{r}
@@ -258,5 +273,64 @@ data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
 ```{r}
-head(deg_results)
+knitr::kable(deg_results)
 ```
+
+# Gene enrichment 
+
+```{r}
+deg_entrez <- enrichmentDataSelection_(mergeset, genes)
+```
+
+
+## Test for over-representation 
+
+```{r}
+enr_topgo <- extractGOterms_(entrez = deg_entrez, species = species)
+```
+```{r}
+knitr::kable(enr_topgo)
+```
+
+```{r}
+enr_topkegg <- extractKEGGterms_(entrez = deg_entrez, species = species)
+```
+```{r}
+knitr::kable(enr_topkegg)
+```
+
+```{r}
+enr_fitlm <- goDiffReg_(mergeset = mergeset, BatchRemovedExprs = combat, design = design)
+
+enr_fitlm_topgo <- extractGOterms_(entrez = enr_fitlm, species = species, FDR = 0.01)
+data.table::fwrite(enr_fitlm_topgo, paste0(csvdir, "Top_GO_fitlm.csv"))
+
+enr_fitlm_topkegg <- extractKEGGterms_(entrez = enr_fitlm, species = species)
+data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
+```
+
+
+## GO Analysis
+
+```{r}
+enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez, OrgDB = orgdb, organism = organism, fitlm = enr_fitlm, pathwayid = pathwayid, species = organism)
+```
+
+
+```{r}
+filename <- paste0(plotdir, "Enriched_GO.png")
+createEnrichtedBarplot_(enrichmentobj = enr_analysis$go, type = "GO", filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
+
+```{r}
+filename <- paste0(plotdir, "Enriched_KEGG.png")
+createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg, type = "KEGG", filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
+
+

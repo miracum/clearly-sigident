@@ -12,8 +12,8 @@ createImportHistogram_ <- function(mergeset, filename = NULL){
     ))
   },
   filename = filename,
-  height = 400,
-  width = 450)
+  height = 1000,
+  width = 1500)
 }
 
 
@@ -34,8 +34,8 @@ createBatchPlot_ <- function(correction_obj, filename = NULL, time){
     ))
   },
   filename = filename,
-  height = 400,
-  width = 450)
+  height = 1000,
+  width = 1500)
 }
 
 
@@ -63,11 +63,40 @@ createDEGheatmap_ <- function(combat, genes, patientcolors, filename = NULL){
     ))
   },
   filename = filename,
-  height = 400,
-  width = 450)
+  height = 1000,
+  width = 1500)
 }
 
-colorHeatmap_ <- function(tumor, controlname){
-  # healthy lung=blue
-  if(Tumor==controlname) "#0000FF" else "#FF0000"
+
+createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCategory = 20){
+  stopifnot(
+    is.character(type),
+    type %in% c("GO", "KEGG")
+  )
+  if (is.null(filename)){
+    filename <- paste0("./plots/Enriched_", type, ".png")
+    if (!dir.exists("./plots/")){
+      dir.create("./plots/")
+    }
+  }
+  shiny::plotPNG({
+    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
+    return(print(graphics::barplot(enrichmentobj, showCategory = showCategory) +
+                   ggplot2::ggtitle(paste0("Enriched ", type, " terms")) +
+                   ggplot2::ylab("Gene count")
+                 ))
+  },
+  filename = filename,
+  height = 1000,
+  width = 1500)
 }
+
+colorHeatmap_ <- function(mergeset, targetcol, controlname){
+  return(
+    unlist(lapply(mergeset[[targetcol]], function(tumor){
+      # healthy=blue
+      return(ifelse(tumor==controlname, "#0000FF", "#FF0000"))
+    }))
+  )
+}
+
