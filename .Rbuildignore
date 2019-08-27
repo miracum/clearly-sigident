@@ -9,3 +9,4 @@
 ^vignette/GSE19188$
 ^tests/testthat/testdata$
 ^tests/testthat/plots$
+^\.RData$

@@ -29,7 +29,17 @@ goDiffReg_ <- function(mergeset, BatchRemovedExprs, design){
   return(fitLimma_(edata, design))
 }
 
-goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, species){
+goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, species, plotdir = NULL){
+
+  if (is.null(plotdir)){
+    plotdir <- "./plots/"
+    if (!dir.exists("./plots/")){
+      dir.create("./plots/")
+    }
+  } else {
+    plotdir <- cleanPathName_(plotdir)
+  }
+
   # TODO is this always like this?
   ego <- clusterProfiler::enrichGO(gene = entrez,
                                    OrgDb = OrgDB,
@@ -62,7 +72,11 @@ goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, spe
   geneFC$ID <- NULL
 
   # pathview
-  p.out1 <- pathview::pathview(gene.data = geneFC, pathway.id = pathwayid, species = species, out.suffix = "image1")
+  p.out1 <- pathview::pathview(gene.data = geneFC,
+                               pathway.id = pathwayid,
+                               species = species,
+                               kegg.dir = plotdir,
+                               out.suffix = "image1")
 
   return(list(go = ego, kegg = kk, geneFC = geneFC, pathview = p.out1))
 }

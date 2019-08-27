@@ -313,9 +313,20 @@ data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 ## GO Analysis
 
 ```{r}
-enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez, OrgDB = orgdb, organism = organism, fitlm = enr_fitlm, pathwayid = pathwayid, species = organism)
+enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez,
+                                      OrgDB = orgdb,
+                                      organism = organism,
+                                      fitlm = enr_fitlm,
+                                      pathwayid = pathwayid,
+                                      species = organism,
+                                      plotdir = plotdir)
 ```
-
+```{r}
+filename <- paste0(plotdir, "/", organism, ".png")
+```
+```{r}
+filename <- paste0(plotdir, "/", organism, ".image1.png")
+```
 
 ```{r}
 filename <- paste0(plotdir, "Enriched_GO.png")

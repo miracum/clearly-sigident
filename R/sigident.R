@@ -36,6 +36,12 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
     is.numeric(deg.q.selection)
   )
 
+
+  #TODO only for debugging
+  load("./tests/testthat/testdata/esets.RData")
+  esets <- c(eset1b, eset2b, eset3b)
+  mergedset <- mergeEsets_(esets)
+
   # create internal list for storage
   rv <- list()
 
@@ -57,11 +63,6 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
   # create output directories
   dir.create(rv$plotdir)
   dir.create(rv$csvdir)
-
-  #TODO only for debugging
-  load("./tests/testthat/testdata/esets.RData")
-  esets <- c(eset1b, eset2b, eset3b)
-  mergedset <- mergeEsets_(esets)
 
   ### Fileimport ###
   # add mergedset to list
@@ -131,7 +132,14 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
   data.table::fwrite(rv$enr_fitlm_topkegg, paste0(rv$csvdir, "Top_KEGG_fitlm.csv"))
 
   # perform enrichment analysis
-  rv$enr_analysis <- goEnrichmentAnalysis_(entrez = rv$deg_entrez, OrgDB = rv$orgdb, organism = rv$organism, fitlm = rv$enr_fitlm, pathwayid = rv$pathwayid, species = rv$organism)
+  rv$enr_analysis <- goEnrichmentAnalysis_(entrez = rv$deg_entrez,
+                                           OrgDB = rv$orgdb,
+                                           organism = rv$organism,
+                                           fitlm = rv$enr_fitlm,
+                                           pathwayid = rv$pathwayid,
+                                           species = rv$organism,
+                                           plotdir = rv$plotdir)
+
   # plotting enrichmentanalysis
   createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$go, type = "GO", filename = paste0(rv$plotdir, "Enriched_GO.png"))
   createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$kegg, type = "KEGG", filename = paste0(rv$plotdir, "Enriched_KEGG.png"))
