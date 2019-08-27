@@ -167,7 +167,7 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
 
   # Elastic net regression
   rv$diagnostic_elasticnet <- glmnetSignature_(traininglist = rv$training_list, alpha = 0.9, nfolds = 10, seed = rv$seed)
-  createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV, filename = paste0(rv$plotdir, "CV_lasso.png"))
-  createROCplot_(roc = rv$diagnostic_lasso$roc.min, filename = paste0(rv$plotdir, "ROC_Lasso.min.png"))
-  createROCplot_(roc = rv$diagnostic_lasso$roc.1se, filename = paste0(rv$plotdir, "ROC_Lasso.1se.png"))
+  createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV, filename = paste0(rv$plotdir, "CV_elasticNet.png"))
+  createROCplot_(roc = rv$diagnostic_lasso$roc.min, filename = paste0(rv$plotdir, "ROC_elasticNet.min.png"))
+  createROCplot_(roc = rv$diagnostic_lasso$roc.1se, filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png"))
 }

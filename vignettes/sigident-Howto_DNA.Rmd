@@ -368,9 +368,9 @@ createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_L
 
 ```{r}
 diagnostic_elasticnet <- glmnetSignature_(traininglist = training_list, alpha = 0.9, nfolds = 10, seed = seed)
-createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_lasso.png"))
-createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_Lasso.min.png"))
-createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_Lasso.1se.png"))
+createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_elasticNet.png"))
+createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_elasticNet.min.png"))
+createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_elasticNet.1se.png"))
 ```
 
 
