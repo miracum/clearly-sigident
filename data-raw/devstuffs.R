@@ -74,6 +74,8 @@ usethis::use_package("pROC", type="Imports")
 usethis::use_package("utils", type="Imports")
 usethis::use_package("methods", type="Imports")
 usethis::use_package("caret", type="Imports")
+usethis::use_package("parallel", type="Imports")
+usethis::use_package("doParallel", type="Imports")
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700

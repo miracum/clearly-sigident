@@ -159,18 +159,45 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
 
 
   # Lasso regression
-  rv$diagnostic_lasso <- glmnetSignature_(traininglist = rv$training_list, alpha = 1, nfolds = 10, seed = rv$seed)
+  rv$diagnostic_lasso <- glmnetSignature_(traininglist = rv$training_list, type = "lasso", nfolds = 10, seed = rv$seed)
   createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV, filename = paste0(rv$plotdir, "CV_lasso.png"))
   createROCplot_(roc = rv$diagnostic_lasso$roc.min, filename = paste0(rv$plotdir, "ROC_Lasso.min.png"))
   createROCplot_(roc = rv$diagnostic_lasso$roc.1se, filename = paste0(rv$plotdir, "ROC_Lasso.1se.png"))
 
 
   # Elastic net regression
-  rv$diagnostic_elasticnet <- glmnetSignature_(traininglist = rv$training_list, alpha = 0.9, nfolds = 10, seed = rv$seed)
-  createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV, filename = paste0(rv$plotdir, "CV_elasticNet.png"))
-  createROCplot_(roc = rv$diagnostic_lasso$roc.min, filename = paste0(rv$plotdir, "ROC_elasticNet.min.png"))
-  createROCplot_(roc = rv$diagnostic_lasso$roc.1se, filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png"))
+  rv$diagnostic_elasticnet <- glmnetSignature_(traininglist = rv$training_list, type = "elastic", alpha = 0.9, nfolds = 10, seed = rv$seed)
+  createCVPlot_(cv_obj = rv$diagnostic_elasticnet$fitCV, filename = paste0(rv$plotdir, "CV_elasticNet.png"))
+  createROCplot_(roc = rv$diagnostic_elasticnet$roc.min, filename = paste0(rv$plotdir, "ROC_elasticNet.min.png"))
+  createROCplot_(roc = rv$diagnostic_elasticnet$roc.1se, filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png"))
 
   # with both calculated hyperparameters alpha and lambda applying grid search
+  rv$diagnostic_glmGrid <- glmnetSignature_(traininglist = rv$training_list, type = "grid", nfolds = 10, seed = rv$seed)
+  # plot model of gridsearch
+  createGridModelPlot_(model = rv$diagnostic_glmGrid$caret.train, filename = paste0(rv$plotdir, "Gridsearch_model.png"))
+  # plot variable importance of gridsearch
+  createGridVarImpPlot_(model = rv$diagnostic_glmGrid$caret.train, filename = paste0(rv$plotdir, "Gridsearch_variable_importance.png"))
+  # create roc plot
+  createROCplot_(roc = rv$diagnostic_glmGrid$roc.elasticNet, filename = paste0(rv$plotdir, "ROC_elasticNet.grid.png"))
 
+
+  # compare aucs
+  model.list <- list(
+    lasso.min = list(model = rv$diagnostic_lasso$lambda.min,
+                     confmat = rv$diagnostic_lasso$confmat.min,
+                     auc = as.numeric(rv$diagnostic_lasso$roc.min$auc)),
+    lasso.1se = list(model = rv$diagnostic_lasso$lambda.1se,
+                     confmat = rv$diagnostic_lasso$confmat.1se,
+                     auc = as.numeric(rv$diagnostic_lasso$roc.1se$auc)),
+    elastic.min = list(model = rv$diagnostic_elasticnet$lambda.min,
+                       confmat = rv$diagnostic_elasticnet$confmat.min,
+                       auc = as.numeric(rv$diagnostic_elasticnet$roc.min$auc)),
+    elastic.1se = list(model = rv$diagnostic_elasticnet$lambda.1se,
+                       confmat = rv$diagnostic_elasticnet$confmat.1se,
+                       auc = as.numeric(rv$diagnostic_elasticnet$roc.1se$auc)),
+    elastic.grid = list(model = rv$diagnostic_glmGrid$elasticNet.auto,
+                        confmat = rv$diagnostic_glmGrid$confmat.elasticNet,
+                        auc = as.numeric(rv$diagnostic_glmGrid$roc.elasticNet$auc))
+  )
+  return(model.list)
 }

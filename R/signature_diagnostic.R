@@ -37,7 +37,7 @@ buildPredictiveGLM_ <- function(train.x, train.y, alpha, fitCV){
 }
 
 
-predictGLM_ <- function(model, test.x, s, type){
+predictGLM_ <- function(model, test.x, s = NULL, type){
   outdat <- as.factor(glmnet::predict.glmnet(
     model,
     newx=test.x,
@@ -51,54 +51,168 @@ calcROC_ <- function(test.y, prediction){
   return(pROC::roc(response = as.numeric(as.character(test.y)), predictor = as.numeric(as.character(prediction))))
 }
 
+glmPrediction_ <- function(model, test.x, test.y, s = NULL){
 
-
-glmnetSignature_ <- function(traininglist, alpha = 0.9, nfolds = 10, seed){
   # initialize outlist
   outlist <- list()
 
+  # Calculate prediction
+  outlist$predicted <- predictGLM_(model = model,
+                                   test.x = test.x,
+                                   s = s,
+                                   type = "class")
+
+  # Generate Confusion Matrix
+  outlist$confmat <- caret::confusionMatrix(data = factor(ifelse(as.numeric(as.character(outlist$predicted)) < 0.5, 0, 1)),
+                                            reference = test.y,
+                                            positive = "1") # determine the true case with the 'positive' argument
+  # Calculate Roc
+  outlist$roc <- calcROC_(test.y = test.y,
+                          prediction = outlist$predicted)
+
+  return(outlist)
+}
+
+
+
+glmnetSignature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
+
+  stopifnot(
+    type %in% c("grid", "lasso", "elastic", "ridge")
+  )
+
+  if (type == "grid"){
+    outlist <- glmnetGridSearch_(traininglist, seed)
+  } else {
+
+    # use provided alpha only in elastic
+    if (type == "lasso"){
+      alpha <- 1
+    } else if (type == "ridge"){
+      alpha <- 0
+    } else if (type == "elastic"){
+      stopifnot(!is.null(alpha))
+    }
+
+    # initialize outlist
+    outlist <- list()
+
+
+    # go parallel
+    ncores <- parallel::detectCores()
+    cl <- parallel::makeCluster(ncores)
+    doParallel::registerDoParallel(cl)
+
+    set.seed(seed)
+    outlist$fitCV <- glmnet::cv.glmnet(traininglist$train$x,
+                                       traininglist$train$y,
+                                       family = "binomial",
+                                       type.measure = "mse",
+                                       nfolds = nfolds,
+                                       alpha = alpha,
+                                       parallel = TRUE)
+    # stop parallel computation
+    parallel::stopCluster(cl)
+    gc()
+
+    # build the predictive models utilizing calculated lambda values
+    glmpred <- buildPredictiveGLM_(traininglist$train$x,
+                                   traininglist$train$y,
+                                   alpha = alpha,
+                                   fitCV = outlist$fitCV)
+    outlist$lambda.min <- glmpred$lambda.min
+    outlist$lambda.1se <- glmpred$lambda.1se
+
+
+    # predict the response variable (diagnosis) of the test data
+    # min
+    pred.min <- glmPrediction_(model = outlist$lambda.min,
+                               test.x = traininglist$test$x,
+                               test.y = traininglist$test$y,
+                               s = outlist$fitCV$lambda.min)
+
+    outlist$predicted.min <- pred.min$prediction
+    outlist$confmat.min <- pred.min$confmat
+    outlist$roc.min <- pred.min$roc
+
+
+    # 1se
+    pred.1se <- glmPrediction_(model = outlist$lambda.1se,
+                               test.x = traininglist$test$x,
+                               test.y = traininglist$test$y,
+                               s = outlist$fitCV$lambda.1se)
+
+    outlist$predicted.1se <- pred.1se$prediction
+    outlist$confmat.1se <- pred.1se$confmat
+    outlist$roc.1se <- pred.1se$roc
+  }
+
+  return(outlist)
+}
+
+
+initGridSearch_ <- function(){
+  # set up alpha and lambda grid to search for pair that minimizes CV erros
+  lambda.grid <- 10^seq(0, -4, length = 100)
+  alpha.grid <- seq(0.1, 1, length=10)
+
+  # set up cross validation method for train function
+  trnCtrl=caret::trainControl(
+    method = "repeatedcv",
+    number=10
+  )
+
+  srchGrd=expand.grid(
+    .alpha = alpha.grid,
+    .lambda = lambda.grid
+  )
+
+  # set up search grid for alpha and lambda parameters
+  return(list(srchGrd=srchGrd, trnCtrl=trnCtrl))
+}
+
+
+glmnetGridSearch_ <- function(traininglist, seed){
+
+  # initialize outlist
+  outlist <- list()
+
+  # initialize gridserach parameters
+  gr.init <- initGridSearch_()
+
+  # go parallel
+  ncores <- parallel::detectCores()
+  cl <- parallel::makeCluster(ncores)
+  doParallel::registerDoParallel(cl)
+
+  # perform cv forecasting
   set.seed(seed)
-  outlist$fitCV <- glmnet::cv.glmnet(traininglist$train$x,
-                                     traininglist$train$y,
-                                     family = "binomial",
-                                     type.measure = "mse",
-                                     nfolds = nfolds,
-                                     alpha = alpha)
+  outlist$caret.train <- caret::train(x = traininglist$train$x,
+                                      y = as.factor(traininglist$train$y),
+                                      method = "glmnet",
+                                      family = "binomial",
+                                      tuneGrid = gr.init$srchGrd,
+                                      trControl = gr.init$trnCtrl,
+                                      standardize = TRUE,
+                                      maxit = 1e7)
+  # stop parallel computation
+  parallel::stopCluster(cl)
+  gc()
 
-  # build the predictive models utilizing calculated lambda values
-  glmpred <- buildPredictiveGLM_(traininglist$train$x,
-                                 traininglist$train$y,
-                                 alpha = alpha,
-                                 fitCV = outlist$fitCV)
-  outlist$lambda.min <- glmpred$lambda.min
-  outlist$lambda.1se <- glmpred$lambda.1se
+  outlist$elasticNet.auto <- performGLMnet_(train.x = traininglist$train$x,
+                                            train.y = traininglist$train$y,
+                                            alpha = outlist$caret.train$bestTune$alpha,
+                                            lambda = outlist$caret.train$bestTune$lambda)
 
+  # prediction
+  pred.elasticNet <- glmPrediction_(model = outlist$elasticNet.auto,
+                             test.x = traininglist$test$x,
+                             test.y = traininglist$test$y,
+                             s = NULL)
 
-  # predict the response variable (diagnosis) of the test data
-  # min
-  outlist$predicted.min <- predictGLM_(model = outlist$lambda.min,
-                                       test.x=traininglist$test$x,
-                                       s=outlist$fitCV$lambda.min,
-                                       type = "class")
-  outlist$confmat.min <- caret::confusionMatrix(data = factor(ifelse(as.numeric(as.character(outlist$predicted.min)) < 0.5, 0, 1)),
-                                                reference = traininglist$test$y,
-                                                positive = "1") # determine the true case with the 'positive' argument
-  # Calculate Roc (min)
-  outlist$roc.min <- calcROC_(test.y = traininglist$test$y,
-                              prediction = outlist$predicted.min)
-
-
-  # 1se
-  outlist$predicted.1se <- predictGLM_(model = outlist$lambda.1se,
-                                       test.x=traininglist$test$x,
-                                       s=outlist$fitCV$lambda.1se,
-                                       type = "class")
-  outlist$confmat.1se <- caret::confusionMatrix(data = factor(ifelse(as.numeric(as.character(outlist$predicted.1se)) < 0.5, 0, 1)),
-                                                reference = traininglist$test$y,
-                                                positive = "1") # determine the true case with the 'positive' argument
-  # Calculate Roc (1se)
-  outlist$roc.1se <- calcROC_(test.y = traininglist$test$y,
-                              prediction = outlist$predicted.1se)
+  outlist$predicted.elasticNet <- pred.elasticNet$prediction
+  outlist$confmat.elasticNet <- pred.elasticNet$confmat
+  outlist$roc.elasticNet <- pred.elasticNet$roc
 
   return(outlist)
 }

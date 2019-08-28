@@ -364,19 +364,86 @@ training_list <- sigident::createTrainingTest_(diagnosis, combat, split = traint
 ## Lasso regression
 
 ```{r}
-diagnostic_lasso <- sigident::glmnetSignature_(traininglist = training_list, alpha = 1, nfolds = 10, seed = seed)
-sigident::createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_lasso.png"))
-sigident::createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_Lasso.min.png"))
-sigident::createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_Lasso.1se.png"))
+diagnostic_lasso <- sigident::glmnetSignature_(traininglist = training_list, type = "lasso", nfolds = 10, seed = seed)
+filename <- paste0(plotdir, "CV_lasso.png")
+sigident::createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = filename)
 ```
+```{r}
+knitr::include_graphics(filename)
+```
+
+```{r}
+filename <- paste0(plotdir, "ROC_Lasso.min.png")
+sigident::createROCplot_(roc = diagnostic_lasso$roc.min, filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
+
+```{r}
+filename <- paste0(plotdir, "ROC_Lasso.1se.png")
+sigident::createROCplot_(roc = diagnostic_lasso$roc.1se, filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
+
 
 ## Elastic net regression 
 
 ```{r}
-diagnostic_elasticnet <- sigident::glmnetSignature_(traininglist = training_list, alpha = 0.9, nfolds = 10, seed = seed)
-sigident::createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = paste0(plotdir, "CV_elasticNet.png"))
-sigident::createROCplot_(roc = diagnostic_lasso$roc.min, filename = paste0(plotdir, "ROC_elasticNet.min.png"))
-sigident::createROCplot_(roc = diagnostic_lasso$roc.1se, filename = paste0(plotdir, "ROC_elasticNet.1se.png"))
+diagnostic_elasticnet <- sigident::(traininglist = training_list, type = "elastic", alpha = 0.9, nfolds = 10, seed = seed)
+filename <- paste0(plotdir, "CV_elasticNet.png")
+sigident::createCVPlot_(cv_obj = diagnostic_elasticnet$fitCV, filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
 ```
 
+```{r}
+filename <- paste0(plotdir, "ROC_elasticNet.min.png")
+sigident::createROCplot_(roc = diagnostic_elasticnet$roc.min, filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
+
+```{r}
+filename <- paste0(plotdir, "ROC_elasticNet.1se.png")
+sigident::createROCplot_(roc = diagnostic_elasticnet$roc.1se, filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
+
+
+## Gridsearch to find alpha and lambda
+
+```{r}
+diagnostic_glmGrid <- sigident::glmnetSignature_(traininglist = training_list, type = "grid", nfolds = 10, seed = seed)
+# plot model of gridsearch
+filename <- paste0(plotdir, "Gridsearch_model.png")
+sigident::createGridModelPlot_(model = diagnostic_glmGrid$caret.train, filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
+
+```{r}
+# plot variable importance of gridsearch
+filename <- paste0(plotdir, "Gridsearch_variable_importance.png")
+sigident::createGridVarImpPlot_(model = diagnostic_glmGrid$caret.train, filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
+
+```{r}
+# create roc plot
+filename <- paste0(plotdir, "ROC_elasticNet.grid.png")
+sigident::createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet, filename = filename)
+```
+```{r}
+knitr::include_graphics(filename)
+```
 

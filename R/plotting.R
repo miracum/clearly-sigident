@@ -6,7 +6,6 @@ createImportHistogram_ <- function(mergeset, filename = NULL){
     }
   }
   shiny::plotPNG({
-    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
     return(print(graphics::boxplot(mergeset@assayData$exprs, main = "Merged data before batch correction",
                                    xlab = "Samples", ylab ="Expression value")
     ))
@@ -26,7 +25,6 @@ createBatchPlot_ <- function(correction_obj, filename = NULL, time){
   }
   # time == "before" or "after"
   shiny::plotPNG({
-    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
     return(print(
       gPCA::PCplot(
         correction_obj, ug="guided", type="1v2", main = paste("gPCA", time, "batch correction")
@@ -46,9 +44,7 @@ createDEGheatmap_ <- function(combat, genes, patientcolors, filename = NULL){
       dir.create("./plots/")
     }
   }
-  # time == "before" or "after"
   shiny::plotPNG({
-    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
     return(print(
       gplots::heatmap.2(combat[genes,],
                         ColSideColors= patientcolors,
@@ -80,7 +76,6 @@ createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCa
     }
   }
   shiny::plotPNG({
-    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
     return(print(graphics::barplot(enrichmentobj, showCategory = showCategory) +
                    ggplot2::ggtitle(paste0("Enriched ", type, " terms")) +
                    ggplot2::ylab("Gene count")
@@ -102,7 +97,6 @@ colorHeatmap_ <- function(mergeset, targetcol, controlname){
 
 createROCplot_ <- function(roc, filename){
   shiny::plotPNG({
-    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
     return(print({graphics::plot(roc)
                  graphics::text(0.4, 0, paste0("AUC: ", round(roc$auc, 4)))
                  }
@@ -115,9 +109,7 @@ createROCplot_ <- function(roc, filename){
 
 
 createCVPlot_ <- function(cv_obj, filename){
-  # time == "before" or "after"
   shiny::plotPNG({
-    # add plot and plot statistics here, "j" is necessary to get values for curve in equations
     return(print(
       graphics::plot(cv_obj)
     ))
@@ -127,4 +119,21 @@ createCVPlot_ <- function(cv_obj, filename){
   width = 450)
 }
 
+createGridModelPlot_ <- function(model, filename){
+  shiny::plotPNG({
+    return(print({graphics::plot(model)}))
+  },
+  filename = filename,
+  height = 1000,
+  width = 1500)
+}
 
+createGridVarImpPlot_ <- function(model, filename){
+  shiny::plotPNG({
+    varImp <- caret::varImp(model)
+    return(print({graphics::plot(varImp, top = 20)}))
+  },
+  filename = filename,
+  height = 1000,
+  width = 1500)
+}
