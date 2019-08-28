@@ -72,10 +72,11 @@ sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targ
   rv$seed <- seed
   rv$traintest.split <- traintest.split
 
-  ### Fileimport ###
   # add mergedset to list
   rv$mergeset <- mergedset
 
+
+  ### Fileimport ###
   # visualize log2 transformed expression values of the merged data set
   createImportHistogram_(mergeset = rv$mergeset, filename = paste0(rv$plotdir, "import_histogram.png"))
 
