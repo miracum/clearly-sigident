@@ -16,7 +16,7 @@ URL: https://gitlab.miracum.org/clearly/sigident
 BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 Copyright: Universitätsklinikum Erlangen
-Date/Publication: 2019-08-27 14:26:26 UTC
+Date/Publication: 2019-08-30 13:16:36 UTC
 biocViews: Expressionanalysis
 Imports: 
     data.table,
@@ -35,6 +35,8 @@ Imports:
     glmnet,
     pROC,
     utils,
+    parallel,
+    doParallel,
     BiocManager,
     Biobase,
     sva,

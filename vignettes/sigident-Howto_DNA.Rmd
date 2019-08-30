@@ -26,167 +26,147 @@ This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which 
 
 ## Download of GEO datasets & Normalization 
 
-```{r}
-# initialize filePath:
-filePath <- tempdir()
-dir.create("./geodata/")
+<!-- ```{r} -->
+<!-- # initialize filePath: -->
+<!-- filePath <- tempdir() -->
+<!-- dir.create("./geodata/") -->
 
-#--------------#
-###### 1. Download of GEO datasets & Normalization #####
-#------------------------------------------------------#
+<!-- #--------------# -->
+<!-- ###### 1. Download of GEO datasets & Normalization ##### -->
+<!-- #------------------------------------------------------# -->
 
-# insert the desired GEO dataset into the getGEO() function
-GSE18842 <- GEOquery::getGEO("GSE18842")
-GSE19804 <- GEOquery::getGEO("GSE19804")
-# extract expressionSets
-eset1 <- GSE18842[[1]]
-eset2 <- GSE19804[[1]]
-
-
-# download raw data, uncompress them and execute GCRMA normalization 
-# actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
-
-GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
-utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir="./geodata")
-cels <- list.files("./geodata/", pattern = "[gz]")
-sapply(paste("./geodata", cels, sep="/"), GEOquery::gunzip)
-cels
-
-# at this point, first the textfile "phenodata.txt must be generated
-## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture 
-## the experimental information. Therefore a text file is created in the terminal window or rather in the command line.
-system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
-## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file. 
-## After this step the normalization can be started. 
-
-celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata") 
-esetC <- gcrma::gcrma(celfiles, fast = TRUE)
-
-# esetC = now is a normalized expressionSet, but without f- and pData
-# the f- and pData are transfered manually from dataset GSE19188
-
-GSE19188 <- GEOquery::getGEO("GSE19188")
-eset3 <- GSE19188[[1]]
-pData3 <- Biobase::pData(eset3)
-fData3 <- Biobase::fData(eset3)
-Biobase::pData(esetC) <- pData3
-Biobase::fData(esetC) <- fData3
-colnames(Biobase::exprs(esetC)) <- colnames(Biobase::exprs(eset3))
-Biobase::annotation(esetC) <- Biobase::annotation(eset3)
-eset3 <- esetC
-```
-
-## Formatting the phenoData 
-
-```{r}
-#-------------------------------------#
-##### 2. Formatting the phenoData #####
-#-------------------------------------#
-
-# the phenoData of the expresssionSets must be formatted in such a way as that the phenoData columns overlap perfectly
-# all expressionSets should have the same columns in the same order
-# not consistent columns must get removed
-# for simpler handling only phenoData columns of interest should be retained 
-# we here retained all consistent phenoData
-
-# create version b, that original expressionSets persist
-eset1b <- eset1
-eset2b <- eset2
-eset3b <- eset3
-
-# show number of samples and phenoData columns
-dim(Biobase::pData(eset1b))
-dim(Biobase::pData(eset2b))
-dim(Biobase::pData(eset3b))
-# depict phenoData column names
-colnames(Biobase::pData(eset1b))
-colnames(Biobase::pData(eset2b))
-colnames(Biobase::pData(eset3b))
+<!-- # insert the desired GEO dataset into the getGEO() function -->
+<!-- GSE18842 <- GEOquery::getGEO("GSE18842") -->
+<!-- GSE19804 <- GEOquery::getGEO("GSE19804") -->
+<!-- # extract expressionSets -->
+<!-- eset1 <- GSE18842[[1]] -->
+<!-- eset2 <- GSE19804[[1]] -->
 
 
-# remove unnecessary phenoData 
-# rename desired column names and if necessary the column entries (as we did for 'Tumor') 
+<!-- # download raw data, uncompress them and execute GCRMA normalization  -->
+<!-- # actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files -->
 
-# eset1b
-eset1b$relation <- NULL
-eset1b$characteristics_ch1 <- NULL
-eset1b$`sample type:ch1` <- NULL
-eset1b$`tissue:ch1` <- NULL
-colnames(Biobase::pData(eset1b))[8] = "Tumor"
-levels(Biobase::eset1b$Tumor) = c("Control","Lung Cancer")
-dim(eset1b)
+<!-- GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath) -->
+<!-- utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir="./geodata") -->
+<!-- cels <- list.files("./geodata/", pattern = "[gz]") -->
+<!-- sapply(paste("./geodata", cels, sep="/"), GEOquery::gunzip) -->
+<!-- cels -->
+
+<!-- # at this point, first the textfile "phenodata.txt must be generated -->
+<!-- ## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture  -->
+<!-- ## the experimental information. Therefore a text file is created in the terminal window or rather in the command line. -->
+<!-- system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'") -->
+<!-- ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.  -->
+<!-- ## After this step the normalization can be started.  -->
+
+<!-- celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")  -->
+<!-- esetC <- gcrma::gcrma(celfiles, fast = TRUE) -->
+
+<!-- # esetC = now is a normalized expressionSet, but without f- and pData -->
+<!-- # the f- and pData are transfered manually from dataset GSE19188 -->
+
+<!-- GSE19188 <- GEOquery::getGEO("GSE19188") -->
+<!-- eset3 <- GSE19188[[1]] -->
+<!-- pData3 <- Biobase::pData(eset3) -->
+<!-- fData3 <- Biobase::fData(eset3) -->
+<!-- Biobase::pData(esetC) <- pData3 -->
+<!-- Biobase::fData(esetC) <- fData3 -->
+<!-- colnames(Biobase::exprs(esetC)) <- colnames(Biobase::exprs(eset3)) -->
+<!-- Biobase::annotation(esetC) <- Biobase::annotation(eset3) -->
+<!-- eset3 <- esetC -->
+<!-- ``` -->
+
+<!-- ## Formatting the phenoData  -->
+
+<!-- ```{r} -->
+<!-- #-------------------------------------# -->
+<!-- ##### 2. Formatting the phenoData ##### -->
+<!-- #-------------------------------------# -->
+
+<!-- # the phenoData of the expresssionSets must be formatted in such a way as that the phenoData columns overlap perfectly -->
+<!-- # all expressionSets should have the same columns in the same order -->
+<!-- # not consistent columns must get removed -->
+<!-- # for simpler handling only phenoData columns of interest should be retained  -->
+<!-- # we here retained all consistent phenoData -->
+
+<!-- # create version b, that original expressionSets persist -->
+<!-- eset1b <- eset1 -->
+<!-- eset2b <- eset2 -->
+<!-- eset3b <- eset3 -->
+
+<!-- # show number of samples and phenoData columns -->
+<!-- dim(Biobase::pData(eset1b)) -->
+<!-- dim(Biobase::pData(eset2b)) -->
+<!-- dim(Biobase::pData(eset3b)) -->
+<!-- # depict phenoData column names -->
+<!-- colnames(Biobase::pData(eset1b)) -->
+<!-- colnames(Biobase::pData(eset2b)) -->
+<!-- colnames(Biobase::pData(eset3b)) -->
 
 
-# eset2b
-eset2b$characteristics_ch1.2 <- NULL
-eset2b$characteristics_ch1.3 <- NULL
-eset2b$contact_department <- NULL
-eset2b$characteristics_ch1 <- NULL
-eset2b$`age:ch1` <- NULL
-eset2b$`gender:ch1` <- NULL
-eset2b$`stage:ch1` <- NULL
-eset2b$`tissue:ch1` <- NULL
-colnames(pData(eset2b))[8] = "Tumor"
-levels(eset2b$Tumor) = c("Control","Lung Cancer")
-dim(eset2b)
+<!-- # remove unnecessary phenoData  -->
+<!-- # rename desired column names and if necessary the column entries (as we did for 'Tumor')  -->
+
+<!-- # eset1b -->
+<!-- eset1b$relation <- NULL -->
+<!-- eset1b$characteristics_ch1 <- NULL -->
+<!-- eset1b$`sample type:ch1` <- NULL -->
+<!-- eset1b$`tissue:ch1` <- NULL -->
+<!-- colnames(Biobase::pData(eset1b))[8] = "Tumor" -->
+<!-- levels(Biobase::eset1b$Tumor) = c("Control","Lung Cancer") -->
+<!-- dim(eset1b) -->
 
 
-# eset3b
-eset3b$characteristics_ch1.2 <- NULL
-eset3b$characteristics_ch1.3 <- NULL
-eset3b$characteristics_ch1.4 <- NULL
-eset3b$contact_phone <- NULL
-eset3b$contact_fax <- NULL
-eset3b$contact_department <- NULL
-eset3b$contact_web_link <- NULL
-eset3b$relation <- NULL
-eset3b$source_name_ch1 <- NULL
-colnames(Biobase::pData(eset3b))[9] = "Tumor"
-levels(eset3b$Tumor) = c("Control","Lung Cancer")
-pNew <- Biobase::pData(eset3b)[,c(1:7,9,8,10:29)] # reorder columns
-Biobase::pData(eset3b) = pNew
-dim(eset3b)
+<!-- # eset2b -->
+<!-- eset2b$characteristics_ch1.2 <- NULL -->
+<!-- eset2b$characteristics_ch1.3 <- NULL -->
+<!-- eset2b$contact_department <- NULL -->
+<!-- eset2b$characteristics_ch1 <- NULL -->
+<!-- eset2b$`age:ch1` <- NULL -->
+<!-- eset2b$`gender:ch1` <- NULL -->
+<!-- eset2b$`stage:ch1` <- NULL -->
+<!-- eset2b$`tissue:ch1` <- NULL -->
+<!-- colnames(pData(eset2b))[8] = "Tumor" -->
+<!-- levels(eset2b$Tumor) = c("Control","Lung Cancer") -->
+<!-- dim(eset2b) -->
 
-# now, all phenoData columns are consistent
-cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), colnames(Biobase::pData(eset3b)))
-```
 
-## Checking normalization 
+<!-- # eset3b -->
+<!-- eset3b$characteristics_ch1.2 <- NULL -->
+<!-- eset3b$characteristics_ch1.3 <- NULL -->
+<!-- eset3b$characteristics_ch1.4 <- NULL -->
+<!-- eset3b$contact_phone <- NULL -->
+<!-- eset3b$contact_fax <- NULL -->
+<!-- eset3b$contact_department <- NULL -->
+<!-- eset3b$contact_web_link <- NULL -->
+<!-- eset3b$relation <- NULL -->
+<!-- eset3b$source_name_ch1 <- NULL -->
+<!-- colnames(Biobase::pData(eset3b))[9] = "Tumor" -->
+<!-- levels(eset3b$Tumor) = c("Control","Lung Cancer") -->
+<!-- pNew <- Biobase::pData(eset3b)[,c(1:7,9,8,10:29)] # reorder columns -->
+<!-- Biobase::pData(eset3b) = pNew -->
+<!-- dim(eset3b) -->
 
-```{r}
-#-----------------------------------#
-##### 3. Checking normalization #####
-#-----------------------------------#
+<!-- # now, all phenoData columns are consistent -->
+<!-- cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), colnames(Biobase::pData(eset3b))) -->
+<!-- ``` -->
 
-graphics::boxplot(Biobase::exprs(eset1b))
-graphics::boxplot(Biobase::exprs(eset2b))
-graphics::boxplot(Biobase::exprs(eset3b))
+<!-- ## Checking normalization  -->
 
-#overview of how many tumor and cancer samples are in esets
-table(Biobase::pData(eset1b)[,"Tumor"])
-table(Biobase::pData(eset2b)[,"Tumor"])
-table(Biobase::pData(eset3b)[,"Tumor"])
-```
+<!-- ```{r} -->
+<!-- #-----------------------------------# -->
+<!-- ##### 3. Checking normalization ##### -->
+<!-- #-----------------------------------# -->
 
-## Merging 
+<!-- graphics::boxplot(Biobase::exprs(eset1b)) -->
+<!-- graphics::boxplot(Biobase::exprs(eset2b)) -->
+<!-- graphics::boxplot(Biobase::exprs(eset3b)) -->
 
-```{r}
-#-----------------------------------------#
-##### 4. Merging and Batch Correction #####
-#-----------------------------------------#
-
-esets <- c(eset1b,eset2b,eset3b)
-mergeset <- sigident::merge_(esets)
-# merging 3 esets, resulting in a mergeset containing 367 samples and 54675 genes
-
-filename <- paste0(plotdir, "import_histogram.png")
-sigident::createImportHistogram_(mergeset, filename)
-```
-
-```{r}
-knitr::include_graphics(filename)
-```
-
+<!-- #overview of how many tumor and cancer samples are in esets -->
+<!-- table(Biobase::pData(eset1b)[,"Tumor"]) -->
+<!-- table(Biobase::pData(eset2b)[,"Tumor"]) -->
+<!-- table(Biobase::pData(eset3b)[,"Tumor"]) -->
+<!-- ``` -->
 
 # Preparations for utilizing the package 
 
@@ -209,21 +189,48 @@ seed <- 111
 traintest.split <- 0.8
 ```
 
+## Merging 
+
+```{r}
+#TODO only for debugging
+load("../tests/testthat/testdata/esets.RData")
+devtools::load_all(path = "../")
+```
+
+
+```{r}
+#-----------------------------------------#
+##### 4. Merging and Batch Correction #####
+#-----------------------------------------#
+
+esets <- c(eset1b,eset2b,eset3b)
+mergeset <- mergeEsets_(esets)
+# merging 3 esets, resulting in a mergeset containing 367 samples and 54675 genes
+
+filename <- paste0(plotdir, "import_histogram.png")
+createImportHistogram_(mergeset, filename)
+```
+
+```{r}
+knitr::include_graphics(filename)
+```
+
+
 
 # Discovering Batch Effects  
 
 ```{r}
-dd <- sigident::createDiagnosisDesign_(mergeset, controlname, targetname, targetcol)
+dd <- createDiagnosisDesign_(mergeset, controlname, targetname, targetcol)
 diagnosis <- dd$diagnosis
 design <- dd$design
 
-DF <- sigident::createDataMatrix_(mergeset)
-batch <- sigident::createBatch_(eset1b, eset2b, eset3b)
-combat <- sigident::createCombat_(DF, batch, design)
+DF <- createDataMatrix_(mergeset)
+batch <- createBatch_(eset1b, eset2b, eset3b)
+combat <- createCombat_(DF, batch, design)
 
-gPCA_before <- sigident::batchCorrection_(DF, batch)
+gPCA_before <- batchCorrection_(DF, batch)
 filename <- paste0(plotdir, "PCplot_before.png")
-sigident::createBatchPlot_(gPCA_before, filename, "before")
+createBatchPlot_(gPCA_before, filename, "before")
 ```
 
 ```{r}
@@ -231,9 +238,9 @@ knitr::include_graphics(filename)
 ```
 
 ```{r}
-gPCA_after <- sigident::batchCorrection_(combat, batch)
+gPCA_after <- batchCorrection_(combat, batch)
 filename <- paste0(plotdir, "PCplot_after.png")
-sigident::createBatchPlot_(gPCA_after, filename, "after")
+createBatchPlot_(gPCA_after, filename, "after")
 ```
 
 ```{r}
@@ -244,15 +251,15 @@ knitr::include_graphics(filename)
 
 ```{r}
 q_selection <- NULL # use default setting
-deg_q <- sigident::qSelection_(mergeset, q_selection)
+deg_q <- qSelection_(mergeset, q_selection)
 
-genes <- sigident::identify.DEGs(BatchRemovedExprs = combat, design = design, qValue = deg_q)
+genes <- identify.DEGs_(BatchRemovedExprs = combat, design = design, qValue = deg_q)
 
 # heatmap creation
 filename <- paste0(plotdir, "DEG_heatmap.png")
 # create colors for map
-ht_colors <- sigident::colorHeatmap_(mergeset, targetcol, controlname)
-sigident::createDEGheatmap_(combat, genes, ht_colors, filename)
+ht_colors <- colorHeatmap_(mergeset, targetcol, controlname)
+createDEGheatmap_(combat, genes, ht_colors, filename)
 ```
 
 ```{r}
@@ -260,8 +267,8 @@ knitr::include_graphics(filename)
 ```
 
 ```{r}
-genelist <- sigident::geneMapping_(mergeset, genes)
-deg_info <- sigident::exportDEGannotations_(mergeset, genes)
+genelist <- geneMapping_(mergeset, genes)
+deg_info <- exportDEGannotations_(mergeset, genes)
 data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
@@ -270,7 +277,7 @@ knitr::kable(deg_info)
 ```
 
 ```{r}
-deg_results <- sigident::limmaTopTable_(BatchRemovedExprs = combat, design = design, qValue = deg_q)
+deg_results <- limmaTopTable_(BatchRemovedExprs = combat, design = design, qValue = deg_q)
 data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
@@ -281,33 +288,33 @@ knitr::kable(deg_results)
 # Gene enrichment 
 
 ```{r}
-deg_entrez <- sigident::enrichmentDataSelection_(mergeset, genes)
+deg_entrez <- enrichmentDataSelection_(mergeset, genes)
 ```
 
 
 ## Test for over-representation 
 
 ```{r}
-enr_topgo <- sigident::extractGOterms_(entrez = deg_entrez, species = species)
+enr_topgo <- extractGOterms_(entrez = deg_entrez, species = species)
 ```
 ```{r}
 knitr::kable(enr_topgo)
 ```
 
 ```{r}
-enr_topkegg <- sigident::extractKEGGterms_(entrez = deg_entrez, species = species)
+enr_topkegg <- extractKEGGterms_(entrez = deg_entrez, species = species)
 ```
 ```{r}
 knitr::kable(enr_topkegg)
 ```
 
 ```{r}
-enr_fitlm <- sigident::goDiffReg_(mergeset = mergeset, BatchRemovedExprs = combat, design = design)
+enr_fitlm <- goDiffReg_(mergeset = mergeset, BatchRemovedExprs = combat, design = design)
 
-enr_fitlm_topgo <- sigident::extractGOterms_(entrez = enr_fitlm, species = species, FDR = 0.01)
+enr_fitlm_topgo <- extractGOterms_(entrez = enr_fitlm, species = species, FDR = 0.01)
 data.table::fwrite(enr_fitlm_topgo, paste0(csvdir, "Top_GO_fitlm.csv"))
 
-enr_fitlm_topkegg <- sigident::extractKEGGterms_(entrez = enr_fitlm, species = species)
+enr_fitlm_topkegg <- extractKEGGterms_(entrez = enr_fitlm, species = species)
 data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 ```
 
@@ -315,7 +322,7 @@ data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 ## GO Analysis
 
 ```{r}
-enr_analysis <- sigident::goEnrichmentAnalysis_(entrez = deg_entrez,
+enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez,
                                                 OrgDB = orgdb,
                                                 organism = organism,
                                                 fitlm = enr_fitlm,
@@ -338,7 +345,7 @@ knitr::include_graphics(filename)
 
 ```{r}
 filename <- paste0(plotdir, "Enriched_GO.png")
-sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$go, type = "GO", filename = filename)
+createEnrichtedBarplot_(enrichmentobj = enr_analysis$go, type = "GO", filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -346,7 +353,7 @@ knitr::include_graphics(filename)
 
 ```{r}
 filename <- paste0(plotdir, "Enriched_KEGG.png")
-sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg, type = "KEGG", filename = filename)
+createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg, type = "KEGG", filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -358,15 +365,15 @@ knitr::include_graphics(filename)
 ## Split data into training and test dataset
 
 ```{r}
-training_list <- sigident::createTrainingTest_(diagnosis, combat, split = traintest.split, seed = seed)
+training_list <- createTrainingTest_(diagnosis, combat, split = traintest.split, seed = seed)
 ```
 
 ## Lasso regression
 
 ```{r}
-diagnostic_lasso <- sigident::glmnetSignature_(traininglist = training_list, type = "lasso", nfolds = 10, seed = seed)
+diagnostic_lasso <- glmnetSignature_(traininglist = training_list, type = "lasso", nfolds = 10, seed = seed)
 filename <- paste0(plotdir, "CV_lasso.png")
-sigident::createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = filename)
+createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -374,7 +381,7 @@ knitr::include_graphics(filename)
 
 ```{r}
 filename <- paste0(plotdir, "ROC_Lasso.min.png")
-sigident::createROCplot_(roc = diagnostic_lasso$roc.min, filename = filename)
+createROCplot_(roc = diagnostic_lasso$roc.min, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -382,7 +389,7 @@ knitr::include_graphics(filename)
 
 ```{r}
 filename <- paste0(plotdir, "ROC_Lasso.1se.png")
-sigident::createROCplot_(roc = diagnostic_lasso$roc.1se, filename = filename)
+createROCplot_(roc = diagnostic_lasso$roc.1se, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -392,9 +399,9 @@ knitr::include_graphics(filename)
 ## Elastic net regression 
 
 ```{r}
-diagnostic_elasticnet <- sigident::(traininglist = training_list, type = "elastic", alpha = 0.9, nfolds = 10, seed = seed)
+diagnostic_elasticnet <- glmnetSignature_(traininglist = training_list, type = "elastic", alpha = 0.9, nfolds = 10, seed = seed)
 filename <- paste0(plotdir, "CV_elasticNet.png")
-sigident::createCVPlot_(cv_obj = diagnostic_elasticnet$fitCV, filename = filename)
+createCVPlot_(cv_obj = diagnostic_elasticnet$fitCV, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -402,7 +409,7 @@ knitr::include_graphics(filename)
 
 ```{r}
 filename <- paste0(plotdir, "ROC_elasticNet.min.png")
-sigident::createROCplot_(roc = diagnostic_elasticnet$roc.min, filename = filename)
+createROCplot_(roc = diagnostic_elasticnet$roc.min, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -410,7 +417,7 @@ knitr::include_graphics(filename)
 
 ```{r}
 filename <- paste0(plotdir, "ROC_elasticNet.1se.png")
-sigident::createROCplot_(roc = diagnostic_elasticnet$roc.1se, filename = filename)
+createROCplot_(roc = diagnostic_elasticnet$roc.1se, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -420,10 +427,10 @@ knitr::include_graphics(filename)
 ## Gridsearch to find alpha and lambda
 
 ```{r}
-diagnostic_glmGrid <- sigident::glmnetSignature_(traininglist = training_list, type = "grid", nfolds = 10, seed = seed)
+diagnostic_glmGrid <- glmnetSignature_(traininglist = training_list, type = "grid", nfolds = 10, seed = seed)
 # plot model of gridsearch
 filename <- paste0(plotdir, "Gridsearch_model.png")
-sigident::createGridModelPlot_(model = diagnostic_glmGrid$caret.train, filename = filename)
+createGridModelPlot_(model = diagnostic_glmGrid$caret.train, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -432,7 +439,7 @@ knitr::include_graphics(filename)
 ```{r}
 # plot variable importance of gridsearch
 filename <- paste0(plotdir, "Gridsearch_variable_importance.png")
-sigident::createGridVarImpPlot_(model = diagnostic_glmGrid$caret.train, filename = filename)
+createGridVarImpPlot_(model = diagnostic_glmGrid$caret.train, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)
@@ -441,7 +448,7 @@ knitr::include_graphics(filename)
 ```{r}
 # create roc plot
 filename <- paste0(plotdir, "ROC_elasticNet.grid.png")
-sigident::createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet, filename = filename)
+createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet, filename = filename)
 ```
 ```{r}
 knitr::include_graphics(filename)

@@ -3,6 +3,7 @@
 ^data-raw$
 ^LICENSE\.md$
 ^docker$
+^vignettes$
 ^data$
 ^geodata$
 ^vignette/geodata$
@@ -10,3 +11,7 @@
 ^tests/testthat/testdata$
 ^tests/testthat/plots$
 ^\.RData$
+^vignettes/geodata$
+^vignettes/plots$
+^vignettes/csv$
+^vignettes/GSE19188$
