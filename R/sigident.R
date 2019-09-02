@@ -1,4 +1,4 @@
-#' @title Perform Signature Analyses in Gene Expression Datasets
+#' @title Perform Signature Analyses in Gene Expression Datasets Derived from MicroArrays
 #'
 #' @description
 #'
@@ -11,7 +11,7 @@
 #'
 #' @export
 
-sigidentDNA <- function(mergedset, plotdir, csvdir, targetcol, controlname, targetname, species, deg.q.selection = NULL, seed = 111, traintest.split = 0.8){
+sigidentMicroarray <- function(mergedset, plotdir, csvdir, targetcol, controlname, targetname, species, deg.q.selection = NULL, seed = 111, traintest.split = 0.8){
   #TODO only for debugging
   plotdir <- "./tests/testthat/plots"
   csvdir <- "./tests/testthat/csvs"

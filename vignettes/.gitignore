@@ -1,2 +1,3 @@
 *.html
 *.R
+!preview.dir/sigident-Howto_Microarray.html
