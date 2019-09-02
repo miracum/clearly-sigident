@@ -8,6 +8,9 @@ sigidentMicroarray(mergedset, plotdir, csvdir, targetcol, controlname,
   targetname, species, deg.q.selection = NULL, seed = 111,
   traintest.split = 0.8)
 }
+\arguments{
+\item{mergedset}{An expression set merged by the method of Hughey and Butte.}
+}
 \description{
 
 }

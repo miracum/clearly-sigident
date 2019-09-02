@@ -43,7 +43,7 @@ This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which 
 <!-- eset2 <- GSE19804[[1]] -->
 
 
-<!-- # download raw data, uncompress them and execute GCRMA normalization  -->
+<!-- # download raw data, uncompress them and execute GCRMA normalization -->
 <!-- # actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files -->
 
 <!-- GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath) -->
@@ -53,13 +53,13 @@ This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which 
 <!-- cels -->
 
 <!-- # at this point, first the textfile "phenodata.txt must be generated -->
-<!-- ## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture  -->
+<!-- ## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture -->
 <!-- ## the experimental information. Therefore a text file is created in the terminal window or rather in the command line. -->
 <!-- system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'") -->
-<!-- ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.  -->
-<!-- ## After this step the normalization can be started.  -->
+<!-- ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file. -->
+<!-- ## After this step the normalization can be started. -->
 
-<!-- celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")  -->
+<!-- celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata") -->
 <!-- esetC <- gcrma::gcrma(celfiles, fast = TRUE) -->
 
 <!-- # esetC = now is a normalized expressionSet, but without f- and pData -->
@@ -76,7 +76,7 @@ This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which 
 <!-- eset3 <- esetC -->
 <!-- ``` -->
 
-<!-- ## Formatting the phenoData  -->
+<!-- ## Formatting the phenoData -->
 
 <!-- ```{r} -->
 <!-- #-------------------------------------# -->
@@ -86,7 +86,7 @@ This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which 
 <!-- # the phenoData of the expresssionSets must be formatted in such a way as that the phenoData columns overlap perfectly -->
 <!-- # all expressionSets should have the same columns in the same order -->
 <!-- # not consistent columns must get removed -->
-<!-- # for simpler handling only phenoData columns of interest should be retained  -->
+<!-- # for simpler handling only phenoData columns of interest should be retained -->
 <!-- # we here retained all consistent phenoData -->
 
 <!-- # create version b, that original expressionSets persist -->
@@ -104,8 +104,8 @@ This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which 
 <!-- colnames(Biobase::pData(eset3b)) -->
 
 
-<!-- # remove unnecessary phenoData  -->
-<!-- # rename desired column names and if necessary the column entries (as we did for 'Tumor')  -->
+<!-- # remove unnecessary phenoData -->
+<!-- # rename desired column names and if necessary the column entries (as we did for 'Tumor') -->
 
 <!-- # eset1b -->
 <!-- eset1b$relation <- NULL -->
@@ -151,7 +151,7 @@ This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which 
 <!-- cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), colnames(Biobase::pData(eset3b))) -->
 <!-- ``` -->
 
-<!-- ## Checking normalization  -->
+<!-- ## Checking normalization -->
 
 <!-- ```{r} -->
 <!-- #-----------------------------------# -->

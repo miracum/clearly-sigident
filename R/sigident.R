@@ -2,6 +2,8 @@
 #'
 #' @description
 #'
+#' @param mergedset An expression set merged by the method of Hughey and Butte.
+#'
 #' @import data.table
 #' @importFrom magrittr "%>%"
 #'
