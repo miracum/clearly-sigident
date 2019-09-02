@@ -9,7 +9,8 @@ my_desc$set("Package", packagename)
 # Set author names
 my_desc$set_authors(c(
   person("Lorenz A.", "Kapsner", email = "lorenz.kapsner@uk-erlangen.de", role = c('cre', 'aut')),
-  person("Johannes", "Vey", role = c('aut'))
+  person("Johannes", "Vey", role = c('aut')),
+  person("Maximilian", "Fuchs", role = c('aut'))
 ))
 # Set copyright
 my_desc$set("Copyright", "Universitätsklinikum Erlangen")

@@ -24,6 +24,7 @@ performGLMnet_ <- function(train.x, train.y, alpha, lambda){
                            family = "binomial",
                            alpha = alpha,
                            lambda = lambda)
+  gc()
   return(outdat)
 }
 
@@ -33,6 +34,7 @@ buildPredictiveGLM_ <- function(train.x, train.y, alpha, fitCV){
   for (i in c("lambda.min", "lambda.1se")){
     outlist[[i]] <- performGLMnet_(train.x, train.y, alpha, fitCV[[i]])
   }
+  gc()
   return(outlist)
 }
 

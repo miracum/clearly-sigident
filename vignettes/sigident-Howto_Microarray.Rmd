@@ -1,8 +1,8 @@
 ---
-title: "sigident - Howto DNA"
+title: "sigident - Howto Microarray"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{sigident-Howto}
+  %\VignetteIndexEntry{sigident-Howto_Microarray}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -198,7 +198,7 @@ devtools::load_all(path = "../")
 ```
 
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 #-----------------------------------------#
 ##### 4. Merging and Batch Correction #####
 #-----------------------------------------#
@@ -211,7 +211,7 @@ filename <- paste0(plotdir, "import_histogram.png")
 createImportHistogram_(mergeset, filename)
 ```
 
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -219,7 +219,7 @@ knitr::include_graphics(filename)
 
 # Discovering Batch Effects  
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 dd <- createDiagnosisDesign_(mergeset, controlname, targetname, targetcol)
 diagnosis <- dd$diagnosis
 design <- dd$design
@@ -233,23 +233,23 @@ filename <- paste0(plotdir, "PCplot_before.png")
 createBatchPlot_(gPCA_before, filename, "before")
 ```
 
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 gPCA_after <- batchCorrection_(combat, batch)
 filename <- paste0(plotdir, "PCplot_after.png")
 createBatchPlot_(gPCA_after, filename, "after")
 ```
 
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
 # DEG Analysis 
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 q_selection <- NULL # use default setting
 deg_q <- qSelection_(mergeset, q_selection)
 
@@ -262,7 +262,7 @@ ht_colors <- colorHeatmap_(mergeset, targetcol, controlname)
 createDEGheatmap_(combat, genes, ht_colors, filename)
 ```
 
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -273,7 +273,7 @@ data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
 ```{r}
-knitr::kable(deg_info)
+knitr::kable(head(deg_info))
 ```
 
 ```{r}
@@ -282,7 +282,7 @@ data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
 ```{r}
-knitr::kable(deg_results)
+knitr::kable(head(deg_results))
 ```
 
 # Gene enrichment 
@@ -298,14 +298,14 @@ deg_entrez <- enrichmentDataSelection_(mergeset, genes)
 enr_topgo <- extractGOterms_(entrez = deg_entrez, species = species)
 ```
 ```{r}
-knitr::kable(enr_topgo)
+knitr::kable(head(enr_topgo))
 ```
 
 ```{r}
 enr_topkegg <- extractKEGGterms_(entrez = deg_entrez, species = species)
 ```
 ```{r}
-knitr::kable(enr_topkegg)
+knitr::kable(head(enr_topkegg))
 ```
 
 ```{r}
@@ -321,9 +321,9 @@ data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 
 ## GO Analysis
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez,
-                                                OrgDB = orgdb,
+                                                OrgDB = OrgDb,
                                                 organism = organism,
                                                 fitlm = enr_fitlm,
                                                 pathwayid = pathwayid,
@@ -331,15 +331,15 @@ enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez,
                                                 plotdir = plotdir)
 ```
 ```{r}
-filename <- paste0(plotdir, "/", organism, ".png")
+filename <- paste0(plotdir, "/", organism, "04110.png")
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 ```{r}
-filename <- paste0(plotdir, "/", organism, ".image1.png")
+filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -347,7 +347,7 @@ knitr::include_graphics(filename)
 filename <- paste0(plotdir, "Enriched_GO.png")
 createEnrichtedBarplot_(enrichmentobj = enr_analysis$go, type = "GO", filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -355,7 +355,7 @@ knitr::include_graphics(filename)
 filename <- paste0(plotdir, "Enriched_KEGG.png")
 createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg, type = "KEGG", filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -375,7 +375,7 @@ diagnostic_lasso <- glmnetSignature_(traininglist = training_list, type = "lasso
 filename <- paste0(plotdir, "CV_lasso.png")
 createCVPlot_(cv_obj = diagnostic_lasso$fitCV, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -383,7 +383,7 @@ knitr::include_graphics(filename)
 filename <- paste0(plotdir, "ROC_Lasso.min.png")
 createROCplot_(roc = diagnostic_lasso$roc.min, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -391,7 +391,7 @@ knitr::include_graphics(filename)
 filename <- paste0(plotdir, "ROC_Lasso.1se.png")
 createROCplot_(roc = diagnostic_lasso$roc.1se, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -403,7 +403,7 @@ diagnostic_elasticnet <- glmnetSignature_(traininglist = training_list, type = "
 filename <- paste0(plotdir, "CV_elasticNet.png")
 createCVPlot_(cv_obj = diagnostic_elasticnet$fitCV, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -411,7 +411,7 @@ knitr::include_graphics(filename)
 filename <- paste0(plotdir, "ROC_elasticNet.min.png")
 createROCplot_(roc = diagnostic_elasticnet$roc.min, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -419,7 +419,7 @@ knitr::include_graphics(filename)
 filename <- paste0(plotdir, "ROC_elasticNet.1se.png")
 createROCplot_(roc = diagnostic_elasticnet$roc.1se, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -432,7 +432,7 @@ diagnostic_glmGrid <- glmnetSignature_(traininglist = training_list, type = "gri
 filename <- paste0(plotdir, "Gridsearch_model.png")
 createGridModelPlot_(model = diagnostic_glmGrid$caret.train, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -441,7 +441,7 @@ knitr::include_graphics(filename)
 filename <- paste0(plotdir, "Gridsearch_variable_importance.png")
 createGridVarImpPlot_(model = diagnostic_glmGrid$caret.train, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
@@ -450,7 +450,7 @@ knitr::include_graphics(filename)
 filename <- paste0(plotdir, "ROC_elasticNet.grid.png")
 createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet, filename = filename)
 ```
-```{r}
+```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 

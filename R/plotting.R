@@ -6,7 +6,8 @@ createImportHistogram_ <- function(mergeset, filename = NULL){
     }
   }
   shiny::plotPNG({
-    return(print(graphics::boxplot(mergeset@assayData$exprs, main = "Merged data before batch correction",
+    return(print(
+      graphics::boxplot(mergeset@assayData$exprs, main = "Merged data before batch correction",
                                    xlab = "Samples", ylab ="Expression value")
     ))
   },
