@@ -32,7 +32,7 @@ my_desc$set("BugReports",
 my_desc$set("License", "GPL-3")
 
 # BioConductor stuff
-my_desc$set("biocViews" = "Expressionanalysis")
+my_desc$set("biocViews" = "")
 
 
 # Save everyting
