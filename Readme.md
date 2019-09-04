@@ -14,7 +14,7 @@ Currently implemented features are:
 
 ## Installation
 
-You can install the development version of **sigident** with:
+You can install the development version of *sigident* with:
 
 ``` r
 options('repos' = 'https://ftp.fau.de/cran/')
