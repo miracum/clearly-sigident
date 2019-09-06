@@ -19,7 +19,8 @@ URL: https://gitlab.miracum.org/clearly/sigident
 BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 Copyright: Universitätsklinikum Erlangen
-Date/Publication: 2019-09-03 14:50:09 UTC
+VignetteBuilder: knitr
+Date/Publication: 2019-09-06 14:44:04 UTC
 biocViews: 
 Imports: 
     data.table,
@@ -54,5 +55,9 @@ Imports:
     pathfindR,
     pathview
 Suggests: 
-    testthat
+    testthat,
+    devtools,
+    rmarkdown,
+    qpdf,
+    knitr
 RoxygenNote: 6.1.1

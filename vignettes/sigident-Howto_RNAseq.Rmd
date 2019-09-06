@@ -3,7 +3,7 @@ title: "sigident - Howto RNAseq"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{sigident-Howto_RNAseq}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 

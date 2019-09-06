@@ -15,3 +15,9 @@ vignettes/geodata
 vignettes/plots
 vignettes/csv
 vignettes/GSE19188
+vignettes/preview.dir
+*.rds
+metadatadir
+metadata
+vignettes/metadata
+vignettes/*.csv

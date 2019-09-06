@@ -16,6 +16,8 @@ my_desc$set_authors(c(
 my_desc$set("Copyright", "Universitätsklinikum Erlangen")
 # Remove some author fields
 my_desc$del("Maintainer")
+# Vignette Builder
+my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
 my_desc$set_version("0.0.0.9000")
 # The title of your package
@@ -97,6 +99,10 @@ usethis::use_package("pathview", type="Imports")
 
 # Suggests
 usethis::use_package("testthat", type = "Suggests")
+usethis::use_package("devtools", type = "Suggests")
+usethis::use_package("rmarkdown", type = "Suggests")
+usethis::use_package("qpdf", type = "Suggests")
+usethis::use_package("knitr", type = "Suggests")
 
 # buildignore and gitignore
 usethis::use_build_ignore("docker")
@@ -108,12 +114,19 @@ usethis::use_build_ignore("tests/testthat/testdata")
 usethis::use_build_ignore("tests/testthat/plots")
 usethis::use_build_ignore(".RData")
 usethis::use_build_ignore("data")
+usethis::use_build_ignore("docker")
+usethis::use_build_ignore("Glio_main.rds")
+usethis::use_build_ignore("metadatadir")
+usethis::use_build_ignore("vignettes/metadata")
+usethis::use_build_ignore("vignettes/preview.dir")
+usethis::use_build_ignore("vignettes/*.csv")
 usethis::use_git_ignore("inst/application/data")
 usethis::use_git_ignore("data")
 usethis::use_git_ignore("vignettes/geodata")
 usethis::use_git_ignore("vignettes/plots")
 usethis::use_git_ignore("vignettes/csv")
 usethis::use_git_ignore("vignettes/GSE19188")
+usethis::use_git_ignore("vignettes/preview.dir")
 usethis::use_git_ignore("geodata")
 usethis::use_git_ignore("*.Rproj")
 usethis::use_git_ignore(".Rproj*")
@@ -121,4 +134,8 @@ usethis::use_git_ignore(".Rhistory")
 usethis::use_git_ignore(".RData")
 usethis::use_git_ignore("tests/testthat/testdata")
 usethis::use_git_ignore("tests/testthat/plots")
-
+usethis::use_git_ignore("*.rds")
+usethis::use_git_ignore("metadatadir")
+usethis::use_git_ignore("metadata")
+usethis::use_git_ignore("vignettes/metadata")
+usethis::use_git_ignore("vignettes/*.csv")

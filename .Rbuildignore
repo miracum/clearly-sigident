@@ -15,3 +15,8 @@
 ^vignettes/plots$
 ^vignettes/csv$
 ^vignettes/GSE19188$
+^Glio_main\.rds$
+^metadatadir$
+^vignettes/metadata$
+^vignettes/preview\.dir$
+^vignettes/*\.csv$
