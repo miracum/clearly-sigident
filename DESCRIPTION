@@ -55,3 +55,4 @@ Imports:
     pathview
 Suggests: 
     testthat
+RoxygenNote: 6.1.1

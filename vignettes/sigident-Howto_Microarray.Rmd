@@ -19,156 +19,55 @@ library(sigident)
 library(knitr)
 ```
 
-# Prerequisites & Data Preparation 
+# Prerequisites and Installation 
+
+## Install mergeGEO package
+
+```{r eval=FALSE}
+devtools::install_git("https://gitlab.miracum.org/clearly/mergegeo.git")
+```
+
+## Install sigident package
+
+```{r eval=FALSE}
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
+```
+
+# Data Preparation 
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. 
 This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which contain #TODO here!!!!
 
-## Download of GEO datasets & Normalization 
+We therefore created the R package 'mergeGEO' that organizes the a method to merge GEO datasets, originally described and published by Hughey & Butte (2015) in one R function.
+For a detailled background, please refer to the original publication ([https://doi.org/10.1093/nar/gkv229](https://doi.org/10.1093/nar/gkv229)) and its supplemental R files (licensed under GPLv3, [https://doi.org/10.5281/zenodo.16006](https://doi.org/10.5281/zenodo.16006)). 
 
-<!-- ```{r} -->
-<!-- # initialize filePath: -->
-<!-- filePath <- tempdir() -->
-<!-- dir.create("./geodata/") -->
+To get a detailled background on how to use 'mergeGEO', please visit its package vignette: ([link](link))
 
-<!-- #--------------# -->
-<!-- ###### 1. Download of GEO datasets & Normalization ##### -->
-<!-- #------------------------------------------------------# -->
+## Download of GEO datasets using mergeGEO 
 
-<!-- # insert the desired GEO dataset into the getGEO() function -->
-<!-- GSE18842 <- GEOquery::getGEO("GSE18842") -->
-<!-- GSE19804 <- GEOquery::getGEO("GSE19804") -->
-<!-- # extract expressionSets -->
-<!-- eset1 <- GSE18842[[1]] -->
-<!-- eset2 <- GSE19804[[1]] -->
+During the utilization of mergeGEO, the GEO datasets are downloaded, normalized and batch corrected. In order to provide a working example, we included exemplary files containtin the required study metadata and the samplemetadata.
 
+```{r}
+studymetadata = "lungcancer_study_metadata.csv"
+samplemetadata = "lungcancer_sample_metadata.csv"
+studyname <- "lungcancer"
+denovo <- TRUE
+metadatadir <- "./metadata"
+dir.create("./metadata")
 
-<!-- # download raw data, uncompress them and execute GCRMA normalization -->
-<!-- # actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files -->
+# copy prepared files to metadatadir
+file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_study_metadata.csv")
+file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_sample_metadata.csv")
 
-<!-- GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath) -->
-<!-- utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir="./geodata") -->
-<!-- cels <- list.files("./geodata/", pattern = "[gz]") -->
-<!-- sapply(paste("./geodata", cels, sep="/"), GEOquery::gunzip) -->
-<!-- cels -->
-
-<!-- # at this point, first the textfile "phenodata.txt must be generated -->
-<!-- ## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture -->
-<!-- ## the experimental information. Therefore a text file is created in the terminal window or rather in the command line. -->
-<!-- system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'") -->
-<!-- ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file. -->
-<!-- ## After this step the normalization can be started. -->
-
-<!-- celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata") -->
-<!-- esetC <- gcrma::gcrma(celfiles, fast = TRUE) -->
-
-<!-- # esetC = now is a normalized expressionSet, but without f- and pData -->
-<!-- # the f- and pData are transfered manually from dataset GSE19188 -->
-
-<!-- GSE19188 <- GEOquery::getGEO("GSE19188") -->
-<!-- eset3 <- GSE19188[[1]] -->
-<!-- pData3 <- Biobase::pData(eset3) -->
-<!-- fData3 <- Biobase::fData(eset3) -->
-<!-- Biobase::pData(esetC) <- pData3 -->
-<!-- Biobase::fData(esetC) <- fData3 -->
-<!-- colnames(Biobase::exprs(esetC)) <- colnames(Biobase::exprs(eset3)) -->
-<!-- Biobase::annotation(esetC) <- Biobase::annotation(eset3) -->
-<!-- eset3 <- esetC -->
-<!-- ``` -->
-
-<!-- ## Formatting the phenoData -->
-
-<!-- ```{r} -->
-<!-- #-------------------------------------# -->
-<!-- ##### 2. Formatting the phenoData ##### -->
-<!-- #-------------------------------------# -->
-
-<!-- # the phenoData of the expresssionSets must be formatted in such a way as that the phenoData columns overlap perfectly -->
-<!-- # all expressionSets should have the same columns in the same order -->
-<!-- # not consistent columns must get removed -->
-<!-- # for simpler handling only phenoData columns of interest should be retained -->
-<!-- # we here retained all consistent phenoData -->
-
-<!-- # create version b, that original expressionSets persist -->
-<!-- eset1b <- eset1 -->
-<!-- eset2b <- eset2 -->
-<!-- eset3b <- eset3 -->
-
-<!-- # show number of samples and phenoData columns -->
-<!-- dim(Biobase::pData(eset1b)) -->
-<!-- dim(Biobase::pData(eset2b)) -->
-<!-- dim(Biobase::pData(eset3b)) -->
-<!-- # depict phenoData column names -->
-<!-- colnames(Biobase::pData(eset1b)) -->
-<!-- colnames(Biobase::pData(eset2b)) -->
-<!-- colnames(Biobase::pData(eset3b)) -->
+mergeset <- mergeGEO(studymetadata = studymetadata,
+                     samplemetadata = samplemetadata,
+                     studyname = studyname,
+                     denovo = denovo,
+                     metadatadir = metadatadir)
+```
 
 
-<!-- # remove unnecessary phenoData -->
-<!-- # rename desired column names and if necessary the column entries (as we did for 'Tumor') -->
-
-<!-- # eset1b -->
-<!-- eset1b$relation <- NULL -->
-<!-- eset1b$characteristics_ch1 <- NULL -->
-<!-- eset1b$`sample type:ch1` <- NULL -->
-<!-- eset1b$`tissue:ch1` <- NULL -->
-<!-- colnames(Biobase::pData(eset1b))[8] = "Tumor" -->
-<!-- levels(Biobase::eset1b$Tumor) = c("Control","Lung Cancer") -->
-<!-- dim(eset1b) -->
-
-
-<!-- # eset2b -->
-<!-- eset2b$characteristics_ch1.2 <- NULL -->
-<!-- eset2b$characteristics_ch1.3 <- NULL -->
-<!-- eset2b$contact_department <- NULL -->
-<!-- eset2b$characteristics_ch1 <- NULL -->
-<!-- eset2b$`age:ch1` <- NULL -->
-<!-- eset2b$`gender:ch1` <- NULL -->
-<!-- eset2b$`stage:ch1` <- NULL -->
-<!-- eset2b$`tissue:ch1` <- NULL -->
-<!-- colnames(pData(eset2b))[8] = "Tumor" -->
-<!-- levels(eset2b$Tumor) = c("Control","Lung Cancer") -->
-<!-- dim(eset2b) -->
-
-
-<!-- # eset3b -->
-<!-- eset3b$characteristics_ch1.2 <- NULL -->
-<!-- eset3b$characteristics_ch1.3 <- NULL -->
-<!-- eset3b$characteristics_ch1.4 <- NULL -->
-<!-- eset3b$contact_phone <- NULL -->
-<!-- eset3b$contact_fax <- NULL -->
-<!-- eset3b$contact_department <- NULL -->
-<!-- eset3b$contact_web_link <- NULL -->
-<!-- eset3b$relation <- NULL -->
-<!-- eset3b$source_name_ch1 <- NULL -->
-<!-- colnames(Biobase::pData(eset3b))[9] = "Tumor" -->
-<!-- levels(eset3b$Tumor) = c("Control","Lung Cancer") -->
-<!-- pNew <- Biobase::pData(eset3b)[,c(1:7,9,8,10:29)] # reorder columns -->
-<!-- Biobase::pData(eset3b) = pNew -->
-<!-- dim(eset3b) -->
-
-<!-- # now, all phenoData columns are consistent -->
-<!-- cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), colnames(Biobase::pData(eset3b))) -->
-<!-- ``` -->
-
-<!-- ## Checking normalization -->
-
-<!-- ```{r} -->
-<!-- #-----------------------------------# -->
-<!-- ##### 3. Checking normalization ##### -->
-<!-- #-----------------------------------# -->
-
-<!-- graphics::boxplot(Biobase::exprs(eset1b)) -->
-<!-- graphics::boxplot(Biobase::exprs(eset2b)) -->
-<!-- graphics::boxplot(Biobase::exprs(eset3b)) -->
-
-<!-- #overview of how many tumor and cancer samples are in esets -->
-<!-- table(Biobase::pData(eset1b)[,"Tumor"]) -->
-<!-- table(Biobase::pData(eset2b)[,"Tumor"]) -->
-<!-- table(Biobase::pData(eset3b)[,"Tumor"]) -->
-<!-- ``` -->
-
-# Preparations for utilizing the package 
+# Preparations for utilizing the sigident package 
 
 These variables need to be defined for the package functions to work. One could use them also as arguments directly in the respective function. However, we think it is more clearly to define them here at the beginning and to refer at each function to the respective variable.  
 
@@ -189,24 +88,8 @@ seed <- 111
 traintest.split <- 0.8
 ```
 
-## Merging 
-
-```{r}
-#TODO only for debugging
-load("../tests/testthat/testdata/esets.RData")
-devtools::load_all(path = "../")
-```
-
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-#-----------------------------------------#
-##### 4. Merging and Batch Correction #####
-#-----------------------------------------#
-
-esets <- c(eset1b,eset2b,eset3b)
-mergeset <- mergeEsets_(esets)
-# merging 3 esets, resulting in a mergeset containing 367 samples and 54675 genes
-
 filename <- paste0(plotdir, "import_histogram.png")
 createImportHistogram_(mergeset, filename)
 ```
