@@ -1,14 +1,14 @@
 createImportHistogram_ <- function(mergeset, filename = NULL){
   if (is.null(filename)){
-    filename <- "./plots/import_histogram.png"
+    filename <- "./plots/import_boxplot.png"
     if (!dir.exists("./plots/")){
       dir.create("./plots/")
     }
   }
   shiny::plotPNG({
     return(print(
-      graphics::boxplot(mergeset@assayData$exprs, main = "Merged data before batch correction",
-                                   xlab = "Samples", ylab ="Expression value")
+      graphics::boxplot(mergeset, main = "Merged microarray data recieved by mergeGEO()",
+                                   xlab = "Samples", ylab ="Expression")
     ))
   },
   filename = filename,

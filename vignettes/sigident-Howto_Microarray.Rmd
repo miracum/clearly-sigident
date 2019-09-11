@@ -38,14 +38,14 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. 
 This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which contain #TODO here!!!!
 
-We therefore created the R package 'mergeGEO' that organizes the a method to merge GEO datasets, originally described and published by Hughey & Butte (2015) in one R function.
+We therefore created the R package 'mergeGEO' that organizes a method to merge GEO datasets, originally described and published by Hughey & Butte (2015) in one R function.
 For a detailled background, please refer to the original publication ([https://doi.org/10.1093/nar/gkv229](https://doi.org/10.1093/nar/gkv229)) and its supplemental R files (licensed under GPLv3, [https://doi.org/10.5281/zenodo.16006](https://doi.org/10.5281/zenodo.16006)). 
 
 To get a detailled background on how to use 'mergeGEO', please visit its package vignette: ([link](link))
 
 ## Download of GEO datasets using mergeGEO 
 
-During the utilization of mergeGEO, the GEO datasets are downloaded, normalized and batch corrected. In order to provide a working example, we included exemplary files containtin the required study metadata and the samplemetadata.
+During the utilization of mergeGEO, the GEO datasets are downloaded, normalized and batch corrected. In order to provide a working example, we included exemplary files containing the required study metadata and the sample metadata.
 
 ```{r}
 studymetadata = "lungcancer_study_metadata.csv"
@@ -64,6 +64,12 @@ mergeset <- mergeGEO(studymetadata = studymetadata,
                      studyname = studyname,
                      denovo = denovo,
                      metadatadir = metadatadir)
+```
+```{r}
+# TODO only for my development #JV
+# loading mergeset exported after usage of mergeGEO
+mergeset <- readRDS("/Users/johannesvey/Bioinfo/Pipeline/RMetaSigDP/mergegeo/mergeset.rds")
+samplemetadata <- read.csv("/Users/johannesvey/Bioinfo/Pipeline/RMetaSigDP/sigident/inst/demofiles/lungcancer_sample_metadata.csv")
 ```
 
 
@@ -88,9 +94,10 @@ seed <- 111
 traintest.split <- 0.8
 ```
 
+First, a boxplot is created with the included samples on the x-axis and the standardised expression values on the y-axis. `mergeset` results as output from the function `mergeGEO()` and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "import_histogram.png")
+filename <- paste0(plotdir, "import_boxplot.png")
 createImportHistogram_(mergeset, filename)
 ```
 
@@ -101,6 +108,7 @@ knitr::include_graphics(filename)
 
 
 # Discovering Batch Effects  
+
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 dd <- createDiagnosisDesign_(mergeset, controlname, targetname, targetcol)
