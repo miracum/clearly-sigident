@@ -36,7 +36,7 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 # Data Preparation 
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. 
-This example uses the GEO datasets "GSE18842", "GSE19804" and "GSE19188", which contain #TODO here!!!!
+This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts gained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).
 
 We therefore created the R package 'mergeGEO' that organizes a method to merge GEO datasets, originally described and published by Hughey & Butte (2015) in one R function.
 For a detailled background, please refer to the original publication ([https://doi.org/10.1093/nar/gkv229](https://doi.org/10.1093/nar/gkv229)) and its supplemental R files (licensed under GPLv3, [https://doi.org/10.5281/zenodo.16006](https://doi.org/10.5281/zenodo.16006)). 
@@ -70,6 +70,7 @@ mergeset <- mergeGEO(studymetadata = studymetadata,
 # loading mergeset exported after usage of mergeGEO
 mergeset <- readRDS("/Users/johannesvey/Bioinfo/Pipeline/RMetaSigDP/mergegeo/mergeset.rds")
 samplemetadata <- read.csv("/Users/johannesvey/Bioinfo/Pipeline/RMetaSigDP/sigident/inst/demofiles/lungcancer_sample_metadata.csv")
+studymetadata <- read.csv("/Users/johannesvey/Bioinfo/Pipeline/RMetaSigDP/sigident/inst/demofiles/lungcancer_study_metadata.csv")
 ```
 
 
@@ -83,7 +84,7 @@ plotdir <- "./plots/"
 dir.create(plotdir)
 csvdir <- "./csv/"
 dir.create(csvdir)
-targetcol <- "Tumor"
+targetcol <- "target"
 controlname <- "Control"
 targetname <- "Lung Cancer"
 species <- "Hs"
@@ -111,25 +112,15 @@ knitr::include_graphics(filename)
 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-dd <- createDiagnosisDesign_(mergeset, controlname, targetname, targetcol)
+dd <- createDiagnosisDesign_(samplemetadata, controlname, targetname, targetcol)
 diagnosis <- dd$diagnosis
 design <- dd$design
 
-DF <- createDataMatrix_(mergeset)
-batch <- createBatch_(eset1b, eset2b, eset3b)
-combat <- createCombat_(DF, batch, design)
+# TODO make this working generically and implement it into functin createBatch(batchcorrection.R)
+study_length <- as.data.frame(table(samplemetadata$study))
+batch <- rep(c(1,2,3,4), times = c(study_length[1,2], study_length[2,2], study_length[3,2],                                       study_length[4,2]))
 
-gPCA_before <- batchCorrection_(DF, batch)
-filename <- paste0(plotdir, "PCplot_before.png")
-createBatchPlot_(gPCA_before, filename, "before")
-```
-
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-gPCA_after <- batchCorrection_(combat, batch)
+gPCA_after <- batchCorrection_(mergeset, batch)
 filename <- paste0(plotdir, "PCplot_after.png")
 createBatchPlot_(gPCA_after, filename, "after")
 ```
