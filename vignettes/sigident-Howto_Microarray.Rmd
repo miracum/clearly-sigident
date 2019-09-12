@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(sigident)
 library(knitr)
+library(mergeGEO)
 ```
 
 # Prerequisites and Installation 
@@ -65,14 +66,6 @@ mergeset <- mergeGEO(studymetadata = studymetadata,
                      denovo = denovo,
                      metadatadir = metadatadir)
 ```
-```{r}
-# TODO only for my development #JV
-# loading mergeset exported after usage of mergeGEO
-mergeset <- readRDS("/Users/johannesvey/Bioinfo/Pipeline/RMetaSigDP/mergegeo/mergeset.rds")
-samplemetadata <- read.csv("/Users/johannesvey/Bioinfo/Pipeline/RMetaSigDP/sigident/inst/demofiles/lungcancer_sample_metadata.csv")
-studymetadata <- read.csv("/Users/johannesvey/Bioinfo/Pipeline/RMetaSigDP/sigident/inst/demofiles/lungcancer_study_metadata.csv")
-```
-
 
 # Preparations for utilizing the sigident package 
 
@@ -108,7 +101,7 @@ knitr::include_graphics(filename)
 
 
 
-# Discovering Batch Effects  
+# TODO change headline Discovering Batch Effects  
 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
