@@ -28,12 +28,6 @@ sigidentMicroarray <- function(mergedset, plotdir, csvdir, targetcol, controlnam
   seed <- 111
   traintest.split <- 0.8
 
-  #TODO only for debugging
-  load("./tests/testthat/testdata/esets.RData")
-  esets <- c(eset1b, eset2b, eset3b)
-  mergedset <- mergeEsets_(esets)
-
-
   stopifnot(
     class(mergedset) == "ExpressionSet",
     is.character(plotdir),
