@@ -13,14 +13,37 @@
 #'
 #' @export
 
-sigidentMicroarray <- function(mergedset, plotdir, csvdir, targetcol, controlname, targetname, species, deg.q.selection = NULL, seed = 111, traintest.split = 0.8){
+sigidentMicroarray <- function(mergedset,
+                               controlname,
+                               targetname,
+                               studyMetadata,
+                               sampleMetadata,
+                               species,
+                               OrgDB,
+                               organism,
+                               pathwayid,
+                               deg.q.selection = NULL,
+                               seed = 111,
+                               traintest.split = 0.8,
+                               plotdir = "./plots/",
+                               csvdir = "./tables/",
+                               targetcol = "target"){
   #TODO only for debugging
+  studymetadata = "lungcancer_study_metadata.csv"
+  samplemetadata = "lungcancer_sample_metadata.csv"
+  metadatadir <- "./metadata/"
+  file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_study_metadata.csv")
+  file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_sample_metadata.csv")
+  studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir, studymetadata))
+  sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir, samplemetadata),
+                                                  studyMetadata = studyMetadata)
+
   plotdir <- "./tests/testthat/plots"
   csvdir <- "./tests/testthat/csvs"
   deg.q.selection <- NULL
   controlname <- "Control"
   targetname <- "Lung Cancer"
-  targetcol <- "Tumor"
+  targetcol <- "target"
   species <- "Hs"
   OrgDb <- "org.Hs.eg.db"
   organism <- "hsa"
@@ -74,7 +97,7 @@ sigidentMicroarray <- function(mergedset, plotdir, csvdir, targetcol, controlnam
 
   ### Fileimport ###
   # visualize log2 transformed expression values of the merged data set
-  createImportHistogram_(mergeset = rv$mergeset, filename = paste0(rv$plotdir, "import_histogram.png"))
+  createImportBoxplot_(mergeset = rv$mergeset, filename = paste0(rv$plotdir, "import_histogram.png"))
 
 
   ### Batchcorrection ###

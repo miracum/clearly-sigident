@@ -53,8 +53,8 @@ studymetadata = "lungcancer_study_metadata.csv"
 samplemetadata = "lungcancer_sample_metadata.csv"
 studyname <- "lungcancer"
 denovo <- TRUE
-metadatadir <- "./metadata"
-dir.create("./metadata")
+metadatadir <- "./metadata/"
+dir.create(metadatadir)
 
 # copy prepared files to metadatadir
 file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_study_metadata.csv")
@@ -65,6 +65,15 @@ mergeset <- mergeGEO(studymetadata = studymetadata,
                      studyname = studyname,
                      denovo = denovo,
                      metadatadir = metadatadir)
+```
+
+
+## Loading Metadata 
+
+```{r}
+studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir, studymetadata))
+sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir, samplemetadata),
+                                             studyMetadata = studyMetadata)
 ```
 
 # Preparations for utilizing the sigident package 
@@ -92,13 +101,12 @@ First, a boxplot is created with the included samples on the x-axis and the stan
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "import_boxplot.png")
-createImportHistogram_(mergeset, filename)
+createImportBoxplot_(mergeset, filename)
 ```
 
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
-
 
 
 # TODO change headline Discovering Batch Effects  
@@ -327,5 +335,63 @@ createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet, filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
+```
+
+
+
+
+# Alternative basic workflow
+
+In order to simplify the whole abovedescribed workflow, we wrapped all these functions into one big function.
+
+## Preprocessing: 
+
+### Merge data sets  
+
+```{r eval = FALSE}
+studymetadata = "lungcancer_study_metadata.csv"
+samplemetadata = "lungcancer_sample_metadata.csv"
+studyname <- "lungcancer"
+denovo <- TRUE
+metadatadir <- "./metadata/"
+dir.create(metadatadir)
+
+# copy prepared files to metadatadir
+file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_study_metadata.csv")
+file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_sample_metadata.csv")
+
+mergeset <- mergeGEO(studymetadata = studymetadata,
+                     samplemetadata = samplemetadata,
+                     studyname = studyname,
+                     denovo = denovo,
+                     metadatadir = metadatadir)
+```
+
+### Read metadata 
+
+```{r eval = FALSE}
+studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir, studymetadata))
+sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir, samplemetadata),
+                                                studyMetadata = studyMetadata)
+```
+
+## Run `sigidentMicroarray`-Function 
+
+```{r eval = FALSE}
+diagnosticModels <- sigidentMicroarray(mergedset = mergeset,
+                                       controlname = "Control",
+                                       targetname = "Lung Cancer",
+                                       studyMetadata = studyMetadata,
+                                       sampleMetadata = sampleMetadata,
+                                       species = "Hs",
+                                       OrgDb = "org.Hs.eg.db",
+                                       organism = "hsa",
+                                       pathwayid = "hsa04110",
+                                       deg.q.selection = NULL,
+                                       seed = 111,
+                                       traintest.split = 0.8,
+                                       plotdir = "./plots/",
+                                       csvdir = "./tables/",
+                                       targetcol = "target"))
 ```
 

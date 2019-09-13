@@ -4,9 +4,10 @@
 \alias{sigidentMicroarray}
 \title{Perform Signature Analyses in Gene Expression Datasets Derived from MicroArrays}
 \usage{
-sigidentMicroarray(mergedset, plotdir, csvdir, targetcol, controlname,
-  targetname, species, deg.q.selection = NULL, seed = 111,
-  traintest.split = 0.8)
+sigidentMicroarray(mergedset, controlname, targetname, studyMetadata,
+  sampleMetadata, species, OrgDB, organism, pathwayid,
+  deg.q.selection = NULL, seed = 111, traintest.split = 0.8,
+  plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
 \item{mergedset}{An expression set merged by the method of Hughey and Butte.}

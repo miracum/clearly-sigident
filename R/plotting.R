@@ -1,4 +1,4 @@
-createImportHistogram_ <- function(mergeset, filename = NULL){
+createImportBoxplot_ <- function(mergeset, filename = NULL){
   if (is.null(filename)){
     filename <- "./plots/import_boxplot.png"
     if (!dir.exists("./plots/")){
