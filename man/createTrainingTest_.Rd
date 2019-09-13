@@ -11,6 +11,8 @@ createTrainingTest_(diagnosis, mergeset, split = 0.8, seed = 111)
 
 \item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
 
+\item{split}{A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.}
+
 \item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
 }
 \description{

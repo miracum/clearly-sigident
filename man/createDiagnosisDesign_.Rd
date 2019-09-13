@@ -8,6 +8,8 @@ createDiagnosisDesign_(sampleMetadata, studyMetadata, controlname,
   targetname, targetcol)
 }
 \arguments{
+\item{sampleMetadata}{A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).}
+
 \item{studyMetadata}{A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).}
 
 \item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}

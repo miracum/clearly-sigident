@@ -9,7 +9,9 @@ createDEGheatmap_(mergeset, genes, patientcolors, filename = NULL)
 \arguments{
 \item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
 
-\item{genes}{A object. The output of the function `identify.DEGs_()`.}
+\item{genes}{A object. The output of the function `identifyDEGs_()`.}
+
+\item{patientcolors}{A object. The ouput of the function `colorHeatmap_()`.}
 
 \item{filename}{A character string indicating the filename. If default (\code{NULL}) a plot named `DEG_heatmap.png` will be created
 inside the directory "./plots".}

@@ -7,6 +7,8 @@
 createBatchPlot_(correction_obj, filename = NULL, time)
 }
 \arguments{
+\item{correction_obj}{An object. The output of the function `batchCorrection_()`.}
+
 \item{filename}{A character string indicating the filename. If default (\code{NULL}) a plot named `PCplot{time}.png` will be created
 inside the directory "./plots".}
 

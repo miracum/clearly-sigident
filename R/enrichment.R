@@ -33,7 +33,7 @@ extractKEGGterms_ <- function(entrez, species){
 #'
 #' @description Helper function to ... (TODO what do we do here?)
 #'
-#' @inheritParams identify.DEGs_
+#' @inheritParams identifyDEGs_
 #'
 #' @export
 goDiffReg_ <- function(mergeset, design){

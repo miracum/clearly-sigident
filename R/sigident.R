@@ -1,12 +1,12 @@
 #' @title Perform Signature Analyses in Gene Expression Datasets Derived from MicroArrays
 #'
-#' @description
+#' @description One function that wrappes all the functionality of the sigident package.
 #'
 #' @param mergeset An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.
 #' @param controlname A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.
 #' @param targetname A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.
 #' @param studyMetadata A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).
-#' @param readSampleMetadata_ A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).
+#' @param sampleMetadata A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).
 #' @param species A character string indicating the sample's species. Currently supported: "Hs".
 #' @param OrgDB A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".
 #' @param organism A character string indicating the organism. Currently supported: "hsa".
@@ -15,7 +15,7 @@
 #'   calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.
 #' @param seed A integer value. Seed to make machine learning algorithms reproducible. Default: 111.
 #' @param nfolds A integer. The number of folds used for cross validation. Default: 10.
-#' @param traintest.split A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.
+#' @param split A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.
 #' @param csvdir A character string. Path to the folder to store output tables. Default: "./tables/".
 #' @param plotdir A character string. Path to the folder to store resulting plots. Default: "./plots/".
 #' @param targetcol A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.
@@ -43,7 +43,7 @@ sigidentMicroarray <- function(mergeset,
                                deg.q.selection = NULL,
                                seed = 111,
                                nfolds = 10,
-                               traintest.split = 0.8,
+                               split = 0.8,
                                plotdir = "./plots/",
                                csvdir = "./tables/",
                                targetcol = "target"){
@@ -125,7 +125,7 @@ sigidentMicroarray <- function(mergeset,
   # store seed, traintest.split
   rv$seed <- seed
   rv$nfolds <- nfolds
-  rv$traintest.split <- traintest.split
+  rv$traintest.split <- split
 
   # add mergedset to list
   rv$mergeset <- mergeset
@@ -163,7 +163,10 @@ sigidentMicroarray <- function(mergeset,
   # heatmap creation
   filename <- paste0(rv$plotdir, "DEG_heatmap.png")
   # create colors for map
-  ht_colors <- colorHeatmap_(sampleMetadata = sampleMetadata, targetcol = rv$targetcol, controlname = rv$controlname) # cancer = red
+  ht_colors <- colorHeatmap_(sampleMetadata = sampleMetadata,
+                             studyMetadata = studyMetadata,
+                             targetcol = rv$targetcol,
+                             controlname = rv$controlname) # cancer = red
   createDEGheatmap_(mergeset = rv$mergeset, genes = rv$genes, patientcolors = ht_colors, filename = filename)
 
 

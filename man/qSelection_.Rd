@@ -7,6 +7,8 @@
 qSelection_(sampleMetadata, deg.q.selection = NULL)
 }
 \arguments{
+\item{sampleMetadata}{A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).}
+
 \item{deg.q.selection}{A numeric value between 0 and 1 indicating the desired q-Value during DEG analysis. Default: NULL, which means, that q is
 calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.}
 }
