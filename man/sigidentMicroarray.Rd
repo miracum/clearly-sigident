@@ -10,7 +10,36 @@ sigidentMicroarray(mergedset, controlname, targetname, studyMetadata,
   plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
-\item{mergedset}{An expression set merged by the method of Hughey and Butte.}
+\item{mergedset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
+
+\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
+
+\item{targetname}{A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.}
+
+\item{studyMetadata}{A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).}
+
+\item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
+
+\item{OrgDB}{A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".}
+
+\item{organism}{A character string indicating the organism. Currently supported: "hsa".}
+
+\item{pathwayid}{A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".}
+
+\item{deg.q.selection}{A numeric value between 0 and 1 indicating the desired q-Value during DEG analysis. Default: NULL, which means, that q is
+calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.}
+
+\item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
+
+\item{traintest.split}{A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.}
+
+\item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
+
+\item{csvdir}{A character string. Path to the folder to store output tables. Default: "./tables/".}
+
+\item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
+
+\item{readSampleMetadata_}{A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).}
 }
 \description{
 
@@ -19,4 +48,7 @@ sigidentMicroarray(mergedset, controlname, targetname, studyMetadata,
 \dontrun{
 }
 
+}
+\seealso{
+mergeGEO
 }

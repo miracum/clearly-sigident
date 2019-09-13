@@ -1,6 +1,7 @@
 # create design
 createDiagnosisDesign_ <- function(samplemetadata, controlname, targetname, targetcol){
   stopifnot(
+    is.data.frame(samplemetadata),
     is.character(controlname),
     is.character(targetname),
     is.character(targetcol)
@@ -17,13 +18,23 @@ createDiagnosisDesign_ <- function(samplemetadata, controlname, targetname, targ
 }
 
 # create batch
-createBatch_ <- function(study_length){
-  # TODO make this working generically
-  
-  return(rep(c(1,2,3), times = c(ncol(eset1),ncol(eset2),ncol(eset3))))
+createBatch_ <- function(sampleMetadata, studyMetadata){
+
+  discovery <- studyMetadata[which(studyMetadata$discovery), "study"]
+  studylist <- list()
+
+  for (d in discovery){
+    studylist[[d]] <- sum(sampleMetadata$study == d)
+  }
+
+  x <- 1:length(studylist)
+
+  times <- sapply(names(studylist), function(n){
+    studylist[[n]]
+  }, USE.NAMES = F)
+  return(rep(x = x, times = times))
 }
 
 batchCorrection_ <- function(x, batch){
   return(gPCA::gPCA.batchdetect(x = t(x), batch = batch, center = FALSE))
 }
-

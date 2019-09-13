@@ -1,23 +1,23 @@
-DEG.limma_ <- function(BatchRemovedExprs, design){
-  fit <- fitLimma_(BatchRemovedExprs, design)
+DEG.limma_ <- function(mergeset, design){
+  fit <- fitLimma_(mergeset, design)
   t <- limma::topTable(fit, coef=2,number=Inf,p.value=0.05,lfc=2)
   genes <- rownames(t)
   return(genes)
 }
 
-identify.DEGs_ <- function(BatchRemovedExprs, design, qValue){
-  fit <- fitLimma_(BatchRemovedExprs, design)
+identify.DEGs_ <- function(mergeset, design, qValue){
+  fit <- fitLimma_(mergeset, design)
   t <- limma::topTable(fit, coef=2,number=Inf,p.value=qValue, lfc=2, adjust.method = "BH")
   genes <- rownames(t)
   return(genes)
 }
 
-fitLimma_ <- function(BatchRemovedExprs, design){
-  return(limma::eBayes(limma::lmFit(BatchRemovedExprs, design)))
+fitLimma_ <- function(mergeset, design){
+  return(limma::eBayes(limma::lmFit(mergeset, design)))
 }
 
-limmaTopTable_ <- function(BatchRemovedExprs, design, qValue){
-  fit <- fitLimma_(BatchRemovedExprs, design)
+limmaTopTable_ <- function(mergeset, design, qValue){
+  fit <- fitLimma_(mergeset, design)
   t <- limma::topTable(fit,
                        coef = 2,
                        number = Inf,
@@ -48,9 +48,9 @@ exportDEGannotations_ <- function(mergeset, genes){
 }
 
 
-qSelection_ <- function(mergeset, deg.q.selection = NULL){
+qSelection_ <- function(sampleMetadata, deg.q.selection = NULL){
   if (is.null(deg.q.selection)){
-    deg_q <- 1/length(mergeset@featureData@data$ID)
+    deg_q <- 1/length(sampleMetadata$sample)
   } else {
     deg_q <- as.numeric(deg.q.selection)
   }

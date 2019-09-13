@@ -2,10 +2,27 @@
 #'
 #' @description
 #'
-#' @param mergedset An expression set merged by the method of Hughey and Butte.
+#' @param mergedset An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.
+#' @param controlname A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.
+#' @param targetname A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.
+#' @param studyMetadata A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).
+#' @param readSampleMetadata_ A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).
+#' @param species A character string indicating the sample's species. Currently supported: "Hs".
+#' @param OrgDB A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".
+#' @param organism A character string indicating the organism. Currently supported: "hsa".
+#' @param pathwayid A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".
+#' @param deg.q.selection A numeric value between 0 and 1 indicating the desired q-Value during DEG analysis. Default: NULL, which means, that q is
+#'   calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.
+#' @param seed A integer value. Seed to make machine learning algorithms reproducible. Default: 111.
+#' @param traintest.split A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.
+#' @param csvdir A character string. Path to the folder to store output tables. Default: "./tables/".
+#' @param plotdir A character string. Path to the folder to store resulting plots. Default: "./plots/".
+#' @param targetcol A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.
 #'
 #' @import data.table
 #' @importFrom magrittr "%>%"
+#'
+#' @seealso mergeGEO
 #'
 #' @examples
 #' \dontrun{
@@ -31,16 +48,19 @@ sigidentMicroarray <- function(mergedset,
   #TODO only for debugging
   studymetadata = "lungcancer_study_metadata.csv"
   samplemetadata = "lungcancer_sample_metadata.csv"
+  studyname = "lungcancer"
   metadatadir <- "./metadata/"
+  dir.create(metadatadir)
   file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_study_metadata.csv")
   file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_sample_metadata.csv")
   studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir, studymetadata))
   sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir, samplemetadata),
                                                   studyMetadata = studyMetadata)
 
-  plotdir <- "./tests/testthat/plots"
-  csvdir <- "./tests/testthat/csvs"
+  plotdir <- "./vignettes/plots"
+  csvdir <- "./vignettes/csv"
   deg.q.selection <- NULL
+  denovo = T
   controlname <- "Control"
   targetname <- "Lung Cancer"
   targetcol <- "target"
@@ -51,8 +71,14 @@ sigidentMicroarray <- function(mergedset,
   seed <- 111
   traintest.split <- 0.8
 
+  mergedset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
+                                  samplemetadata = samplemetadata,
+                                  studyname = studyname,
+                                  denovo = denovo,
+                                  metadatadir = metadatadir)
+
   stopifnot(
-    class(mergedset) == "ExpressionSet",
+    class(mergedset) == "matrix",
     is.character(plotdir),
     is.character(csvdir),
     is.character(controlname),
@@ -64,6 +90,12 @@ sigidentMicroarray <- function(mergedset,
     is.numeric(traintest.split),
     traintest.split < 1 & traintest.split > 0
   )
+
+  if (!is.null(deg.q.selection)){
+    stopifnot(
+      deg.q.selection > 0 | deg.q.selection < 1
+    )
+  }
 
   # create internal list for storage
   rv <- list()
@@ -97,32 +129,28 @@ sigidentMicroarray <- function(mergedset,
 
   ### Fileimport ###
   # visualize log2 transformed expression values of the merged data set
-  createImportBoxplot_(mergeset = rv$mergeset, filename = paste0(rv$plotdir, "import_histogram.png"))
+  createImportBoxplot_(mergeset = rv$mergeset, filename = paste0(rv$plotdir, "import_boxplot.png"))
 
 
   ### Batchcorrection ###
   # get diagnosis and design
-  dd <- createDiagnosisDesign_(mergeset = rv$mergeset, controlname = rv$controlname, targetname = rv$targetname, targetcol = rv$targetcol)
+  dd <- createDiagnosisDesign_(samplemetadata = sampleMetadata, controlname = rv$controlname, targetname = rv$targetname, targetcol = rv$targetcol)
   rv$diagnosis <- dd$diagnosis
   rv$design <- dd$design
 
-  rv$DF <- createDataMatrix_(rv$mergeset)
-  rv$batch <- createBatch_(eset1b, eset2b, eset3b)
-  rv$combat <- createCombat_(rv$DF, rv$batch, rv$design)
+  rv$batch <- createBatch_(studyMetadata = studyMetadata,
+                           sampleMetadata = sampleMetadata)
 
-  rv$gPCA_before <- batchCorrection_(rv$DF, rv$batch)
-  filename <- paste0(rv$plotdir, "PCplot_before.png")
-  createBatchPlot_(rv$gPCA_before, filename, "before")
-
-  rv$gPCA_after <- batchCorrection_(rv$combat, rv$batch)
+  rv$gPCA_after <- batchCorrection_(rv$mergeset, rv$batch)
   filename <- paste0(rv$plotdir, "PCplot_after.png")
   createBatchPlot_(rv$gPCA_after, filename, "after")
 
 
   ### DEG Analysis ###
-  rv$deg_q <- qSelection_(rv$mergeset, deg.q.selection)
+  rv$deg_q <- qSelection_(sampleMetadata = sampleMetadata,
+                          deg.q.selection = deg.q.selection)
 
-  rv$genes <- identify.DEGs_(BatchRemovedExprs = rv$combat, design = rv$design, qValue = rv$deg_q)
+  rv$genes <- identify.DEGs_(mergeset = rv$mergeset, design = rv$design, qValue = rv$deg_q)
 
   # heatmap creation
   filename <- paste0(rv$plotdir, "DEG_heatmap.png")

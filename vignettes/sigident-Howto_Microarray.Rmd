@@ -113,13 +113,15 @@ knitr::include_graphics(filename)
 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-dd <- createDiagnosisDesign_(samplemetadata, controlname, targetname, targetcol)
+dd <- createDiagnosisDesign_(samplemetadata = sampleMetadata,
+                             controlname = controlname,
+                             targetname = targetname,
+                             targetcol = targetcol)
 diagnosis <- dd$diagnosis
 design <- dd$design
 
-# TODO make this working generically and implement it into functin createBatch(batchcorrection.R)
-study_length <- as.data.frame(table(samplemetadata$study))
-batch <- rep(c(1,2,3,4), times = c(study_length[1,2], study_length[2,2], study_length[3,2],                                       study_length[4,2]))
+batch <- createBatch_(studyMetadata = studyMetadata,
+                      sampleMetadata = sampleMetadata)
 
 gPCA_after <- batchCorrection_(mergeset, batch)
 filename <- paste0(plotdir, "PCplot_after.png")
@@ -134,7 +136,8 @@ knitr::include_graphics(filename)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 q_selection <- NULL # use default setting
-deg_q <- qSelection_(mergeset, q_selection)
+deg_q <- qSelection_(sampleMetadata = sampleMetadata,
+                     deg.q.selection = q_selection)
 
 genes <- identify.DEGs_(BatchRemovedExprs = combat, design = design, qValue = deg_q)
 
