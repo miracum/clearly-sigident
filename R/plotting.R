@@ -38,7 +38,7 @@ createBatchPlot_ <- function(correction_obj, filename = NULL, time){
 }
 
 
-createDEGheatmap_ <- function(combat, genes, patientcolors, filename = NULL){
+createDEGheatmap_ <- function(mergeset, genes, patientcolors, filename = NULL){
   if (is.null(filename)){
     filename <- "./plots/DEG_heatmap.png"
     if (!dir.exists("./plots/")){
@@ -47,7 +47,7 @@ createDEGheatmap_ <- function(combat, genes, patientcolors, filename = NULL){
   }
   shiny::plotPNG({
     return(print(
-      gplots::heatmap.2(combat[genes,],
+      gplots::heatmap.2(mergeset[genes,],
                         ColSideColors= patientcolors,
                         key= TRUE,
                         symkey= FALSE,
@@ -87,9 +87,13 @@ createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCa
   width = 1500)
 }
 
-colorHeatmap_ <- function(mergeset, targetcol, controlname){
+colorHeatmap_ <- function(sampleMetadata, targetcol, controlname){
+
+  discovery <- studyMetadata[which(studyMetadata$discovery), "study"]
+  discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
+
   return(
-    unlist(lapply(mergeset[[targetcol]], function(tumor){
+    unlist(lapply(discoverydata, function(tumor){
       # healthy=blue
       return(ifelse(tumor==controlname, "#0000FF", "#FF0000"))
     }))

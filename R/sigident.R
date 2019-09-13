@@ -145,9 +145,9 @@ sigidentMicroarray <- function(mergedset,
   rv$batch <- createBatch_(studyMetadata = studyMetadata,
                            sampleMetadata = sampleMetadata)
 
-  rv$gPCA_after <- batchCorrection_(rv$mergeset, rv$batch)
+  rv$gPCA_after <- batchCorrection_(mergeset = rv$mergeset, batch = rv$batch)
   filename <- paste0(rv$plotdir, "PCplot_after.png")
-  createBatchPlot_(rv$gPCA_after, filename, "after")
+  createBatchPlot_(correction_obj = rv$gPCA_after, filename = filename, time = "after")
 
 
   ### DEG Analysis ###
@@ -159,12 +159,13 @@ sigidentMicroarray <- function(mergedset,
   # heatmap creation
   filename <- paste0(rv$plotdir, "DEG_heatmap.png")
   # create colors for map
-  ht_colors <- colorHeatmap_(mergeset = rv$mergeset, targetcol = rv$targetcol, controlname = rv$controlname) # cancer = red
-  createDEGheatmap_(rv$combat, rv$genes, ht_colors, filename)
+  ht_colors <- colorHeatmap_(sampleMetadata = sampleMetadata, targetcol = rv$targetcol, controlname = rv$controlname) # cancer = red
+  createDEGheatmap_(mergeset = rv$mergeset, genes = rv$genes, patientcolors = ht_colors, filename = filename)
 
 
+  # TODO start here 13.9. Lorenz
   # create genelist
-  rv$genelist <- geneMapping_(rv$mergeset, rv$genes)
+  rv$genelist <- geneMapping_(mergeset = rv$mergeset, genes = rv$genes)
   rv$deg_info <- exportDEGannotations_(rv$mergeset, rv$genes)
   data.table::fwrite(rv$deg_info, paste0(rv$csvdir, "DEG_info.csv"))
 

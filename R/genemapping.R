@@ -14,7 +14,7 @@ geneMap_ <- function(eset, genes){
 
 
 geneMapping_ <- function(mergeset, genes){
-  syms <- geneMap_(mergeset,genes)
+  syms <- geneMap_(mergeset, genes)
 
   # TODO is this always like this?
   genelist <- unlist(lapply(syms, strsplit, " /// "))

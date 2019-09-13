@@ -38,6 +38,6 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
   return(rep(x = x, times = times))
 }
 
-batchCorrection_ <- function(x, batch){
-  return(gPCA::gPCA.batchdetect(x = t(x), batch = batch, center = FALSE))
+batchCorrection_ <- function(mergeset, batch){
+  return(gPCA::gPCA.batchdetect(x = t(mergeset), batch = batch, center = FALSE))
 }

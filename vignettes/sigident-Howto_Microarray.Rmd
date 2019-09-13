@@ -113,7 +113,8 @@ knitr::include_graphics(filename)
 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-dd <- createDiagnosisDesign_(samplemetadata = sampleMetadata,
+dd <- createDiagnosisDesign_(sampleMetadata = sampleMetadata,
+                             studyMetadata = studyMetadata,
                              controlname = controlname,
                              targetname = targetname,
                              targetcol = targetcol)
@@ -123,9 +124,12 @@ design <- dd$design
 batch <- createBatch_(studyMetadata = studyMetadata,
                       sampleMetadata = sampleMetadata)
 
-gPCA_after <- batchCorrection_(mergeset, batch)
+gPCA_after <- batchCorrection_(mergeset = mergeset,
+                               batch = batch)
 filename <- paste0(plotdir, "PCplot_after.png")
-createBatchPlot_(gPCA_after, filename, "after")
+createBatchPlot_(correction_obj = gPCA_after,
+                 filename = filename,
+                 time = "after")
 ```
 
 ```{r out.width='80%'}
@@ -139,18 +143,27 @@ q_selection <- NULL # use default setting
 deg_q <- qSelection_(sampleMetadata = sampleMetadata,
                      deg.q.selection = q_selection)
 
-genes <- identify.DEGs_(BatchRemovedExprs = combat, design = design, qValue = deg_q)
+genes <- identify.DEGs_(mergeset = mergeset,
+                        design = design,
+                        qValue = deg_q)
 
 # heatmap creation
 filename <- paste0(plotdir, "DEG_heatmap.png")
 # create colors for map
-ht_colors <- colorHeatmap_(mergeset, targetcol, controlname)
-createDEGheatmap_(combat, genes, ht_colors, filename)
+ht_colors <- colorHeatmap_(sampleMetadata = sampleMetadata,
+                           targetcol = targetcol,
+                           controlname = controlname) # cancer = red
+createDEGheatmap_(mergeset = mergeset,
+                  genes = genes,
+                  patientcolors = ht_colors,
+                  filename = filename)
 ```
 
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
+
+TODO start here 13.9. Lorenz
 
 ```{r}
 genelist <- geneMapping_(mergeset, genes)
