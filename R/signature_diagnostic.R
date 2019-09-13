@@ -1,3 +1,12 @@
+#' @title createTrainingTest_
+#'
+#' @description Helper function to split data into training and test set
+#'
+#' @param diagnosis A object. The output of the function `createDiagnosisDesign_()`.
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 createTrainingTest_ <- function(diagnosis, mergeset, split = 0.8, seed = 111){
 
   data.for.calculation <- data.table::data.table(cbind(diagnosis, t(mergeset)))
@@ -76,11 +85,25 @@ glmPrediction_ <- function(model, test.x, test.y, s = NULL){
 }
 
 
-
+#' @title glmnetSignature_
+#'
+#' @description Helper function to perform calculation of diagnostic signature (TODO is this the correct description???)
+#'
+#' @param traininglist A list object containint the training data. The output of the function `createTrainingTest_()`.
+#' @param type A character string. The algorihm used to perform calculations. Currently implemented are \emph{"grid", "lasso", "elastic"} and
+#'   \emph{"ridge"}.
+#' @param alpha A numeric between 0 and 1. The elasticnet mixing parameter passed to `glmnet::glmnet()`.
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 glmnetSignature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
 
   stopifnot(
-    type %in% c("grid", "lasso", "elastic", "ridge")
+    type %in% c("grid", "lasso", "elastic", "ridge"),
+    is.numeric(nfolds),
+    is.numeric(seed),
+    is.list(traininglist)
   )
 
   if (type == "grid"){
@@ -93,7 +116,10 @@ glmnetSignature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed
     } else if (type == "ridge"){
       alpha <- 0
     } else if (type == "elastic"){
-      stopifnot(!is.null(alpha))
+      stopifnot(
+        !is.null(alpha),
+        alpha >= 0 | alpha <= 1
+      )
     }
 
     # initialize outlist

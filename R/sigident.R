@@ -14,6 +14,7 @@
 #' @param deg.q.selection A numeric value between 0 and 1 indicating the desired q-Value during DEG analysis. Default: NULL, which means, that q is
 #'   calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.
 #' @param seed A integer value. Seed to make machine learning algorithms reproducible. Default: 111.
+#' @param nfolds A integer. The number of folds used for cross validation. Default: 10.
 #' @param traintest.split A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.
 #' @param csvdir A character string. Path to the folder to store output tables. Default: "./tables/".
 #' @param plotdir A character string. Path to the folder to store resulting plots. Default: "./plots/".
@@ -41,6 +42,7 @@ sigidentMicroarray <- function(mergeset,
                                pathwayid,
                                deg.q.selection = NULL,
                                seed = 111,
+                               nfolds = 10,
                                traintest.split = 0.8,
                                plotdir = "./plots/",
                                csvdir = "./tables/",
@@ -88,6 +90,7 @@ sigidentMicroarray <- function(mergeset,
     is.numeric(deg.q.selection) | is.null(deg.q.selection),
     is.numeric(seed),
     is.numeric(traintest.split),
+    is.numeric(nfolds),
     traintest.split < 1 & traintest.split > 0
   )
 
@@ -121,6 +124,7 @@ sigidentMicroarray <- function(mergeset,
 
   # store seed, traintest.split
   rv$seed <- seed
+  rv$nfolds <- nfolds
   rv$traintest.split <- traintest.split
 
   # add mergedset to list
@@ -228,7 +232,7 @@ sigidentMicroarray <- function(mergeset,
   # Lasso regression
   rv$diagnostic_lasso <- glmnetSignature_(traininglist = rv$training_list,
                                           type = "lasso",
-                                          nfolds = 10,
+                                          nfolds = rv$nfolds,
                                           seed = rv$seed)
   createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV,
                 filename = paste0(rv$plotdir, "CV_lasso.png"))
@@ -242,7 +246,7 @@ sigidentMicroarray <- function(mergeset,
   rv$diagnostic_elasticnet <- glmnetSignature_(traininglist = rv$training_list,
                                                type = "elastic",
                                                alpha = 0.9,
-                                               nfolds = 10,
+                                               nfolds = rv$nfolds,
                                                seed = rv$seed)
   createCVPlot_(cv_obj = rv$diagnostic_elasticnet$fitCV,
                 filename = paste0(rv$plotdir, "CV_elasticNet.png"))
@@ -254,7 +258,7 @@ sigidentMicroarray <- function(mergeset,
   # with both calculated hyperparameters alpha and lambda applying grid search
   rv$diagnostic_glmGrid <- glmnetSignature_(traininglist = rv$training_list,
                                             type = "grid",
-                                            nfolds = 10,
+                                            nfolds = rv$nfolds,
                                             seed = rv$seed)
   # plot model of gridsearch
   createGridModelPlot_(model = rv$diagnostic_glmGrid$caret.train,

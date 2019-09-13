@@ -267,13 +267,13 @@ enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez,
                                       species = organism,
                                       plotdir = plotdir)
 ```
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "/", organism, "04110.png")
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
 ```
 ```{r out.width='80%'}
@@ -282,7 +282,7 @@ knitr::include_graphics(filename)
 
 TODO Description here.
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_GO.png")
 createEnrichtedBarplot_(enrichmentobj = enr_analysis$go,
                         type = "GO",
@@ -294,7 +294,7 @@ knitr::include_graphics(filename)
 
 TODO Description here.
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_KEGG.png")
 createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg,
                         type = "KEGG",
@@ -324,7 +324,7 @@ training_list <- createTrainingTest_(diagnosis = diagnosis,
 
 TODO Description here.
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_lasso <- glmnetSignature_(traininglist = training_list,
                                      type = "lasso",
                                      nfolds = 10,
@@ -337,7 +337,7 @@ createCVPlot_(cv_obj = diagnostic_lasso$fitCV,
 knitr::include_graphics(filename)
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_Lasso.min.png")
 createROCplot_(roc = diagnostic_lasso$roc.min,
                filename = filename)
@@ -346,7 +346,7 @@ createROCplot_(roc = diagnostic_lasso$roc.min,
 knitr::include_graphics(filename)
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_Lasso.1se.png")
 createROCplot_(roc = diagnostic_lasso$roc.1se,
                filename = filename)
@@ -360,7 +360,7 @@ knitr::include_graphics(filename)
 
 TODO Description here.
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_elasticnet <- glmnetSignature_(traininglist = training_list,
                                           type = "elastic",
                                           alpha = 0.9,
@@ -374,7 +374,7 @@ createCVPlot_(cv_obj = diagnostic_elasticnet$fitCV,
 knitr::include_graphics(filename)
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_elasticNet.min.png")
 createROCplot_(roc = diagnostic_elasticnet$roc.min,
                filename = filename)
@@ -383,7 +383,7 @@ createROCplot_(roc = diagnostic_elasticnet$roc.min,
 knitr::include_graphics(filename)
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_elasticNet.1se.png")
 createROCplot_(roc = diagnostic_elasticnet$roc.1se,
                filename = filename)
@@ -397,7 +397,7 @@ knitr::include_graphics(filename)
 
 TODO Description here.
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_glmGrid <- glmnetSignature_(traininglist = training_list,
                                        type = "grid",
                                        nfolds = 10,
@@ -411,7 +411,7 @@ createGridModelPlot_(model = diagnostic_glmGrid$caret.train,
 knitr::include_graphics(filename)
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # plot variable importance of gridsearch
 filename <- paste0(plotdir, "Gridsearch_variable_importance.png")
 createGridVarImpPlot_(model = diagnostic_glmGrid$caret.train,
@@ -421,7 +421,7 @@ createGridVarImpPlot_(model = diagnostic_glmGrid$caret.train,
 knitr::include_graphics(filename)
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_elasticNet.grid.png")
 createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet,
@@ -497,6 +497,7 @@ diagnosticModels <- sigidentMicroarray(mergeset = mergeset,
                                        pathwayid = "hsa04110",
                                        deg.q.selection = NULL,
                                        seed = 111,
+                                       nfolds = 10,
                                        traintest.split = 0.8,
                                        plotdir = "./plots/",
                                        csvdir = "./tables/",
