@@ -134,7 +134,11 @@ sigidentMicroarray <- function(mergedset,
 
   ### Batchcorrection ###
   # get diagnosis and design
-  dd <- createDiagnosisDesign_(samplemetadata = sampleMetadata, controlname = rv$controlname, targetname = rv$targetname, targetcol = rv$targetcol)
+  dd <- createDiagnosisDesign_(sampleMetadata = sampleMetadata,
+                               studyMetadata = studyMetadata,
+                               controlname = rv$controlname,
+                               targetname = rv$targetname,
+                               targetcol = rv$targetcol)
   rv$diagnosis <- dd$diagnosis
   rv$design <- dd$design
 

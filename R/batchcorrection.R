@@ -1,5 +1,5 @@
 # create design
-createDiagnosisDesign_ <- function(samplemetadata, controlname, targetname, targetcol){
+createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, targetname, targetcol){
   stopifnot(
     is.data.frame(samplemetadata),
     is.character(controlname),
@@ -7,7 +7,10 @@ createDiagnosisDesign_ <- function(samplemetadata, controlname, targetname, targ
     is.character(targetcol)
   )
 
-  diag <- as.vector(samplemetadata[[targetcol]])
+  discovery <- studyMetadata[which(studyMetadata$discovery), "study"]
+  discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
+
+  diag <- as.vector(discoverydata)
 
   diagnosis <- gsub(controlname, "0", diag)
   diagnosis <- gsub(targetname, "1", diagnosis)
