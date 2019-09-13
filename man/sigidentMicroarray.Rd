@@ -4,13 +4,13 @@
 \alias{sigidentMicroarray}
 \title{Perform Signature Analyses in Gene Expression Datasets Derived from MicroArrays}
 \usage{
-sigidentMicroarray(mergedset, controlname, targetname, studyMetadata,
+sigidentMicroarray(mergeset, controlname, targetname, studyMetadata,
   sampleMetadata, species, OrgDB, organism, pathwayid,
   deg.q.selection = NULL, seed = 111, traintest.split = 0.8,
   plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
-\item{mergedset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
+\item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
 
 \item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
 

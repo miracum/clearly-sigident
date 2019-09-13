@@ -48,7 +48,7 @@ To get a detailled background on how to use 'mergeGEO', please visit its package
 
 During the utilization of mergeGEO, the GEO datasets are downloaded, normalized and batch corrected. In order to provide a working example, we included exemplary files containing the required study metadata and the sample metadata.
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 studymetadata = "lungcancer_study_metadata.csv"
 samplemetadata = "lungcancer_sample_metadata.csv"
 studyname <- "lungcancer"
@@ -64,11 +64,11 @@ file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
                            package = "mergeGEO"),
           to="./metadata/lungcancer_sample_metadata.csv")
 
-mergeset <- mergeGEO(studymetadata = studymetadata,
-                     samplemetadata = samplemetadata,
-                     studyname = studyname,
-                     denovo = denovo,
-                     metadatadir = metadatadir)
+mergeset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
+                               samplemetadata = samplemetadata,
+                               studyname = studyname,
+                               denovo = denovo,
+                               metadatadir = metadatadir)
 ```
 
 
@@ -213,6 +213,7 @@ enr_topgo <- extractGOterms_(entrez = deg_entrez,
                              species = species)
 ```
 ```{r}
+dim(enr_topgo)
 knitr::kable(head(enr_topgo))
 ```
 
@@ -223,6 +224,7 @@ enr_topkegg <- extractKEGGterms_(entrez = deg_entrez,
                                  species = species)
 ```
 ```{r}
+dim(enr_topkegg)
 knitr::kable(head(enr_topkegg))
 ```
 
@@ -236,12 +238,21 @@ enr_fitlm_topgo <- extractGOterms_(entrez = enr_fitlm,
                                    species = species,
                                    FDR = 0.01)
 data.table::fwrite(enr_fitlm_topgo, paste0(csvdir, "Top_GO_fitlm.csv"))
+```
+```{r}
+dim(enr_fitlm_topgo)
+knitr::kable(head(enr_fitlm_topgo))
+```
 
+```{r}
 enr_fitlm_topkegg <- extractKEGGterms_(entrez = enr_fitlm,
                                        species = species)
 data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 ```
-
+```{r}
+dim(enr_fitlm_topkegg)
+knitr::kable(head(enr_fitlm_topkegg))
+```
 
 ## GO Analysis
 
@@ -475,7 +486,7 @@ sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(
 TODO Description here.
 
 ```{r eval = FALSE}
-diagnosticModels <- sigidentMicroarray(mergedset = mergeset,
+diagnosticModels <- sigidentMicroarray(mergeset = mergeset,
                                        controlname = "Control",
                                        targetname = "Lung Cancer",
                                        studyMetadata = studyMetadata,

@@ -1,3 +1,13 @@
+#' @title createImportBoxplot_
+#'
+#' @description Helper function to create boxplot of mergeset
+#'
+#' @param filename A character string indicating the filename. If default (\code{NULL}) a plot named `import_boxplot.png` will be created
+#'   inside the directory "./plots".
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 createImportBoxplot_ <- function(mergeset, filename = NULL){
   if (is.null(filename)){
     filename <- "./plots/import_boxplot.png"
@@ -17,6 +27,18 @@ createImportBoxplot_ <- function(mergeset, filename = NULL){
 }
 
 
+#' @title createBatchPlot_
+#'
+#' @description Helper function to create batchplot
+#'
+#' @param filename A character string indicating the filename. If default (\code{NULL}) a plot named `PCplot{time}.png` will be created
+#'   inside the directory "./plots".
+#' @param time A character string indicating if the plot is "before" or "after" batch correction. This information is integrated
+#'   into the filename.
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 createBatchPlot_ <- function(correction_obj, filename = NULL, time){
   if (is.null(filename)){
     filename <- paste0("./plots/PCplot_", time, ".png")
@@ -38,6 +60,17 @@ createBatchPlot_ <- function(correction_obj, filename = NULL, time){
 }
 
 
+#' @title createDEGheatmap_
+#'
+#' @description Helper function to create DEG heatmap
+#'
+#' @param filename A character string indicating the filename. If default (\code{NULL}) a plot named `DEG_heatmap.png` will be created
+#'   inside the directory "./plots".
+#' @param genes A object. The output of the function `identify.DEGs_()`.
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 createDEGheatmap_ <- function(mergeset, genes, patientcolors, filename = NULL){
   if (is.null(filename)){
     filename <- "./plots/DEG_heatmap.png"
@@ -65,10 +98,24 @@ createDEGheatmap_ <- function(mergeset, genes, patientcolors, filename = NULL){
 }
 
 
+#' @title createEnrichtedBarplot_
+#'
+#' @description Helper function to create enrichted barplots
+#'
+#' @param filename A character string indicating the filename. If default (\code{NULL}) a plot named `Enriched_{type}.png` will be created
+#'   inside the directory "./plots".
+#' @param enrichmentobj An object resulting from the function `goEnrichmentAnalysis_()`.
+#' @param type A character string. One of eiter "GO" or "KEGG".
+#' @param showCategory An integer. Indicating the number of maximum categories to show in barplot.
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCategory = 20){
   stopifnot(
     is.character(type),
-    type %in% c("GO", "KEGG")
+    type %in% c("GO", "KEGG"),
+    is.numeric(showCategory)
   )
   if (is.null(filename)){
     filename <- paste0("./plots/Enriched_", type, ".png")
@@ -87,6 +134,14 @@ createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCa
   width = 1500)
 }
 
+
+#' @title colorHeatmap_
+#'
+#' @description Helper function to color the heatmap
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 colorHeatmap_ <- function(sampleMetadata, targetcol, controlname){
 
   discovery <- studyMetadata[which(studyMetadata$discovery), "study"]
@@ -100,6 +155,16 @@ colorHeatmap_ <- function(sampleMetadata, targetcol, controlname){
   )
 }
 
+
+#' @title createROCplot_
+#'
+#' @description Helper function to create roc plots
+#'
+#' @param filename A character string. The filename.
+#' @param roc An object containing the roc information. The ouput of the function `glmnetSignature_()`
+#'   with \code{type = "elastic"} or \code{type = "lasso"}.
+#'
+#' @export
 createROCplot_ <- function(roc, filename){
   shiny::plotPNG({
     return(print({graphics::plot(roc)
@@ -113,6 +178,13 @@ createROCplot_ <- function(roc, filename){
 }
 
 
+#' @title createCVPlot_
+#'
+#' @description Helper function to create cross-validation plots
+#'
+#' @inheritParams createROCplot_
+#'
+#' @export
 createCVPlot_ <- function(cv_obj, filename){
   shiny::plotPNG({
     return(print(
@@ -124,6 +196,15 @@ createCVPlot_ <- function(cv_obj, filename){
   width = 450)
 }
 
+
+#' @title createGridModelPlot_
+#'
+#' @description Helper function to create the grid-model plot
+#'
+#' @param filename A character string. The filename.
+#' @param model An object containing the model information. The ouput of the function `glmnetSignature_()` with \code{type = "grid"}.
+#'
+#' @export
 createGridModelPlot_ <- function(model, filename){
   shiny::plotPNG({
     return(print({graphics::plot(model)}))
@@ -133,6 +214,14 @@ createGridModelPlot_ <- function(model, filename){
   width = 1500)
 }
 
+
+#' @title createGridVarImpPlot_
+#'
+#' @description Helper function to create the variable importance plot
+#'
+#' @inheritParams createGridModelPlot_
+#'
+#' @export
 createGridVarImpPlot_ <- function(model, filename){
   shiny::plotPNG({
     varImp <- caret::varImp(model)

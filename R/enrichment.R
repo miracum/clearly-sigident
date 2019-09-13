@@ -1,12 +1,13 @@
-enrichmentDataSelection_ <- function(mergeset, genes){
-  # TODO ist das immer Spalte 12?
-  Entrez <- Biobase::fData(mergeset)[12][genes,]
-  # remove empty characters and replicates in EntrezIDs
-  DEGs.Entrez <- Entrez[Entrez != ""]
-  return(unique(DEGs.Entrez))
-}
-
-
+#' @title extractGOterms_
+#'
+#' @description Helper function to extract GO terms
+#'
+#' @param entrez A character vector containing the Entrez-IDs.
+#' @param FDR The false discovery rate passed to `limma::goana`.
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 extractGOterms_ <- function(entrez, species, FDR = NULL){
   return(limma::topGO(
     limma::goana(de = entrez, species = species, FDR = FDR)
@@ -14,17 +15,43 @@ extractGOterms_ <- function(entrez, species, FDR = NULL){
 }
 
 
+#' @title extractKEGGterms_
+#'
+#' @description Helper function to extract KEGG terms
+#'
+#' @inheritParams extractGOterms_
+#'
+#' @export
 extractKEGGterms_ <- function(entrez, species){
   return(limma::topKEGG(
     limma::kegga(de = entrez, species = species)
   ))
 }
 
+
+#' @title goDiffReg_
+#'
+#' @description Helper function to ... (TODO what do we do here?)
+#'
+#' @inheritParams identify.DEGs_
+#'
+#' @export
 goDiffReg_ <- function(mergeset, design){
   # run limma analysis
   return(fitLimma_(mergeset, design))
 }
 
+
+#' @title goEnrichmentAnalysis_
+#'
+#' @description Helper function to perform enrichment analysis
+#'
+#' @param fitlm A object, returned by `goDiffReg_()`.
+#'
+#' @inheritParams sigidentMicroarray
+#' @inheritParams extractGOterms_
+#'
+#' @export
 goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, species, plotdir = NULL){
 
   if (is.null(plotdir)){

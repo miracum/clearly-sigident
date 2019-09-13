@@ -5,6 +5,16 @@ DEG.limma_ <- function(mergeset, design){
   return(genes)
 }
 
+#' @title identify.DEGs_
+#'
+#' @description Helper function to identify DEGs
+#'
+#' @param design A object. The output of the function `createDiagnosisDesign_()`.
+#' @param qValue A numeric value. The output of the function `qSelection_()`.
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 identify.DEGs_ <- function(mergeset, design, qValue){
   fit <- fitLimma_(mergeset, design)
   t <- limma::topTable(fit, coef=2,number=Inf,p.value=qValue, lfc=2, adjust.method = "BH")
@@ -47,7 +57,13 @@ exportDEGannotations_ <- function(mergeset, genes){
   return(DEGsInfo)
 }
 
-
+#' @title qSelection_
+#'
+#' @description Helper function to select qValues
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 qSelection_ <- function(sampleMetadata, deg.q.selection = NULL){
   if (is.null(deg.q.selection)){
     deg_q <- 1/length(sampleMetadata$sample)

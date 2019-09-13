@@ -1,7 +1,15 @@
+#' @title createDiagnosisDesign_
+#'
+#' @description Helper function to create diagnosis and design
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 # create design
 createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, targetname, targetcol){
   stopifnot(
-    is.data.frame(samplemetadata),
+    is.data.frame(sampleMetadata),
+    is.data.frame(studyMetadata),
     is.character(controlname),
     is.character(targetname),
     is.character(targetcol)
@@ -20,6 +28,13 @@ createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, t
   return(list(diagnosis = diagnosis, design = design))
 }
 
+#' @title createBatch_
+#'
+#' @description Helper function to create batch
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 # create batch
 createBatch_ <- function(sampleMetadata, studyMetadata){
 
@@ -38,6 +53,16 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
   return(rep(x = x, times = times))
 }
 
+
+#' @title batchCorrection_
+#'
+#' @description Helper function to detect batches
+#'
+#' @param batch Takes the results from \code{createBatch_()} as input.
+#'
+#' @inheritParams sigidentMicroarray
+#'
+#' @export
 batchCorrection_ <- function(mergeset, batch){
   return(gPCA::gPCA.batchdetect(x = t(mergeset), batch = batch, center = FALSE))
 }

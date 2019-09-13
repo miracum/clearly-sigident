@@ -2,7 +2,7 @@
 #'
 #' @description
 #'
-#' @param mergedset An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.
+#' @param mergeset An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.
 #' @param controlname A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.
 #' @param targetname A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.
 #' @param studyMetadata A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).
@@ -30,7 +30,7 @@
 #'
 #' @export
 
-sigidentMicroarray <- function(mergedset,
+sigidentMicroarray <- function(mergeset,
                                controlname,
                                targetname,
                                studyMetadata,
@@ -71,14 +71,14 @@ sigidentMicroarray <- function(mergedset,
   seed <- 111
   traintest.split <- 0.8
 
-  mergedset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
+  mergeset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
                                   samplemetadata = samplemetadata,
                                   studyname = studyname,
                                   denovo = denovo,
                                   metadatadir = metadatadir)
 
   stopifnot(
-    class(mergedset) == "matrix",
+    class(mergeset) == "matrix",
     is.character(plotdir),
     is.character(csvdir),
     is.character(controlname),
@@ -124,7 +124,7 @@ sigidentMicroarray <- function(mergedset,
   rv$traintest.split <- traintest.split
 
   # add mergedset to list
-  rv$mergeset <- mergedset
+  rv$mergeset <- mergeset
 
 
   ### Fileimport ###
