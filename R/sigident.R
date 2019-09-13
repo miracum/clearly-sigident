@@ -164,32 +164,39 @@ sigidentMicroarray <- function(mergedset,
 
 
   # TODO start here 13.9. Lorenz
-  # create genelist
-  rv$genelist <- geneMapping_(mergeset = rv$mergeset, genes = rv$genes)
-  rv$deg_info <- exportDEGannotations_(rv$mergeset, rv$genes)
-  data.table::fwrite(rv$deg_info, paste0(rv$csvdir, "DEG_info.csv"))
-
-  rv$deg_results <- limmaTopTable_(rv$combat, rv$design, rv$deg_q)
-  data.table::fwrite(rv$deg_results, paste0(rv$csvdir, "DEG_results.csv"))
+  # rv$deg_info <- exportDEGannotations_(mergeset = rv$mergeset,
+  #                                      genes = rv$genes)
+  # data.table::fwrite(rv$deg_info, paste0(rv$csvdir, "DEG_info.csv"))
+  #
+  # rv$deg_results <- limmaTopTable_(mergeset = rv$combat,
+  #                                  design = rv$design,
+  #                                  qValue = rv$deg_q)
+  # data.table::fwrite(rv$deg_results, paste0(rv$csvdir, "DEG_results.csv"))
 
   # gene enrichment
-  rv$deg_entrez <- enrichmentDataSelection_(mergeset = rv$mergeset, genes = rv$genes)
+  rv$deg_entrez <- unique(rv$genes)
   # test for over-representation of gene ontology terms
-  rv$enr_topgo <- extractGOterms_(entrez = rv$deg_entrez, species = rv$species)
+  rv$enr_topgo <- extractGOterms_(entrez = rv$deg_entrez,
+                                  species = rv$species)
   data.table::fwrite(rv$enr_topgo, paste0(rv$csvdir, "Top_GO.csv"))
 
   # test for over-representation of KEGG pathways
-  rv$enr_topkegg <- extractKEGGterms_(entrez = rv$deg_entrez, species = rv$species)
+  rv$enr_topkegg <- extractKEGGterms_(entrez = rv$deg_entrez,
+                                      species = rv$species)
   data.table::fwrite(rv$enr_topkegg, paste0(rv$csvdir, "Top_KEGG.csv"))
 
   # take differential regulation between two groups (design) into account
-  rv$enr_fitlm <- goDiffReg_(mergeset = rv$mergeset, BatchRemovedExprs = rv$combat, design = rv$design)
+  rv$enr_fitlm <- goDiffReg_(mergeset = rv$mergeset,
+                             design = rv$design)
   # test for over-representation of gene ontology terms
-  rv$enr_fitlm_topgo <- extractGOterms_(entrez = rv$enr_fitlm, species = rv$species, FDR = 0.01)
+  rv$enr_fitlm_topgo <- extractGOterms_(entrez = rv$enr_fitlm,
+                                        species = rv$species,
+                                        FDR = 0.01)
   data.table::fwrite(rv$enr_fitlm_topgo, paste0(rv$csvdir, "Top_GO_fitlm.csv"))
 
   # test for over-representation of KEGG pathways
-  rv$enr_fitlm_topkegg <- extractKEGGterms_(entrez = rv$enr_fitlm, species = rv$species)
+  rv$enr_fitlm_topkegg <- extractKEGGterms_(entrez = rv$enr_fitlm,
+                                            species = rv$species)
   data.table::fwrite(rv$enr_fitlm_topkegg, paste0(rv$csvdir, "Top_KEGG_fitlm.csv"))
 
   # perform enrichment analysis
@@ -202,36 +209,62 @@ sigidentMicroarray <- function(mergedset,
                                            plotdir = rv$plotdir)
 
   # plotting enrichmentanalysis
-  createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$go, type = "GO", filename = paste0(rv$plotdir, "Enriched_GO.png"))
-  createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$kegg, type = "KEGG", filename = paste0(rv$plotdir, "Enriched_KEGG.png"))
+  createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$go,
+                          type = "GO",
+                          filename = paste0(rv$plotdir, "Enriched_GO.png"))
+  createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$kegg,
+                          type = "KEGG",
+                          filename = paste0(rv$plotdir, "Enriched_KEGG.png"))
 
 
   # identification of Diagnostic Signature
   # first, create training_list
-  rv$training_list <- createTrainingTest_(rv$diagnosis, rv$combat, split = rv$traintest.split, seed = rv$seed)
+  rv$training_list <- createTrainingTest_(diagnosis = rv$diagnosis,
+                                          mergeset = rv$mergeset,
+                                          split = rv$traintest.split,
+                                          seed = rv$seed)
 
 
   # Lasso regression
-  rv$diagnostic_lasso <- glmnetSignature_(traininglist = rv$training_list, type = "lasso", nfolds = 10, seed = rv$seed)
-  createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV, filename = paste0(rv$plotdir, "CV_lasso.png"))
-  createROCplot_(roc = rv$diagnostic_lasso$roc.min, filename = paste0(rv$plotdir, "ROC_Lasso.min.png"))
-  createROCplot_(roc = rv$diagnostic_lasso$roc.1se, filename = paste0(rv$plotdir, "ROC_Lasso.1se.png"))
+  rv$diagnostic_lasso <- glmnetSignature_(traininglist = rv$training_list,
+                                          type = "lasso",
+                                          nfolds = 10,
+                                          seed = rv$seed)
+  createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV,
+                filename = paste0(rv$plotdir, "CV_lasso.png"))
+  createROCplot_(roc = rv$diagnostic_lasso$roc.min,
+                 filename = paste0(rv$plotdir, "ROC_Lasso.min.png"))
+  createROCplot_(roc = rv$diagnostic_lasso$roc.1se,
+                 filename = paste0(rv$plotdir, "ROC_Lasso.1se.png"))
 
 
   # Elastic net regression
-  rv$diagnostic_elasticnet <- glmnetSignature_(traininglist = rv$training_list, type = "elastic", alpha = 0.9, nfolds = 10, seed = rv$seed)
-  createCVPlot_(cv_obj = rv$diagnostic_elasticnet$fitCV, filename = paste0(rv$plotdir, "CV_elasticNet.png"))
-  createROCplot_(roc = rv$diagnostic_elasticnet$roc.min, filename = paste0(rv$plotdir, "ROC_elasticNet.min.png"))
-  createROCplot_(roc = rv$diagnostic_elasticnet$roc.1se, filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png"))
+  rv$diagnostic_elasticnet <- glmnetSignature_(traininglist = rv$training_list,
+                                               type = "elastic",
+                                               alpha = 0.9,
+                                               nfolds = 10,
+                                               seed = rv$seed)
+  createCVPlot_(cv_obj = rv$diagnostic_elasticnet$fitCV,
+                filename = paste0(rv$plotdir, "CV_elasticNet.png"))
+  createROCplot_(roc = rv$diagnostic_elasticnet$roc.min,
+                 filename = paste0(rv$plotdir, "ROC_elasticNet.min.png"))
+  createROCplot_(roc = rv$diagnostic_elasticnet$roc.1se,
+                 filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png"))
 
   # with both calculated hyperparameters alpha and lambda applying grid search
-  rv$diagnostic_glmGrid <- glmnetSignature_(traininglist = rv$training_list, type = "grid", nfolds = 10, seed = rv$seed)
+  rv$diagnostic_glmGrid <- glmnetSignature_(traininglist = rv$training_list,
+                                            type = "grid",
+                                            nfolds = 10,
+                                            seed = rv$seed)
   # plot model of gridsearch
-  createGridModelPlot_(model = rv$diagnostic_glmGrid$caret.train, filename = paste0(rv$plotdir, "Gridsearch_model.png"))
+  createGridModelPlot_(model = rv$diagnostic_glmGrid$caret.train,
+                       filename = paste0(rv$plotdir, "Gridsearch_model.png"))
   # plot variable importance of gridsearch
-  createGridVarImpPlot_(model = rv$diagnostic_glmGrid$caret.train, filename = paste0(rv$plotdir, "Gridsearch_variable_importance.png"))
+  createGridVarImpPlot_(model = rv$diagnostic_glmGrid$caret.train,
+                        filename = paste0(rv$plotdir, "Gridsearch_variable_importance.png"))
   # create roc plot
-  createROCplot_(roc = rv$diagnostic_glmGrid$roc.elasticNet, filename = paste0(rv$plotdir, "ROC_elasticNet.grid.png"))
+  createROCplot_(roc = rv$diagnostic_glmGrid$roc.elasticNet,
+                 filename = paste0(rv$plotdir, "ROC_elasticNet.grid.png"))
 
 
   # compare aucs

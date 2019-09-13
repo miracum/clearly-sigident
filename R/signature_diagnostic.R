@@ -1,6 +1,6 @@
-createTrainingTest_ <- function(diagnosis, combat, split = 0.8, seed = 111){
+createTrainingTest_ <- function(diagnosis, mergeset, split = 0.8, seed = 111){
 
-  data.for.calculation <- data.table::data.table(cbind(diagnosis, t(combat)))
+  data.for.calculation <- data.table::data.table(cbind(diagnosis, t(mergeset)))
   colnames(data.for.calculation)[1] <- "diagnosis"
 
   # randomly split the data into training set (80% for building a predictive model) and test set (20% for evaluating the model)

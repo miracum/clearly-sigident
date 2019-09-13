@@ -20,13 +20,9 @@ extractKEGGterms_ <- function(entrez, species){
   ))
 }
 
-goDiffReg_ <- function(mergeset, BatchRemovedExprs, design){
-  edata <- BatchRemovedExprs
-  # TODO is this always like this?
-  rownames(edata) <- mergeset@featureData@data$ENTREZ_GENE_ID
-
+goDiffReg_ <- function(mergeset, design){
   # run limma analysis
-  return(fitLimma_(edata, design))
+  return(fitLimma_(mergeset, design))
 }
 
 goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, species, plotdir = NULL){
@@ -61,10 +57,9 @@ goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, spe
                         number=Inf,
                         p.value=0.05,
                         lfc=2)
-  geneFC <- tt[,1:2]
+  geneFC <- as.data.frame(cbind(ID = rownames(tt), logFC = as.numeric(tt[,"logFC"])))
   geneFC <- geneFC[order(geneFC$ID),]
   # removing empty Entrez-IDs
-  #geneFC <- geneFC[27:701,] # old code
   geneFC <- geneFC[which(geneFC$ID != ""),]
   # removing Entrez-ID replicates
   geneFC <- geneFC[!duplicated(geneFC$ID),]
