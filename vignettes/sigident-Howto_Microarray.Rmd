@@ -57,8 +57,12 @@ metadatadir <- "./metadata/"
 dir.create(metadatadir)
 
 # copy prepared files to metadatadir
-file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_study_metadata.csv")
-file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_sample_metadata.csv")
+file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv",
+                           package = "mergeGEO"),
+          to="./metadata/lungcancer_study_metadata.csv")
+file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
+                           package = "mergeGEO"),
+          to="./metadata/lungcancer_sample_metadata.csv")
 
 mergeset <- mergeGEO(studymetadata = studymetadata,
                      samplemetadata = samplemetadata,
@@ -69,6 +73,8 @@ mergeset <- mergeGEO(studymetadata = studymetadata,
 
 
 ## Loading Metadata 
+
+TODO Description here.
 
 ```{r}
 studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir, studymetadata))
@@ -109,8 +115,9 @@ knitr::include_graphics(filename)
 ```
 
 
-# TODO change headline Discovering Batch Effects  
+# Create experiment desciption and visualize batch effects  
 
+TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 dd <- createDiagnosisDesign_(sampleMetadata = sampleMetadata,
@@ -137,6 +144,8 @@ knitr::include_graphics(filename)
 ```
 
 # DEG Analysis 
+
+TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 q_selection <- NULL # use default setting
@@ -188,12 +197,16 @@ knitr::include_graphics(filename)
 
 # Gene enrichment 
 
+TODO Description here.
+
 ```{r}
 deg_entrez <- unique(genes)
 ```
 
 
 ## Test for over-representation 
+
+TODO Description here.
 
 ```{r}
 enr_topgo <- extractGOterms_(entrez = deg_entrez,
@@ -203,6 +216,8 @@ enr_topgo <- extractGOterms_(entrez = deg_entrez,
 knitr::kable(head(enr_topgo))
 ```
 
+TODO Description here.
+
 ```{r}
 enr_topkegg <- extractKEGGterms_(entrez = deg_entrez,
                                  species = species)
@@ -210,6 +225,8 @@ enr_topkegg <- extractKEGGterms_(entrez = deg_entrez,
 ```{r}
 knitr::kable(head(enr_topkegg))
 ```
+
+TODO Description here.
 
 ```{r}
 enr_fitlm <- goDiffReg_(mergeset = mergeset,
@@ -227,6 +244,8 @@ data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 
 
 ## GO Analysis
+
+TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 enr_analysis <- goEnrichmentAnalysis_(entrez = deg_entrez,
@@ -250,6 +269,8 @@ filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
 knitr::include_graphics(filename)
 ```
 
+TODO Description here.
+
 ```{r}
 filename <- paste0(plotdir, "Enriched_GO.png")
 createEnrichtedBarplot_(enrichmentobj = enr_analysis$go,
@@ -259,6 +280,8 @@ createEnrichtedBarplot_(enrichmentobj = enr_analysis$go,
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
+
+TODO Description here.
 
 ```{r}
 filename <- paste0(plotdir, "Enriched_KEGG.png")
@@ -273,7 +296,11 @@ knitr::include_graphics(filename)
 
 # Identification of diagnostic signatures 
 
+TODO Description here.
+
 ## Split data into training and test dataset
+
+TODO Description here.
 
 ```{r}
 training_list <- createTrainingTest_(diagnosis = diagnosis,
@@ -283,6 +310,8 @@ training_list <- createTrainingTest_(diagnosis = diagnosis,
 ```
 
 ## Lasso regression
+
+TODO Description here.
 
 ```{r}
 diagnostic_lasso <- glmnetSignature_(traininglist = training_list,
@@ -318,6 +347,8 @@ knitr::include_graphics(filename)
 
 ## Elastic net regression 
 
+TODO Description here.
+
 ```{r}
 diagnostic_elasticnet <- glmnetSignature_(traininglist = training_list,
                                           type = "elastic",
@@ -352,6 +383,8 @@ knitr::include_graphics(filename)
 
 
 ## Gridsearch to find alpha and lambda
+
+TODO Description here.
 
 ```{r}
 diagnostic_glmGrid <- glmnetSignature_(traininglist = training_list,
@@ -396,7 +429,11 @@ In order to simplify the whole abovedescribed workflow, we wrapped all these fun
 
 ## Preprocessing: 
 
+TODO Description here.
+
 ### Merge data sets  
+
+TODO Description here.
 
 ```{r eval = FALSE}
 studymetadata = "lungcancer_study_metadata.csv"
@@ -407,8 +444,12 @@ metadatadir <- "./metadata/"
 dir.create(metadatadir)
 
 # copy prepared files to metadatadir
-file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_study_metadata.csv")
-file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_sample_metadata.csv")
+file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv",
+                           package = "mergeGEO"),
+          to="./metadata/lungcancer_study_metadata.csv")
+file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
+                           package = "mergeGEO"),
+          to="./metadata/lungcancer_sample_metadata.csv")
 
 mergeset <- mergeGEO(studymetadata = studymetadata,
                      samplemetadata = samplemetadata,
@@ -419,13 +460,19 @@ mergeset <- mergeGEO(studymetadata = studymetadata,
 
 ### Read metadata 
 
+TODO Description here.
+
 ```{r eval = FALSE}
-studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir, studymetadata))
-sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir, samplemetadata),
+studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir,
+                                                                             studymetadata))
+sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir,
+                                                                                samplemetadata),
                                                 studyMetadata = studyMetadata)
 ```
 
 ## Run `sigidentMicroarray`-Function 
+
+TODO Description here.
 
 ```{r eval = FALSE}
 diagnosticModels <- sigidentMicroarray(mergedset = mergeset,
