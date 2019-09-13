@@ -103,7 +103,7 @@ OrgDb <- "org.Hs.eg.db"
 organism <- "hsa"
 pathwayid <- "hsa04110"
 seed <- 111
-traintest.split <- 0.8
+split <- 0.8
 ```
 
 First, a boxplot is created with the included samples on the x-axis and the standardised expression values on the y-axis. `mergeset` results as output from the function `mergeGEO()` and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
@@ -172,6 +172,7 @@ genes <- sigident::identifyDEGs_(mergeset = mergeset,
 filename <- paste0(plotdir, "DEG_heatmap.png")
 # create colors for map
 ht_colors <- sigident::colorHeatmap_(sampleMetadata = sampleMetadata,
+                                     studyMetadata = studyMetadata,
                                      targetcol = targetcol,
                                      controlname = controlname) # cancer = red
 sigident::createDEGheatmap_(mergeset = mergeset,
@@ -406,7 +407,7 @@ TODO Description here.
 ```r
 training_list <- sigident::createTrainingTest_(diagnosis = diagnosis,
                                                mergeset = mergeset,
-                                               split = traintest.split,
+                                               split = split,
                                                seed = seed)
 ```
 
@@ -627,7 +628,7 @@ diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,
                                                  deg.q.selection = NULL,
                                                  seed = 111,
                                                  nfolds = 10,
-                                                 traintest.split = 0.8,
+                                                 split = 0.8,
                                                  plotdir = "./plots/",
                                                  csvdir = "./tables/",
                                                  targetcol = "target"))
