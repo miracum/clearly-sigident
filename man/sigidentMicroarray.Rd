@@ -6,9 +6,8 @@
 \usage{
 sigidentMicroarray(mergeset, controlname, targetname, studyMetadata,
   sampleMetadata, species, OrgDB, organism, pathwayid,
-  deg.q.selection = NULL, seed = 111, nfolds = 10,
-  traintest.split = 0.8, plotdir = "./plots/", csvdir = "./tables/",
-  targetcol = "target")
+  deg.q.selection = NULL, seed = 111, nfolds = 10, split = 0.8,
+  plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
 \item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
@@ -18,6 +17,8 @@ sigidentMicroarray(mergeset, controlname, targetname, studyMetadata,
 \item{targetname}{A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.}
 
 \item{studyMetadata}{A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).}
+
+\item{sampleMetadata}{A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).}
 
 \item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
 
@@ -34,18 +35,16 @@ calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.}
 
 \item{nfolds}{A integer. The number of folds used for cross validation. Default: 10.}
 
-\item{traintest.split}{A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.}
+\item{split}{A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.}
 
 \item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
 
 \item{csvdir}{A character string. Path to the folder to store output tables. Default: "./tables/".}
 
 \item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
-
-\item{readSampleMetadata_}{A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).}
 }
 \description{
-
+One function that wrappes all the functionality of the sigident package.
 }
 \examples{
 \dontrun{

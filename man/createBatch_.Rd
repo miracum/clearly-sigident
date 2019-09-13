@@ -7,6 +7,8 @@
 createBatch_(sampleMetadata, studyMetadata)
 }
 \arguments{
+\item{sampleMetadata}{A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).}
+
 \item{studyMetadata}{A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).}
 }
 \description{

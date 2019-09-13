@@ -1,6 +1,6 @@
 Package: sigident
 Title: Signature Analyses in Genomic Expression Sets
-Version: 0.0.0.9000
+Version: 0.0.1.9000
 Authors@R: 
     c(person(given = "Lorenz A.",
              family = "Kapsner",
@@ -12,7 +12,7 @@ Authors@R:
       person(given = "Maximilian",
              family = "Fuchs",
              role = "aut"))
-Description: Identify diagnostic and prognostic signatures from gene expression datasets.
+Description: Identify diagnostic and prognostic signatures from gene expression datasets. Currently, the only supported input data are 'series_matrix' from GEO merged by the R package 'mergeGEO'.
 License: GPL-3
 LazyData: true
 URL: https://gitlab.miracum.org/clearly/sigident
@@ -20,7 +20,7 @@ BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 Copyright: Universitätsklinikum Erlangen
 VignetteBuilder: knitr
-Date/Publication: 2019-09-13 06:35:12 UTC
+Date/Publication: 2019-09-13 15:36:28 UTC
 biocViews: 
 Imports: 
     data.table,

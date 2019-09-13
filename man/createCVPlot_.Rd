@@ -7,6 +7,8 @@
 createCVPlot_(cv_obj, filename)
 }
 \arguments{
+\item{cv_obj}{A object. The result of the function `signature_()`.}
+
 \item{filename}{A character string. The filename.}
 }
 \description{

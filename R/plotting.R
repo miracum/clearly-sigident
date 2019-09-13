@@ -35,8 +35,7 @@ createImportBoxplot_ <- function(mergeset, filename = NULL){
 #'   inside the directory "./plots".
 #' @param time A character string indicating if the plot is "before" or "after" batch correction. This information is integrated
 #'   into the filename.
-#'
-#' @inheritParams sigidentMicroarray
+#' @param correction_obj An object. The output of the function `batchCorrection_()`.
 #'
 #' @export
 createBatchPlot_ <- function(correction_obj, filename = NULL, time){
@@ -66,7 +65,8 @@ createBatchPlot_ <- function(correction_obj, filename = NULL, time){
 #'
 #' @param filename A character string indicating the filename. If default (\code{NULL}) a plot named `DEG_heatmap.png` will be created
 #'   inside the directory "./plots".
-#' @param genes A object. The output of the function `identify.DEGs_()`.
+#' @param genes A object. The output of the function `identifyDEGs_()`.
+#' @param patientcolors A object. The ouput of the function `colorHeatmap_()`.
 #'
 #' @inheritParams sigidentMicroarray
 #'
@@ -87,7 +87,7 @@ createDEGheatmap_ <- function(mergeset, genes, patientcolors, filename = NULL){
                         density.info= "none",
                         scale = "none",
                         trace= "none",
-                        col = topo.colors(100),
+                        col = grDevices::topo.colors(100),
                         cexRow = 0.4,
                         cexCol = 0.4)
     ))
@@ -142,7 +142,7 @@ createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCa
 #' @inheritParams sigidentMicroarray
 #'
 #' @export
-colorHeatmap_ <- function(sampleMetadata, targetcol, controlname){
+colorHeatmap_ <- function(sampleMetadata, studyMetadata, targetcol, controlname){
 
   discovery <- studyMetadata[which(studyMetadata$discovery), "study"]
   discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
@@ -181,6 +181,8 @@ createROCplot_ <- function(roc, filename){
 #' @title createCVPlot_
 #'
 #' @description Helper function to create cross-validation plots
+#'
+#' @param cv_obj A object. The result of the function `signature_()`.
 #'
 #' @inheritParams createROCplot_
 #'
