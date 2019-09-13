@@ -281,7 +281,7 @@ OrgDb &lt;- &quot;org.Hs.eg.db&quot;
 organism &lt;- &quot;hsa&quot;
 pathwayid &lt;- &quot;hsa04110&quot;
 seed &lt;- 111
-traintest.split &lt;- 0.8
+split &lt;- 0.8
 </code></pre>
 
 <p>First, a boxplot is created with the included samples on the x-axis and the standardised expression values on the y-axis. <code>mergeset</code> results as output from the function <code>mergeGEO()</code> and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.</p>
@@ -339,6 +339,7 @@ genes &lt;- sigident::identifyDEGs_(mergeset = mergeset,
 filename &lt;- paste0(plotdir, &quot;DEG_heatmap.png&quot;)
 # create colors for map
 ht_colors &lt;- sigident::colorHeatmap_(sampleMetadata = sampleMetadata,
+                                     studyMetadata = studyMetadata,
                                      targetcol = targetcol,
                                      controlname = controlname) # cancer = red
 sigident::createDEGheatmap_(mergeset = mergeset,
@@ -764,7 +765,7 @@ sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg,
 
 <pre><code class="r">training_list &lt;- sigident::createTrainingTest_(diagnosis = diagnosis,
                                                mergeset = mergeset,
-                                               split = traintest.split,
+                                               split = split,
                                                seed = seed)
 </code></pre>
 
@@ -947,7 +948,7 @@ sampleMetadata &lt;- mergeGEO::readSampleMetadata_(samplemetadataFilename = past
                                                  deg.q.selection = NULL,
                                                  seed = 111,
                                                  nfolds = 10,
-                                                 traintest.split = 0.8,
+                                                 split = 0.8,
                                                  plotdir = &quot;./plots/&quot;,
                                                  csvdir = &quot;./tables/&quot;,
                                                  targetcol = &quot;target&quot;))
