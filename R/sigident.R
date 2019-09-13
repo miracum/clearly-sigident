@@ -74,10 +74,10 @@ sigidentMicroarray <- function(mergeset,
   traintest.split <- 0.8
 
   mergeset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                                  samplemetadata = samplemetadata,
-                                  studyname = studyname,
-                                  denovo = denovo,
-                                  metadatadir = metadatadir)
+                                 samplemetadata = samplemetadata,
+                                 studyname = studyname,
+                                 denovo = denovo,
+                                 metadatadir = metadatadir)
 
   stopifnot(
     class(mergeset) == "matrix",
@@ -158,7 +158,7 @@ sigidentMicroarray <- function(mergeset,
   rv$deg_q <- qSelection_(sampleMetadata = sampleMetadata,
                           deg.q.selection = deg.q.selection)
 
-  rv$genes <- identify.DEGs_(mergeset = rv$mergeset, design = rv$design, qValue = rv$deg_q)
+  rv$genes <- identifyDEGs_(mergeset = rv$mergeset, design = rv$design, qValue = rv$deg_q)
 
   # heatmap creation
   filename <- paste0(rv$plotdir, "DEG_heatmap.png")
@@ -230,10 +230,10 @@ sigidentMicroarray <- function(mergeset,
 
 
   # Lasso regression
-  rv$diagnostic_lasso <- glmnetSignature_(traininglist = rv$training_list,
-                                          type = "lasso",
-                                          nfolds = rv$nfolds,
-                                          seed = rv$seed)
+  rv$diagnostic_lasso <- signature_(traininglist = rv$training_list,
+                                    type = "lasso",
+                                    nfolds = rv$nfolds,
+                                    seed = rv$seed)
   createCVPlot_(cv_obj = rv$diagnostic_lasso$fitCV,
                 filename = paste0(rv$plotdir, "CV_lasso.png"))
   createROCplot_(roc = rv$diagnostic_lasso$roc.min,
@@ -243,11 +243,11 @@ sigidentMicroarray <- function(mergeset,
 
 
   # Elastic net regression
-  rv$diagnostic_elasticnet <- glmnetSignature_(traininglist = rv$training_list,
-                                               type = "elastic",
-                                               alpha = 0.9,
-                                               nfolds = rv$nfolds,
-                                               seed = rv$seed)
+  rv$diagnostic_elasticnet <- signature_(traininglist = rv$training_list,
+                                         type = "elastic",
+                                         alpha = 0.9,
+                                         nfolds = rv$nfolds,
+                                         seed = rv$seed)
   createCVPlot_(cv_obj = rv$diagnostic_elasticnet$fitCV,
                 filename = paste0(rv$plotdir, "CV_elasticNet.png"))
   createROCplot_(roc = rv$diagnostic_elasticnet$roc.min,
@@ -256,10 +256,10 @@ sigidentMicroarray <- function(mergeset,
                  filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png"))
 
   # with both calculated hyperparameters alpha and lambda applying grid search
-  rv$diagnostic_glmGrid <- glmnetSignature_(traininglist = rv$training_list,
-                                            type = "grid",
-                                            nfolds = rv$nfolds,
-                                            seed = rv$seed)
+  rv$diagnostic_glmGrid <- signature_(traininglist = rv$training_list,
+                                      type = "grid",
+                                      nfolds = rv$nfolds,
+                                      seed = rv$seed)
   # plot model of gridsearch
   createGridModelPlot_(model = rv$diagnostic_glmGrid$caret.train,
                        filename = paste0(rv$plotdir, "Gridsearch_model.png"))

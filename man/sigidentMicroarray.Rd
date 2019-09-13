@@ -6,8 +6,9 @@
 \usage{
 sigidentMicroarray(mergeset, controlname, targetname, studyMetadata,
   sampleMetadata, species, OrgDB, organism, pathwayid,
-  deg.q.selection = NULL, seed = 111, traintest.split = 0.8,
-  plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
+  deg.q.selection = NULL, seed = 111, nfolds = 10,
+  traintest.split = 0.8, plotdir = "./plots/", csvdir = "./tables/",
+  targetcol = "target")
 }
 \arguments{
 \item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
@@ -30,6 +31,8 @@ sigidentMicroarray(mergeset, controlname, targetname, studyMetadata,
 calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.}
 
 \item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
+
+\item{nfolds}{A integer. The number of folds used for cross validation. Default: 10.}
 
 \item{traintest.split}{A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.}
 

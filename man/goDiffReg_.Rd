@@ -6,11 +6,6 @@
 \usage{
 goDiffReg_(mergeset, design)
 }
-\arguments{
-\item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
-
-\item{design}{A object. The output of the function `createDiagnosisDesign_()`.}
-}
 \description{
 Helper function to ... (TODO what do we do here?)
 }

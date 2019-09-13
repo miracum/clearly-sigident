@@ -85,7 +85,7 @@ glmPrediction_ <- function(model, test.x, test.y, s = NULL){
 }
 
 
-#' @title glmnetSignature_
+#' @title signature_
 #'
 #' @description Helper function to perform calculation of diagnostic signature (TODO is this the correct description???)
 #'
@@ -97,7 +97,7 @@ glmPrediction_ <- function(model, test.x, test.y, s = NULL){
 #' @inheritParams sigidentMicroarray
 #'
 #' @export
-glmnetSignature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
+signature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
 
   stopifnot(
     type %in% c("grid", "lasso", "elastic", "ridge"),

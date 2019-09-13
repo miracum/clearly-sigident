@@ -5,7 +5,7 @@ DEG.limma_ <- function(mergeset, design){
   return(genes)
 }
 
-#' @title identify.DEGs_
+#' @title identifyDEGs_
 #'
 #' @description Helper function to identify DEGs
 #'
@@ -15,7 +15,7 @@ DEG.limma_ <- function(mergeset, design){
 #' @inheritParams sigidentMicroarray
 #'
 #' @export
-identify.DEGs_ <- function(mergeset, design, qValue){
+identifyDEGs_ <- function(mergeset, design, qValue){
   fit <- fitLimma_(mergeset, design)
   t <- limma::topTable(fit, coef=2,number=Inf,p.value=qValue, lfc=2, adjust.method = "BH")
   genes <- rownames(t)
