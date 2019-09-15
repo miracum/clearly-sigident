@@ -73,11 +73,12 @@ sigidentMicroarray <- function(mergeset,
   seed <- 111
   traintest.split <- 0.8
 
-  mergeset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                                 samplemetadata = samplemetadata,
-                                 studyname = studyname,
-                                 denovo = denovo,
-                                 metadatadir = metadatadir)
+  m <- mergeGEO::mergeGEO(studymetadata = studymetadata,
+                          samplemetadata = samplemetadata,
+                          studyname = studyname,
+                          denovo = denovo,
+                          metadatadir = metadatadir)
+  mergeset <- m$ematMergedDiscoveryAllClasses
 
   stopifnot(
     class(mergeset) == "matrix",

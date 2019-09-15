@@ -52,7 +52,7 @@ During the utilization of mergeGEO, the GEO datasets are downloaded, normalized 
 studymetadata = "lungcancer_study_metadata.csv"
 samplemetadata = "lungcancer_sample_metadata.csv"
 studyname <- "lungcancer"
-denovo <- F
+denovo <- TRUE
 metadatadir <- "./metadata/"
 dir.create(metadatadir)
 
@@ -64,11 +64,12 @@ file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
                            package = "mergeGEO"),
           to="./metadata/lungcancer_sample_metadata.csv")
 
-mergeset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                               samplemetadata = samplemetadata,
-                               studyname = studyname,
-                               denovo = denovo,
-                               metadatadir = metadatadir)
+m <- mergeGEO::mergeGEO(studymetadata = studymetadata,
+                        samplemetadata = samplemetadata,
+                        studyname = studyname,
+                        denovo = denovo,
+                        metadatadir = metadatadir)
+mergeset <- m$ematMergedDiscoveryAllClasses
 ```
 
 
@@ -463,11 +464,12 @@ file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
                            package = "mergeGEO"),
           to="./metadata/lungcancer_sample_metadata.csv")
 
-mergeset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                               samplemetadata = samplemetadata,
-                               studyname = studyname,
-                               denovo = denovo,
-                               metadatadir = metadatadir)
+m <- mergeGEO::mergeGEO(studymetadata = studymetadata,
+                        samplemetadata = samplemetadata,
+                        studyname = studyname,
+                        denovo = denovo,
+                        metadatadir = metadatadir)
+mergeset <- m$ematMergedDiscoveryAllClasses
 ```
 
 ### Read metadata 
