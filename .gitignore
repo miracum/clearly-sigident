@@ -2,6 +2,7 @@ inst/application/data
 data
 *.Rproj
 .Rproj*
+.RDataTmp
 .Rhistory
 inst/doc
 geodata

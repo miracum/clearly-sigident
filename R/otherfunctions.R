@@ -65,3 +65,27 @@ createCombat_ <- function(mergedset, batch, design){
   edata <- edata[!duplicated(rownames(edata)),]
   return(edata)
 }
+
+#' @title exportDEGannotations_
+#'
+#' @description Helper function to export DEG annotations from mergedset.
+#'
+#' @inheritParams createCombat_
+#' @inheritParams createDEGheatmap_
+#'
+#' @export
+exportDEGannotations_ <- function(mergedset, genes){
+  ids <- genes
+  # TODO is this always so?
+  sym <- Biobase::fData(mergeset)["Gene Symbol"][ids,]
+  tit <- Biobase::fData(mergeset)["Gene Title"][ids,]
+  gbACC <- Biobase::fData(mergeset)["GB_ACC"][ids,]
+  Entrez <- Biobase::fData(mergeset)["ENTREZ_GENE_ID"][ids,]
+  DEGsInfo <- data.table::data.table(cbind(ids,
+                                           sym,
+                                           tit,
+                                           gbACC,
+                                           Entrez))
+  colnames(DEGsInfo) <- c("probe_ID","gene_symbol","gene_title","genebank_accession","entrez_id")
+  return(DEGsInfo)
+}

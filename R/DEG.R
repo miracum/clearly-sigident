@@ -41,21 +41,6 @@ limmaTopTable_ <- function(mergeset, design, qValue){
   return(t)
 }
 
-exportDEGannotations_ <- function(mergeset, genes){
-  ids <- genes
-  # TODO is this always so?
-  sym <- Biobase::fData(mergeset)["Gene Symbol"][ids,]
-  tit <- Biobase::fData(mergeset)["Gene Title"][ids,]
-  gbACC <- Biobase::fData(mergeset)["GB_ACC"][ids,]
-  Entrez <- Biobase::fData(mergeset)["ENTREZ_GENE_ID"][ids,]
-  DEGsInfo <- data.table::data.table(cbind(ids,
-                                           sym,
-                                           tit,
-                                           gbACC,
-                                           Entrez))
-  colnames(DEGsInfo) <- c("probe_ID","gene_symbol","gene_title","genebank_accession","entrez_id")
-  return(DEGsInfo)
-}
 
 #' @title qSelection_
 #'
