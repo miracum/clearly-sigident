@@ -51,7 +51,7 @@ During the utilization of mergeGEO, the GEO datasets are downloaded, normalized 
 studymetadata = "lungcancer_study_metadata.csv"
 samplemetadata = "lungcancer_sample_metadata.csv"
 studyname <- "lungcancer"
-denovo <- F
+denovo <- TRUE
 metadatadir <- "./metadata/"
 dir.create(metadatadir)
 
@@ -63,11 +63,12 @@ file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
                            package = "mergeGEO"),
           to="./metadata/lungcancer_sample_metadata.csv")
 
-mergeset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                               samplemetadata = samplemetadata,
-                               studyname = studyname,
-                               denovo = denovo,
-                               metadatadir = metadatadir)
+m <- mergeGEO::mergeGEO(studymetadata = studymetadata,
+                        samplemetadata = samplemetadata,
+                        studyname = studyname,
+                        denovo = denovo,
+                        metadatadir = metadatadir)
+mergeset <- m$ematMergedDiscoveryAllClasses
 ```
 
 
@@ -267,11 +268,11 @@ knitr::kable(head(enr_topkegg))
 |              |Pathway                                |   N| DE|      P.DE|
 |:-------------|:--------------------------------------|---:|--:|---------:|
 |path:hsa05144 |Malaria                                |  49|  9| 0.0000010|
-|path:hsa04110 |Cell cycle                             | 124| 11| 0.0000874|
-|path:hsa04657 |IL-17 signaling pathway                |  93|  9| 0.0002005|
-|path:hsa04974 |Protein digestion and absorption       |  95|  9| 0.0002358|
-|path:hsa05418 |Fluid shear stress and atherosclerosis | 139| 11| 0.0002424|
-|path:hsa04610 |Complement and coagulation cascades    |  79|  8| 0.0003330|
+|path:hsa04110 |Cell cycle                             | 124| 11| 0.0000876|
+|path:hsa04657 |IL-17 signaling pathway                |  93|  9| 0.0002008|
+|path:hsa04974 |Protein digestion and absorption       |  95|  9| 0.0002363|
+|path:hsa05418 |Fluid shear stress and atherosclerosis | 139| 11| 0.0002429|
+|path:hsa04610 |Complement and coagulation cascades    |  79|  8| 0.0003336|
 
 TODO Description here.
 
@@ -590,11 +591,12 @@ file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
                            package = "mergeGEO"),
           to="./metadata/lungcancer_sample_metadata.csv")
 
-mergeset <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                               samplemetadata = samplemetadata,
-                               studyname = studyname,
-                               denovo = denovo,
-                               metadatadir = metadatadir)
+m <- mergeGEO::mergeGEO(studymetadata = studymetadata,
+                        samplemetadata = samplemetadata,
+                        studyname = studyname,
+                        denovo = denovo,
+                        metadatadir = metadatadir)
+mergeset <- m$ematMergedDiscoveryAllClasses
 ```
 
 ### Read metadata 

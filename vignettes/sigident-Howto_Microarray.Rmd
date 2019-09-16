@@ -22,12 +22,6 @@ library(mergeGEO)
 
 # Prerequisites and Installation 
 
-## Install mergeGEO package
-
-```{r eval=FALSE}
-devtools::install_git("https://gitlab.miracum.org/clearly/mergegeo.git")
-```
-
 ## Install sigident package
 
 ```{r eval=FALSE}
@@ -39,38 +33,153 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. 
 This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts gained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).
 
-We therefore created the R package 'mergeGEO' that organizes a method to merge GEO datasets, originally described and published by Hughey & Butte (2015) in one R function.
-For a detailled background, please refer to the original publication ([https://doi.org/10.1093/nar/gkv229](https://doi.org/10.1093/nar/gkv229)) and its supplemental R files (licensed under GPLv3, [https://doi.org/10.5281/zenodo.16006](https://doi.org/10.5281/zenodo.16006)). 
+## Download of GEO datasets and normalization
 
-To get a detailled background on how to use 'mergeGEO', please visit its package vignette: ([link](link))
-
-## Download of GEO datasets using mergeGEO 
-
-During the utilization of mergeGEO, the GEO datasets are downloaded, normalized and batch corrected. In order to provide a working example, we included exemplary files containing the required study metadata and the sample metadata.
+TODO description
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-studymetadata = "lungcancer_study_metadata.csv"
-samplemetadata = "lungcancer_sample_metadata.csv"
-studyname <- "lungcancer"
-denovo <- TRUE
-metadatadir <- "./metadata/"
-dir.create(metadatadir)
+# initialize filePath:
+filePath <- tempdir()
+datadir <- "./geodata/"
+dir.create(datadir)
 
-# copy prepared files to metadatadir
-file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv",
-                           package = "mergeGEO"),
-          to="./metadata/lungcancer_study_metadata.csv")
-file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
-                           package = "mergeGEO"),
-          to="./metadata/lungcancer_sample_metadata.csv")
+#------------------------------------------------------#
+###### 1. Download of GEO datasets & Normalization #####
+#------------------------------------------------------#
 
-m <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                        samplemetadata = samplemetadata,
-                        studyname = studyname,
-                        denovo = denovo,
-                        metadatadir = metadatadir)
-mergeset <- m$ematMergedDiscoveryAllClasses
+
+# insert the desired GEO dataset into the getGEO() function
+GSE18842 <- GEOquery::getGEO("GSE18842")
+GSE19804 <- GEOquery::getGEO("GSE19804")
+# extract expressionSets
+eset1 <- GSE18842[[1]]
+eset2 <- GSE19804[[1]]
+
+
+# download raw data, uncompress them and execute GCRMA normalization
+# actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
+
+GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
+utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir="./geodata")
+cels <- list.files("./geodata/", pattern = "[gz]")
+sapply(paste("./geodata", cels, sep="/"), GEOquery::gunzip)
+
+# at this point, first the textfile "phenodata.txt must be generated
+## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture
+## the experimental information. Therefore a text file is created in the terminal window or rather in the command line.
+system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
+## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.
+## After this step the normalization can be started.
+
+celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")
+esetC <- gcrma::gcrma(celfiles, fast = FALSE)
+
+# esetC = now is a normalized expressionSet, but without f- and pData
+# the f- and pData are transfered manually from dataset GSE19188
+
+GSE19188 <- GEOquery::getGEO("GSE19188")
+eset3 <- GSE19188[[1]]
+pData3 <- Biobase::pData(eset3)
+fData3 <- Biobase::fData(eset3)
+Biobase::pData(esetC) <- pData3
+Biobase::fData(esetC) <- fData3
+colnames(Biobase::exprs(esetC)) <- colnames(Biobase::exprs(eset3))
+Biobase::annotation(esetC) <- Biobase::annotation(eset3)
+eset3 <- esetC
 ```
+
+## Formatting the phenoData
+
+```{r}
+#-------------------------------------#
+##### 2. Formatting the phenoData #####
+#-------------------------------------#
+
+# the phenoData of the expresssionSets must be formatted in such a way as that the phenoData columns overlap perfectly
+# all expressionSets should have the same columns in the same order
+# not consistent columns must get removed
+# for simpler handling only phenoData columns of interest should be retained
+# we here retained all consistent phenoData
+
+# create version b, that original expressionSets persist
+eset1b <- eset1
+eset2b <- eset2
+eset3b <- eset3
+
+# show number of samples and phenoData columns
+dim(Biobase::pData(eset1b))
+dim(Biobase::pData(eset2b))
+dim(Biobase::pData(eset3b))
+# depict phenoData column names
+colnames(Biobase::pData(eset1b))
+colnames(Biobase::pData(eset2b))
+colnames(Biobase::pData(eset3b))
+
+
+# remove unnecessary phenoData
+# rename desired column names and if necessary the column entries (as we did for 'Tumor')
+
+# eset1b
+eset1b$relation <- NULL
+eset1b$characteristics_ch1 <- NULL
+eset1b$`sample type:ch1` <- NULL
+eset1b$`tissue:ch1` <- NULL
+colnames(Biobase::pData(eset1b))[8] = "target"
+levels(Biobase::eset1b$target) = c("Control","Lung Cancer")
+dim(eset1b)
+
+
+# eset2b
+eset2b$characteristics_ch1.2 <- NULL
+eset2b$characteristics_ch1.3 <- NULL
+eset2b$contact_department <- NULL
+eset2b$characteristics_ch1 <- NULL
+eset2b$`age:ch1` <- NULL
+eset2b$`gender:ch1` <- NULL
+eset2b$`stage:ch1` <- NULL
+eset2b$`tissue:ch1` <- NULL
+colnames(pData(eset2b))[8] = "target"
+levels(eset2b$target) = c("Control","Lung Cancer")
+dim(eset2b)
+
+
+# eset3b
+eset3b$characteristics_ch1.2 <- NULL
+eset3b$characteristics_ch1.3 <- NULL
+eset3b$characteristics_ch1.4 <- NULL
+eset3b$contact_phone <- NULL
+eset3b$contact_fax <- NULL
+eset3b$contact_department <- NULL
+eset3b$contact_web_link <- NULL
+eset3b$relation <- NULL
+eset3b$source_name_ch1 <- NULL
+colnames(Biobase::pData(eset3b))[9] = "target"
+levels(eset3b$target) = c("Control","Lung Cancer")
+pNew <- Biobase::pData(eset3b)[,c(1:7,9,8,10:29)] # reorder columns
+Biobase::pData(eset3b) = pNew
+dim(eset3b)
+
+# now, all phenoData columns are consistent
+cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), colnames(Biobase::pData(eset3b)))
+```
+
+## Checking normalization
+
+```{r}
+#-----------------------------------#
+##### 3. Checking normalization #####
+#-----------------------------------#
+
+graphics::boxplot(Biobase::exprs(eset1b))
+graphics::boxplot(Biobase::exprs(eset2b))
+graphics::boxplot(Biobase::exprs(eset3b))
+
+#overview of how many tumor and cancer samples are in esets
+table(Biobase::pData(eset1b)[,"target"])
+table(Biobase::pData(eset2b)[,"target"])
+table(Biobase::pData(eset3b)[,"target"])
+```
+
 
 
 ## Loading Metadata 
