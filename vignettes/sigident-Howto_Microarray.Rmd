@@ -40,39 +40,48 @@ TODO description
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # initialize filePath:
 filePath <- tempdir()
-datadir <- "./geodata/"
+maindir <- "./geodata/"
+datadir <- paste0(maindir, "data/")
+dir.create(maindir)
 dir.create(datadir)
 
 #------------------------------------------------------#
 ###### 1. Download of GEO datasets & Normalization #####
 #------------------------------------------------------#
 
-
-# insert the desired GEO dataset into the getGEO() function
-GSE18842 <- GEOquery::getGEO("GSE18842")
-GSE19804 <- GEOquery::getGEO("GSE19804")
+if (!file.exists(paste0(datadir, "GSE18842"))){
+  # insert the desired GEO dataset into the getGEO() function
+  GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
+  GSE19804 <- GEOquery::getGEO("GSE19804", destdir = datadir)
+} else {
+  GSE18842 <- GEOquery::getGEO(filename = paste0(datadir, "GSE18842"))
+  GSE19804 <- GEOquery::getGEO(filename = paste0(datadir, "GSE19804"))
+}
 # extract expressionSets
 eset1 <- GSE18842[[1]]
 eset2 <- GSE19804[[1]]
 
-
 # download raw data, uncompress them and execute GCRMA normalization
 # actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
 
-GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
-utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir="./geodata")
-cels <- list.files("./geodata/", pattern = "[gz]")
-sapply(paste("./geodata", cels, sep="/"), GEOquery::gunzip)
-
-# at this point, first the textfile "phenodata.txt must be generated
-## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture
-## the experimental information. Therefore a text file is created in the terminal window or rather in the command line.
-system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
-## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.
-## After this step the normalization can be started.
+if (!file.exists(paste0(maindir, "phenodata.txt"))){
+  GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
+  utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir="./geodata")
+  cels <- list.files("./geodata/", pattern = "[gz]")
+  sapply(paste("./geodata", cels, sep="/"), GEOquery::gunzip)
+  
+  # at this point, first the textfile "phenodata.txt must be generated
+  ## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture
+  ## the experimental information. Therefore a text file is created in the terminal window or rather in the command line.
+  system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
+  ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.
+  ## After this step the normalization can be started.
+} else {
+  cels <- list.files("./geodata/", pattern = "[gz]")
+}
 
 celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")
-esetC <- gcrma::gcrma(celfiles, fast = FALSE)
+esetC <- gcrma::gcrma(celfiles, fast = TRUE)
 
 # esetC = now is a normalized expressionSet, but without f- and pData
 # the f- and pData are transfered manually from dataset GSE19188
