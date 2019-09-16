@@ -79,7 +79,6 @@ usethis::use_package("methods", type="Imports")
 usethis::use_package("caret", type="Imports")
 usethis::use_package("parallel", type="Imports")
 usethis::use_package("doParallel", type="Imports")
-usethis::use_dev_package("mergeGEO", type="Imports")
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700
