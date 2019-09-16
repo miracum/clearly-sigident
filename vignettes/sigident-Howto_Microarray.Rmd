@@ -44,6 +44,11 @@ datadir <- paste0(maindir, "data/")
 dir.create(maindir)
 dir.create(datadir)
 
+# initialize more infos on the study
+targetcol <- "target" # should be named "target"
+controlname <- "Control"
+targetname <- "Lung Cancer"
+
 #------------------------------------------------------#
 ###### 1. Download of GEO datasets & Normalization #####
 #------------------------------------------------------#
@@ -85,7 +90,11 @@ esetC <- gcrma::gcrma(celfiles, fast = TRUE)
 # esetC = now is a normalized expressionSet, but without f- and pData
 # the f- and pData are transfered manually from dataset GSE19188
 
-GSE19188 <- GEOquery::getGEO("GSE19188")
+if (!file.exists(paste0(datadir, "GSE19188"))){
+  GSE19188 <- GEOquery::getGEO("GSE19188", destdir = datadir)
+} else {
+  GSE19188 <- GEOquery::getGEO(filename = paste0(datadir, "GSE19188"))
+}
 eset3 <- GSE19188[[1]]
 pData3 <- Biobase::pData(eset3)
 fData3 <- Biobase::fData(eset3)
@@ -132,8 +141,8 @@ eset1b$relation <- NULL
 eset1b$characteristics_ch1 <- NULL
 eset1b$`sample type:ch1` <- NULL
 eset1b$`tissue:ch1` <- NULL
-colnames(Biobase::pData(eset1b))[8] = "target"
-levels(Biobase::eset1b$target) = c("Control","Lung Cancer")
+colnames(Biobase::pData(eset1b))[8] = targetcol
+levels(eset1b[[targetcol]]) = c(controlname, targetname)
 dim(eset1b)
 
 
@@ -146,8 +155,8 @@ eset2b$`age:ch1` <- NULL
 eset2b$`gender:ch1` <- NULL
 eset2b$`stage:ch1` <- NULL
 eset2b$`tissue:ch1` <- NULL
-colnames(pData(eset2b))[8] = "target"
-levels(eset2b$target) = c("Control","Lung Cancer")
+colnames(pData(eset2b))[8] = targetcol
+levels(eset2b[[targetcol]]) = c(controlname, targetname)
 dim(eset2b)
 
 
@@ -161,8 +170,8 @@ eset3b$contact_department <- NULL
 eset3b$contact_web_link <- NULL
 eset3b$relation <- NULL
 eset3b$source_name_ch1 <- NULL
-colnames(Biobase::pData(eset3b))[9] = "target"
-levels(eset3b$target) = c("Control","Lung Cancer")
+colnames(Biobase::pData(eset3b))[9] = targetcol
+levels(eset3b[[targetcol]]) = c(controlname, targetname)
 pNew <- Biobase::pData(eset3b)[,c(1:7,9,8,10:29)] # reorder columns
 Biobase::pData(eset3b) = pNew
 dim(eset3b)
@@ -183,9 +192,9 @@ graphics::boxplot(Biobase::exprs(eset2b))
 graphics::boxplot(Biobase::exprs(eset3b))
 
 #overview of how many tumor and cancer samples are in esets
-table(Biobase::pData(eset1b)[,"target"])
-table(Biobase::pData(eset2b)[,"target"])
-table(Biobase::pData(eset3b)[,"target"])
+table(Biobase::pData(eset1b)[,targetcol])
+table(Biobase::pData(eset2b)[,targetcol])
+table(Biobase::pData(eset3b)[,targetcol])
 ```
 
 
@@ -199,9 +208,6 @@ plotdir <- "./plots/"
 dir.create(plotdir)
 csvdir <- "./csv/"
 dir.create(csvdir)
-targetcol <- "target"
-controlname <- "Control"
-targetname <- "Lung Cancer"
 species <- "Hs"
 OrgDb <- "org.Hs.eg.db"
 organism <- "hsa"
@@ -219,13 +225,11 @@ TODO Description here.
 
 ```{r}
 # workaround
-load("../../../Shiny/RMetaSigDP_privVey/inst/application/data/esets.RData")
-
 GSE18842_meta <- data.table::data.table(
   cbind(
     study = "GSE18842",
     sample = eset1b@phenoData@data[,"geo_accession"],
-    target = as.character(eset1b@phenoData@data[,"Tumor"])
+    target = as.character(eset1b@phenoData@data[,targetcol])
   )
 )
 
@@ -233,7 +237,7 @@ GSE19804_meta <- data.table::data.table(
   cbind(
     study = "GSE19804",
     sample = eset2b@phenoData@data[,"geo_accession"],
-    target = as.character(eset2b@phenoData@data[,"Tumor"])
+    target = as.character(eset2b@phenoData@data[,targetcol])
   )
 )
 
@@ -241,7 +245,7 @@ GSE19188_meta <- data.table::data.table(
   cbind(
     study = "GSE19188",
     sample = eset3b@phenoData@data[,"geo_accession"],
-    target = as.character(eset3b@phenoData@data[,"Tumor"])
+    target = as.character(eset3b@phenoData@data[,targetcol])
   )
 )
 
@@ -293,7 +297,7 @@ knitr::include_graphics(filename)
 
 ```{r message=FALSE, warning=FALSE, error=FALSE}
 # generate vector with column diagnosis
-table(mergedset@phenoData@data$target)
+table(mergedset@phenoData@data[[targetcol]])
 
 dd <- sigident::createDiagnosisDesign_(sampleMetadata = sampleMetadata,
                                        studyMetadata = studyMetadata,
@@ -345,7 +349,7 @@ knitr::include_graphics(filename)
 
 ```{r results='hide'}
 # remove unneeded objects
-rm("DF", "mergedset", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
+rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
 ```
 
 
@@ -396,28 +400,28 @@ sigident::createDEGheatmap_(mergeset = mergeset,
 knitr::include_graphics(filename)
 ```
 
-<!-- TODO start here 13.9. Lorenz -->
+TODO description here
 
-<!-- ```{r} -->
-<!-- deg_info <- exportDEGannotations_(mergeset = mergeset, -->
-<!--                                   genes = genes) -->
-<!-- data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv")) -->
-<!-- ``` -->
+```{r}
+deg_info <- exportDEGannotations_(mergeset = mergedset,
+                                  genes = genes)
+data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
+```
 
-<!-- ```{r} -->
-<!-- knitr::kable(head(deg_info)) -->
-<!-- ``` -->
+```{r}
+knitr::kable(head(deg_info))
+```
 
-<!-- ```{r} -->
-<!-- deg_results <- limmaTopTable_(BatchRemovedExprs = combat, -->
-<!--                               design = design, -->
-<!--                               qValue = deg_q) -->
-<!-- data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv")) -->
-<!-- ``` -->
+```{r}
+deg_results <- limmaTopTable_(mergeset = mergeset,
+                              design = design,
+                              qValue = deg_q)
+data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
+```
 
-<!-- ```{r} -->
-<!-- knitr::kable(head(deg_results)) -->
-<!-- ``` -->
+```{r}
+knitr::kable(head(deg_results))
+```
 
 # Gene enrichment 
 
