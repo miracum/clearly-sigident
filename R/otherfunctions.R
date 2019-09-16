@@ -1,4 +1,11 @@
-mergeEsets_ <- function(esetlist){
+#' @title merge_
+#'
+#' @description Helper function to merge expression sets
+#'
+#' @param esetlist A list of expression sets to merge
+#'
+#' @export
+merge_ <- function(esetlist){
 
   set1 <- esetlist[[1]] # set1 = first eset in list, will be overwritten by combined esets
 
@@ -35,4 +42,26 @@ mergeEsets_ <- function(esetlist){
   }
   esetNew <- set1 # overwriting set1 with newly combined eset, then jumping back in the loop
   return(esetNew) # loop is finished after combining all esets; result is returned here
+}
+
+#' @title createCombat_
+#'
+#' @description Helper function to create a matrix with genes as rows and samples as columns
+#'
+#' @param mergedset A large expression set. The output of the function `merge_()`.
+#'
+#' @inheritParams batchCorrection_
+#' @inheritParams goDiffReg_
+#'
+#' @export
+createCombat_ <- function(mergedset, batch, design){
+  # generate data frame with expression values and model matrix regardarding diagnosis
+  DF <- mergedset@assayData$exprs
+  edata <- sva::ComBat(DF, batch = batch, mod = design, par.prior = T)
+  # mapping Entrez-IDs to expression matrix
+  rownames(edata) <- as.character(mergedset@featureData@data$ENTREZ_GENE_ID)
+  # remove empty characters and replicates in EntrezIDs
+  edata <- edata[rownames(edata)!="",]
+  edata <- edata[!duplicated(rownames(edata)),]
+  return(edata)
 }

@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(sigident)
 library(knitr)
-library(mergeGEO)
 ```
 
 # Prerequisites and Installation 
@@ -190,17 +189,6 @@ table(Biobase::pData(eset3b)[,"target"])
 ```
 
 
-
-## Loading Metadata 
-
-TODO Description here.
-
-```{r}
-studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir, studymetadata))
-sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir, samplemetadata),
-                                             studyMetadata = studyMetadata)
-```
-
 # Preparations for utilizing the sigident package 
 
 These variables need to be defined for the package functions to work. One could use them also as arguments directly in the respective function. However, we think it is more clearly to define them here at the beginning and to refer at each function to the respective variable.  
@@ -222,7 +210,129 @@ seed <- 111
 split <- 0.8
 ```
 
-First, a boxplot is created with the included samples on the x-axis and the standardised expression values on the y-axis. `mergeset` results as output from the function `mergeGEO()` and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
+
+## Extract Metadata 
+
+TODO Description here.
+
+### Extract sample metadata 
+
+```{r}
+# workaround
+load("../../../Shiny/RMetaSigDP_privVey/inst/application/data/esets.RData")
+
+GSE18842_meta <- data.table::data.table(
+  cbind(
+    study = "GSE18842",
+    sample = eset1b@phenoData@data[,"geo_accession"],
+    target = as.character(eset1b@phenoData@data[,"Tumor"])
+  )
+)
+
+GSE19804_meta <- data.table::data.table(
+  cbind(
+    study = "GSE19804",
+    sample = eset2b@phenoData@data[,"geo_accession"],
+    target = as.character(eset2b@phenoData@data[,"Tumor"])
+  )
+)
+
+GSE19188_meta <- data.table::data.table(
+  cbind(
+    study = "GSE19188",
+    sample = eset3b@phenoData@data[,"geo_accession"],
+    target = as.character(eset3b@phenoData@data[,"Tumor"])
+  )
+)
+
+sampleMetadata <- rbind(GSE18842_meta,
+                        GSE19804_meta,
+                        GSE19188_meta)
+```
+
+### Define study metadata 
+
+```{r}
+studyMetadata <- data.frame(
+  cbind(study = c("GSE18842", "GSE19804", "GSE19188", "GSE30219"),
+        discovery = as.logical(c(1, 1, 1, 0)),
+        validation = as.logical(c(0, 0, 0, 1))
+  )
+)
+```
+
+## Merging and Batch Correction
+
+TODO description here
+
+First, a boxplot is created with the included samples on the x-axis and the standardised expression values on the y-axis. `mergedset` results as output from above described merging and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
+
+```{r}
+#-----------------------------------------#
+##### 4. Merging and Batch Correction #####
+#-----------------------------------------#
+
+
+esets=c(eset1b,eset2b,eset3b)
+mergedset <- merge_(esets)
+# merging 3 esets, resulting in a mergeset containing 367 samples and 54675 genes
+
+# visualize log2 transformed expression values of the merged data set
+filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
+jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
+boxplot(mergedset@assayData$exprs, main = "Merged data before batch correction", 
+        xlab = "Samples", ylab ="Expression value")
+dev.off()
+```
+
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+### Discovering Batch Effects 
+
+```{r message=FALSE, warning=FALSE, error=FALSE}
+# generate vector with column diagnosis
+table(mergedset@phenoData@data$target)
+
+dd <- sigident::createDiagnosisDesign_(sampleMetadata = sampleMetadata,
+                                       studyMetadata = studyMetadata,
+                                       controlname = controlname,
+                                       targetname = targetname,
+                                       targetcol = targetcol)
+diagnosis <- dd$diagnosis
+length(diagnosis)
+table(diagnosis)
+
+design <- dd$design
+
+# determine batches with number of samples
+batch <- sigident::createBatch_(studyMetadata = studyMetadata,
+                                sampleMetadata = sampleMetadata)
+# check batch assignment
+table(batch)
+length(batch)
+
+# Batch Effect Correction 
+# removing batch effects computing linear models, take variance between the diagnosis into consideration
+mergeset <- createCombat_(mergedset = mergedset, batch = batch, design = design)
+```
+
+`mergeset` results as output from above described merging and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+DF <- mergedset@assayData$exprs
+gPCA_before <- sigident::batchDetection_(mergeset = DF,
+                                          batch = batch)
+filename <- paste0(plotdir, "PCplot_before.png")
+sigident::createBatchPlot_(correction_obj = gPCA_before,
+                           filename = filename,
+                           time = "before")
+```
+
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "import_boxplot.png")
@@ -233,24 +343,18 @@ sigident::createImportBoxplot_(mergeset, filename)
 knitr::include_graphics(filename)
 ```
 
+```{r results='hide'}
+# remove unneeded objects
+rm("DF", "mergedset", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
+```
 
-# Create experiment desciption and visualize batch effects  
+
+### Visualize batch effects  
 
 TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-dd <- sigident::createDiagnosisDesign_(sampleMetadata = sampleMetadata,
-                                       studyMetadata = studyMetadata,
-                                       controlname = controlname,
-                                       targetname = targetname,
-                                       targetcol = targetcol)
-diagnosis <- dd$diagnosis
-design <- dd$design
-
-batch <- sigident::createBatch_(studyMetadata = studyMetadata,
-                                sampleMetadata = sampleMetadata)
-
-gPCA_after <- sigident::batchCorrection_(mergeset = mergeset,
+gPCA_after <- sigident::batchDetection_(mergeset = mergeset,
                                          batch = batch)
 filename <- paste0(plotdir, "PCplot_after.png")
 sigident::createBatchPlot_(correction_obj = gPCA_after,

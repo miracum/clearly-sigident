@@ -15,7 +15,7 @@ createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, t
     is.character(targetcol)
   )
 
-  discovery <- studyMetadata[which(studyMetadata$discovery), "study"]
+  discovery <- studyMetadata[which(studyMetadata$discovery == TRUE), "study"]
   discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
 
   diag <- as.vector(discoverydata)
@@ -38,7 +38,7 @@ createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, t
 # create batch
 createBatch_ <- function(sampleMetadata, studyMetadata){
 
-  discovery <- studyMetadata[which(studyMetadata$discovery), "study"]
+  discovery <- studyMetadata[which(studyMetadata$discovery == TRUE), "study"]
   studylist <- list()
 
   for (d in discovery){
@@ -54,7 +54,7 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
 }
 
 
-#' @title batchCorrection_
+#' @title batchDetection_
 #'
 #' @description Helper function to detect batches
 #'
@@ -63,6 +63,6 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
 #' @inheritParams sigidentMicroarray
 #'
 #' @export
-batchCorrection_ <- function(mergeset, batch){
+batchDetection_ <- function(mergeset, batch){
   return(gPCA::gPCA.batchdetect(x = t(mergeset), batch = batch, center = FALSE))
 }
