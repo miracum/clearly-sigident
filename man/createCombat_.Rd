@@ -9,6 +9,8 @@ createCombat_(mergedset, batch, design)
 \arguments{
 \item{mergedset}{A large expression set. The output of the function `merge_()`.}
 
+\item{batch}{Takes the results from \code{createBatch_()} as input.}
+
 \item{design}{A object. The output of the function `createDiagnosisDesign_()`.}
 }
 \description{

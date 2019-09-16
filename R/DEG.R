@@ -26,6 +26,15 @@ fitLimma_ <- function(mergeset, design){
   return(limma::eBayes(limma::lmFit(mergeset, design)))
 }
 
+
+#' @title limmaTopTable_
+#'
+#' @description Helper function to get DEG results
+#'
+#' @inheritParams sigidentMicroarray
+#' @inheritParams identifyDEGs_
+#'
+#' @export
 limmaTopTable_ <- function(mergeset, design, qValue){
   fit <- fitLimma_(mergeset, design)
   t <- limma::topTable(fit,

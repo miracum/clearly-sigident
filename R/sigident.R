@@ -150,7 +150,7 @@ sigidentMicroarray <- function(mergeset,
   rv$batch <- createBatch_(studyMetadata = studyMetadata,
                            sampleMetadata = sampleMetadata)
 
-  rv$gPCA_after <- batchCorrection_(mergeset = rv$mergeset, batch = rv$batch)
+  rv$gPCA_after <- batchDetection_(mergeset = rv$mergeset, batch = rv$batch)
   filename <- paste0(rv$plotdir, "PCplot_after.png")
   createBatchPlot_(correction_obj = rv$gPCA_after, filename = filename, time = "after")
 
@@ -169,17 +169,6 @@ sigidentMicroarray <- function(mergeset,
                              targetcol = rv$targetcol,
                              controlname = rv$controlname) # cancer = red
   createDEGheatmap_(mergeset = rv$mergeset, genes = rv$genes, patientcolors = ht_colors, filename = filename)
-
-
-  # TODO start here 13.9. Lorenz
-  # rv$deg_info <- exportDEGannotations_(mergeset = rv$mergeset,
-  #                                      genes = rv$genes)
-  # data.table::fwrite(rv$deg_info, paste0(rv$csvdir, "DEG_info.csv"))
-  #
-  # rv$deg_results <- limmaTopTable_(mergeset = rv$combat,
-  #                                  design = rv$design,
-  #                                  qValue = rv$deg_q)
-  # data.table::fwrite(rv$deg_results, paste0(rv$csvdir, "DEG_results.csv"))
 
   # gene enrichment
   rv$deg_entrez <- unique(rv$genes)
