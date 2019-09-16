@@ -50,7 +50,7 @@ merge_ <- function(esetlist){
 #'
 #' @param mergedset A large expression set. The output of the function `merge_()`.
 #'
-#' @inheritParams batchCorrection_
+#' @inheritParams batchDetection_
 #' @inheritParams goDiffReg_
 #'
 #' @export
@@ -74,13 +74,12 @@ createCombat_ <- function(mergedset, batch, design){
 #' @inheritParams createDEGheatmap_
 #'
 #' @export
-exportDEGannotations_ <- function(mergedset, genes){
-  ids <- genes
-  # TODO is this always so?
-  sym <- Biobase::fData(mergeset)["Gene Symbol"][ids,]
-  tit <- Biobase::fData(mergeset)["Gene Title"][ids,]
-  gbACC <- Biobase::fData(mergeset)["GB_ACC"][ids,]
-  Entrez <- Biobase::fData(mergeset)["ENTREZ_GENE_ID"][ids,]
+exportDEGannotations_ <- function(mergedset){
+  ids <- mergedset@featureData@data[,"ID"]
+  sym <- Biobase::fData(mergedset)["Gene Symbol"][ids,]
+  tit <- Biobase::fData(mergedset)["Gene Title"][ids,]
+  gbACC <- Biobase::fData(mergedset)["GB_ACC"][ids,]
+  Entrez <- Biobase::fData(mergedset)["ENTREZ_GENE_ID"][ids,]
   DEGsInfo <- data.table::data.table(cbind(ids,
                                            sym,
                                            tit,

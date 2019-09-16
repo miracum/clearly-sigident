@@ -403,8 +403,7 @@ knitr::include_graphics(filename)
 TODO description here
 
 ```{r}
-deg_info <- exportDEGannotations_(mergeset = mergedset,
-                                  genes = genes)
+deg_info <- sigident::exportDEGannotations_(mergedset = mergedset)
 data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 

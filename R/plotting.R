@@ -35,7 +35,7 @@ createImportBoxplot_ <- function(mergeset, filename = NULL){
 #'   inside the directory "./plots".
 #' @param time A character string indicating if the plot is "before" or "after" batch correction. This information is integrated
 #'   into the filename.
-#' @param correction_obj An object. The output of the function `batchCorrection_()`.
+#' @param correction_obj An object. The output of the function `batchDetection_()`.
 #'
 #' @export
 createBatchPlot_ <- function(correction_obj, filename = NULL, time){
@@ -144,7 +144,7 @@ createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCa
 #' @export
 colorHeatmap_ <- function(sampleMetadata, studyMetadata, targetcol, controlname){
 
-  discovery <- studyMetadata[which(studyMetadata$discovery), "study"]
+  discovery <- studyMetadata[which(studyMetadata$discovery==TRUE), "study"]
   discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
 
   return(
