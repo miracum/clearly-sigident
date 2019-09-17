@@ -20,3 +20,4 @@
 ^vignettes/metadata$
 ^vignettes/preview\.dir$
 ^vignettes/*\.csv$
+^vignettes/figure$
