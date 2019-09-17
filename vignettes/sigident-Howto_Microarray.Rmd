@@ -283,7 +283,7 @@ First, a boxplot is created with the included samples on the x-axis and the stan
 
 
 esets=c(eset1b,eset2b,eset3b)
-mergedset <- merge_(esets)
+mergedset <- sigident::merge_(esets)
 # merging 3 esets, resulting in a mergeset containing 367 samples and 54675 genes
 
 # visualize log2 transformed expression values of the merged data set
@@ -324,7 +324,7 @@ length(batch)
 
 # Batch Effect Correction 
 # removing batch effects computing linear models, take variance between the diagnosis into consideration
-mergeset <- createCombat_(mergedset = mergedset, batch = batch, design = design)
+mergeset <- sigident::createCombat_(mergedset = mergedset, batch = batch, design = design)
 ```
 
 `mergeset` results as output from above described merging and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
@@ -364,7 +364,7 @@ TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 gPCA_after <- sigident::batchDetection_(mergeset = mergeset,
-                                         batch = batch)
+                                        batch = batch)
 filename <- paste0(plotdir, "PCplot_after.png")
 sigident::createBatchPlot_(correction_obj = gPCA_after,
                            filename = filename,
@@ -417,9 +417,9 @@ knitr::kable(head(deg_info))
 ```
 
 ```{r}
-deg_results <- limmaTopTable_(mergeset = mergeset,
-                              design = design,
-                              qValue = deg_q)
+deg_results <- sigident::limmaTopTable_(mergeset = mergeset,
+                                        design = design,
+                                        qValue = deg_q)
 data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
