@@ -23,7 +23,7 @@ my_desc$set_version("0.0.1.9000")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
-my_desc$set(Description = "Identify diagnostic and prognostic signatures from gene expression datasets. Currently, the only supported input data are 'series_matrix' from GEO merged by the R package 'mergeGEO'.")
+my_desc$set(Description = "Identify diagnostic and prognostic signatures from gene expression datasets.")
 # The description of your package
 my_desc$set("Date/Publication" = paste(as.character(Sys.time()), "UTC"))
 # The urls

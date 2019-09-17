@@ -12,7 +12,7 @@ Authors@R:
       person(given = "Maximilian",
              family = "Fuchs",
              role = "aut"))
-Description: Identify diagnostic and prognostic signatures from gene expression datasets. Currently, the only supported input data are 'series_matrix' from GEO merged by the R package 'mergeGEO'.
+Description: Identify diagnostic and prognostic signatures from gene expression datasets.
 License: GPL-3
 LazyData: true
 URL: https://gitlab.miracum.org/clearly/sigident
@@ -20,7 +20,7 @@ BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 Copyright: Universitätsklinikum Erlangen
 VignetteBuilder: knitr
-Date/Publication: 2019-09-16 14:13:24 UTC
+Date/Publication: 2019-09-17 07:39:06 UTC
 biocViews: 
 Imports: 
     data.table,

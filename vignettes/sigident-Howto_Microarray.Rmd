@@ -53,49 +53,49 @@ targetname <- "Lung Cancer"
 ###### 1. Download of GEO datasets & Normalization #####
 #------------------------------------------------------#
 
-if (!file.exists(paste0(datadir, "GSE18842"))){
-  # insert the desired GEO dataset into the getGEO() function
-  GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
-  GSE19804 <- GEOquery::getGEO("GSE19804", destdir = datadir)
-} else {
-  GSE18842 <- GEOquery::getGEO(filename = paste0(datadir, "GSE18842"))
-  GSE19804 <- GEOquery::getGEO(filename = paste0(datadir, "GSE19804"))
-}
+# insert the desired GEO dataset into the getGEO() function
+GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
+GSE19804 <- GEOquery::getGEO("GSE19804", destdir = datadir)
+
 # extract expressionSets
 eset1 <- GSE18842[[1]]
 eset2 <- GSE19804[[1]]
 
 # download raw data, uncompress them and execute GCRMA normalization
 # actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
-
-if (!file.exists(paste0(maindir, "phenodata.txt"))){
-  GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
-  utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir="./geodata")
-  cels <- list.files("./geodata/", pattern = "[gz]")
-  sapply(paste("./geodata", cels, sep="/"), GEOquery::gunzip)
-  
+GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
+utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir=maindir)
+cels <- list.files(maindir, pattern = "[gz]")
+tryCatch({
+  sapply(paste(maindir, cels, sep="/"), GEOquery::gunzip)
   # at this point, first the textfile "phenodata.txt must be generated
   ## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture
   ## the experimental information. Therefore a text file is created in the terminal window or rather in the command line.
   system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
   ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.
   ## After this step the normalization can be started.
-} else {
-  cels <- list.files("./geodata/", pattern = "[gz]")
-}
+}, error = function(e){
+  print(e)
+})
 
-celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")
+cels <- list.files(maindir, pattern = "CEL$")
+
+celfiles <- paste0(maindir, cels)
+# use justGCRMA now due to memory issues with gcrma --> justGCRMA is much more memory efficient
+# https://www.rdocumentation.org/packages/gcrma/versions/2.44.0/topics/justGCRMA
+esetC <- gcrma::justGCRMA(filenames = celfiles, fast = TRUE)
+# call garbage collection here
 gc()
-esetC <- gcrma::gcrma(celfiles, fast = TRUE)
-gc()
+
+# old code
+#celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")
+#esetC <- gcrma::gcrma(celfiles, fast = TRUE)
+
 # esetC = now is a normalized expressionSet, but without f- and pData
 # the f- and pData are transfered manually from dataset GSE19188
 
-if (!file.exists(paste0(datadir, "GSE19188"))){
-  GSE19188 <- GEOquery::getGEO("GSE19188", destdir = datadir)
-} else {
-  GSE19188 <- GEOquery::getGEO(filename = paste0(datadir, "GSE19188"))
-}
+GSE19188 <- GEOquery::getGEO("GSE19188", destdir = datadir)
+
 eset3 <- GSE19188[[1]]
 pData3 <- Biobase::pData(eset3)
 fData3 <- Biobase::fData(eset3)
