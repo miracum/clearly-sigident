@@ -85,8 +85,9 @@ if (!file.exists(paste0(maindir, "phenodata.txt"))){
 }
 
 celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")
+gc()
 esetC <- gcrma::gcrma(celfiles, fast = TRUE)
-
+gc()
 # esetC = now is a normalized expressionSet, but without f- and pData
 # the f- and pData are transfered manually from dataset GSE19188
 
