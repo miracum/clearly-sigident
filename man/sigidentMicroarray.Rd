@@ -10,15 +10,15 @@ sigidentMicroarray(mergeset, controlname, targetname, studyMetadata,
   plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
-\item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
+\item{mergeset}{A merged ExpressionSet.}
 
 \item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
 
 \item{targetname}{A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.}
 
-\item{studyMetadata}{A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).}
+\item{studyMetadata}{A data frame. The data frame holding the study metadata.}
 
-\item{sampleMetadata}{A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).}
+\item{sampleMetadata}{A data frame. The data frame holding the sample metadata.}
 
 \item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
 
@@ -50,7 +50,4 @@ One function that wrappes all the functionality of the sigident package.
 \dontrun{
 }
 
-}
-\seealso{
-mergeGEO
 }

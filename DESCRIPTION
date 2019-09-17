@@ -20,7 +20,7 @@ BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 Copyright: Universitätsklinikum Erlangen
 VignetteBuilder: knitr
-Date/Publication: 2019-09-17 07:39:06 UTC
+Date/Publication: 2019-09-17 10:39:42 UTC
 biocViews: 
 Imports: 
     data.table,
@@ -51,6 +51,7 @@ Imports:
     hgu133plus2cdf,
     GO.db,
     org.Hs.eg.db,
+    hgu133plus2probe,
     clusterProfiler,
     pathfindR,
     pathview

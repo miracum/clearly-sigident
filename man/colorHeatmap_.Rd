@@ -7,9 +7,9 @@
 colorHeatmap_(sampleMetadata, studyMetadata, targetcol, controlname)
 }
 \arguments{
-\item{sampleMetadata}{A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).}
+\item{sampleMetadata}{A data frame. The data frame holding the sample metadata.}
 
-\item{studyMetadata}{A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).}
+\item{studyMetadata}{A data frame. The data frame holding the study metadata.}
 
 \item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
 
