@@ -7,7 +7,7 @@
 batchDetection_(mergeset, batch)
 }
 \arguments{
-\item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
+\item{mergeset}{A merged ExpressionSet.}
 
 \item{batch}{Takes the results from \code{createBatch_()} as input.}
 }

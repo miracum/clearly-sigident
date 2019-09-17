@@ -7,7 +7,7 @@
 identifyDEGs_(mergeset, design, qValue)
 }
 \arguments{
-\item{mergeset}{An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.}
+\item{mergeset}{A merged ExpressionSet.}
 
 \item{design}{A object. The output of the function `createDiagnosisDesign_()`.}
 

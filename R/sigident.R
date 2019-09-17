@@ -2,7 +2,7 @@
 #'
 #' @description One function that wrappes all the functionality of the sigident package.
 #'
-#' @param mergeset An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.
+#' @param mergeset A merged ExpressionSet.
 #' @param controlname A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.
 #' @param targetname A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.
 #' @param studyMetadata A data frame. The data frame holding the study metadata.
