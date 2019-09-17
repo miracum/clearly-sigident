@@ -22,3 +22,4 @@ metadatadir
 metadata
 vignettes/metadata
 vignettes/*.csv
+vignettes/figure
