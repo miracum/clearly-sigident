@@ -23,9 +23,6 @@
 #' @import data.table
 #' @importFrom magrittr "%>%"
 #'
-#' @examples
-#' \dontrun{
-#' }
 #'
 #' @export
 
@@ -56,9 +53,9 @@ sigidentMicroarray <- function(mergeset,
     is.character(species),
     is.numeric(deg.q.selection) | is.null(deg.q.selection),
     is.numeric(seed),
-    is.numeric(traintest.split),
+    is.numeric(split),
     is.numeric(nfolds),
-    traintest.split < 1 & traintest.split > 0
+    split < 1 & split > 0
   )
 
   if (!is.null(deg.q.selection)){
@@ -77,7 +74,7 @@ sigidentMicroarray <- function(mergeset,
 
   # store species, orgdb and orgamism
   rv$species <- species
-  rv$orgdb <- OrgDb
+  rv$orgdb <- OrgDB
   rv$organism <- organism
   rv$pathwayid <- pathwayid
 
@@ -137,7 +134,7 @@ sigidentMicroarray <- function(mergeset,
                              targetcol = rv$targetcol,
                              controlname = rv$controlname) # cancer = red
   createDEGheatmap_(mergeset = rv$mergeset, genes = rv$genes, patientcolors = ht_colors, filename = filename)
-  
+
   deg_results <- limmaTopTable_(mergeset = rv$mergeset,
                                 design = rv$design,
                                 qValue = rv$deg_q)
