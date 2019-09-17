@@ -17,7 +17,7 @@ createImportBoxplot_ <- function(mergeset, filename = NULL){
   }
   shiny::plotPNG({
     return(print(
-      graphics::boxplot(mergeset, main = "Merged microarray data recieved by mergeGEO()",
+      graphics::boxplot(mergeset, main = "Merged microarray data",
                                    xlab = "Samples", ylab ="Expression")
     ))
   },

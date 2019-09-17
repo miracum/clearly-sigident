@@ -668,51 +668,10 @@ In order to simplify the whole abovedescribed workflow, we wrapped all these fun
 
 ## Preprocessing: 
 
-TODO Description here.
-
-### Merge data sets  
-
-TODO Description here.
-
-```{r eval = FALSE}
-studymetadata = "lungcancer_study_metadata.csv"
-samplemetadata = "lungcancer_sample_metadata.csv"
-studyname <- "lungcancer"
-denovo <- TRUE
-metadatadir <- "./metadata/"
-dir.create(metadatadir)
-
-# copy prepared files to metadatadir
-file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv",
-                           package = "mergeGEO"),
-          to="./metadata/lungcancer_study_metadata.csv")
-file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv",
-                           package = "mergeGEO"),
-          to="./metadata/lungcancer_sample_metadata.csv")
-
-m <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                        samplemetadata = samplemetadata,
-                        studyname = studyname,
-                        denovo = denovo,
-                        metadatadir = metadatadir)
-mergeset <- m$ematMergedDiscoveryAllClasses
-```
-
-### Read metadata 
-
-TODO Description here.
-
-```{r eval = FALSE}
-studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir,
-                                                                             studymetadata))
-sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir,
-                                                                                samplemetadata),
-                                                studyMetadata = studyMetadata)
-```
+The preprocessing needs to be conform with the above described approach.
 
 ## Run `sigidentMicroarray`-Function 
 
-TODO Description here.
 
 ```{r eval = FALSE}
 diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,

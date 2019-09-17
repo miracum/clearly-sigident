@@ -5,8 +5,8 @@
 #' @param mergeset An ExpressionSet resulting from the \code{mergeGEO::mergeGEO()} function.
 #' @param controlname A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.
 #' @param targetname A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.
-#' @param studyMetadata A data frame. The data frame holding the study metadata (output of the function \code{mergeGEO::readStudyMetadata_()}).
-#' @param sampleMetadata A data frame. The data frame holding the sample metadata (output of the function \code{mergeGEO::readSampleMetadata_()}).
+#' @param studyMetadata A data frame. The data frame holding the study metadata.
+#' @param sampleMetadata A data frame. The data frame holding the sample metadata.
 #' @param species A character string indicating the sample's species. Currently supported: "Hs".
 #' @param OrgDB A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".
 #' @param organism A character string indicating the organism. Currently supported: "hsa".
@@ -22,8 +22,6 @@
 #'
 #' @import data.table
 #' @importFrom magrittr "%>%"
-#'
-#' @seealso mergeGEO
 #'
 #' @examples
 #' \dontrun{
@@ -47,38 +45,6 @@ sigidentMicroarray <- function(mergeset,
                                plotdir = "./plots/",
                                csvdir = "./tables/",
                                targetcol = "target"){
-  #TODO only for debugging
-  studymetadata = "lungcancer_study_metadata.csv"
-  samplemetadata = "lungcancer_sample_metadata.csv"
-  studyname = "lungcancer"
-  metadatadir <- "./metadata/"
-  dir.create(metadatadir)
-  file.copy(from=system.file("./demofiles/lungcancer_study_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_study_metadata.csv")
-  file.copy(from=system.file("./demofiles/lungcancer_sample_metadata.csv", package = "mergeGEO"), to="./metadata/lungcancer_sample_metadata.csv")
-  studyMetadata <- mergeGEO::readStudyMetadata_(studymetadataFilename = paste0(metadatadir, studymetadata))
-  sampleMetadata <- mergeGEO::readSampleMetadata_(samplemetadataFilename = paste0(metadatadir, samplemetadata),
-                                                  studyMetadata = studyMetadata)
-
-  plotdir <- "./vignettes/plots"
-  csvdir <- "./vignettes/csv"
-  deg.q.selection <- NULL
-  denovo = T
-  controlname <- "Control"
-  targetname <- "Lung Cancer"
-  targetcol <- "target"
-  species <- "Hs"
-  OrgDb <- "org.Hs.eg.db"
-  organism <- "hsa"
-  pathwayid <- "hsa04110"
-  seed <- 111
-  traintest.split <- 0.8
-
-  m <- mergeGEO::mergeGEO(studymetadata = studymetadata,
-                          samplemetadata = samplemetadata,
-                          studyname = studyname,
-                          denovo = denovo,
-                          metadatadir = metadatadir)
-  mergeset <- m$ematMergedDiscoveryAllClasses
 
   stopifnot(
     class(mergeset) == "matrix",
