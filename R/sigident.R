@@ -125,7 +125,9 @@ sigidentMicroarray <- function(mergeset,
   rv$deg_q <- qSelection_(sampleMetadata = sampleMetadata,
                           deg.q.selection = deg.q.selection)
 
-  rv$genes <- identifyDEGs_(mergeset = rv$mergeset, design = rv$design, qValue = rv$deg_q)
+  rv$genes <- identifyDEGs_(mergeset = rv$mergeset,
+                            design = rv$design,
+                            qValue = rv$deg_q)
 
   # heatmap creation
   filename <- paste0(rv$plotdir, "DEG_heatmap.png")
@@ -135,6 +137,11 @@ sigidentMicroarray <- function(mergeset,
                              targetcol = rv$targetcol,
                              controlname = rv$controlname) # cancer = red
   createDEGheatmap_(mergeset = rv$mergeset, genes = rv$genes, patientcolors = ht_colors, filename = filename)
+  
+  deg_results <- limmaTopTable_(mergeset = rv$mergeset,
+                                design = rv$design,
+                                qValue = rv$deg_q)
+  data.table::fwrite(deg_results, paste0(rv$csvdir, "DEG_results.csv"))
 
   # gene enrichment
   rv$deg_entrez <- unique(rv$genes)
