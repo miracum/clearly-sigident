@@ -7,7 +7,7 @@
 createDEGheatmap_(mergeset, genes, patientcolors, filename = NULL)
 }
 \arguments{
-\item{mergeset}{A merged ExpressionSet.}
+\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
 
 \item{genes}{A object. The output of the function `identifyDEGs_()`.}
 

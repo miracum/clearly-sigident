@@ -10,7 +10,7 @@ sigidentMicroarray(mergeset, controlname, targetname, studyMetadata,
   plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
-\item{mergeset}{A merged ExpressionSet.}
+\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
 
 \item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
 
@@ -45,9 +45,4 @@ calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.}
 }
 \description{
 One function that wrappes all the functionality of the sigident package.
-}
-\examples{
-\dontrun{
-}
-
 }

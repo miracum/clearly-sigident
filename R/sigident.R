@@ -2,7 +2,7 @@
 #'
 #' @description One function that wrappes all the functionality of the sigident package.
 #'
-#' @param mergeset A merged ExpressionSet.
+#' @param mergeset A matrix of merged expression sets (rows = genes, columns = samples).
 #' @param controlname A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.
 #' @param targetname A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.
 #' @param studyMetadata A data frame. The data frame holding the study metadata.
