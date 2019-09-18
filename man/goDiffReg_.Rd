@@ -7,7 +7,7 @@
 goDiffReg_(mergeset, design)
 }
 \arguments{
-\item{mergeset}{A merged ExpressionSet.}
+\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
 
 \item{design}{A object. The output of the function `createDiagnosisDesign_()`.}
 }

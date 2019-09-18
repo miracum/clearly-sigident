@@ -9,7 +9,7 @@ createTrainingTest_(diagnosis, mergeset, split = 0.8, seed = 111)
 \arguments{
 \item{diagnosis}{A object. The output of the function `createDiagnosisDesign_()`.}
 
-\item{mergeset}{A merged ExpressionSet.}
+\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
 
 \item{split}{A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.}
 

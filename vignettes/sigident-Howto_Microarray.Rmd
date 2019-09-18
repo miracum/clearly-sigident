@@ -285,7 +285,10 @@ First, a boxplot is created with the included samples on the x-axis and the stan
 esets=c(eset1b,eset2b,eset3b)
 mergedset <- sigident::merge_(esets)
 # merging 3 esets, resulting in a mergeset containing 367 samples and 54675 genes
+```
 
+
+```{r}
 # visualize log2 transformed expression values of the merged data set
 filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
 jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
@@ -684,7 +687,7 @@ diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,
                                                  studyMetadata = studyMetadata,
                                                  sampleMetadata = sampleMetadata,
                                                  species = "Hs",
-                                                 OrgDb = "org.Hs.eg.db",
+                                                 OrgDB = "org.Hs.eg.db",
                                                  organism = "hsa",
                                                  pathwayid = "hsa04110",
                                                  deg.q.selection = NULL,
@@ -693,6 +696,6 @@ diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,
                                                  split = 0.8,
                                                  plotdir = "./plots/",
                                                  csvdir = "./tables/",
-                                                 targetcol = "target"))
+                                                 targetcol = "target")
 ```
 
