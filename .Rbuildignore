@@ -21,3 +21,4 @@
 ^vignettes/preview\.dir$
 ^vignettes/*\.csv$
 ^vignettes/figure$
+^vignettes/tables$
