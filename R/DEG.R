@@ -58,9 +58,11 @@ limmaTopTable_ <- function(mergeset, design, qValue){
 #' @inheritParams sigidentMicroarray
 #'
 #' @export
-qSelection_ <- function(sampleMetadata, deg.q.selection = NULL){
+qSelection_ <- function(sampleMetadata, studyMetadata, deg.q.selection = NULL){
   if (is.null(deg.q.selection)){
-    deg_q <- 1/length(sampleMetadata$sample)
+    discovery <- discovery_(sampleMetadata = sampleMetadata,
+                            studyMetadata = studyMetadata)
+    deg_q <- 1/length(sampleMetadata[sampleMetadata$study %in% discovery, "sample"])
   } else {
     deg_q <- as.numeric(deg.q.selection)
   }
