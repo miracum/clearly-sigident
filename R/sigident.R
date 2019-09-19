@@ -12,7 +12,7 @@
 #' @param organism A character string indicating the organism. Currently supported: "hsa".
 #' @param pathwayid A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".
 #' @param deg.q.selection A numeric value between 0 and 1 indicating the desired q-Value during DEG analysis. Default: NULL, which means, that q is
-#'   calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.
+#'   calculated the following: \emph{1/length(sample-IDs in discovery studies)}.
 #' @param seed A integer value. Seed to make machine learning algorithms reproducible. Default: 111.
 #' @param nfolds A integer. The number of folds used for cross validation. Default: 10.
 #' @param split A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.
@@ -254,3 +254,5 @@ sigidentMicroarray <- function(mergeset,
   )
   return(model.list)
 }
+
+

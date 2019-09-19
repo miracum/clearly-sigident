@@ -3,8 +3,10 @@ title: "sigident - Howto Microarray"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{sigident-Howto_Microarray}
-  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::knitr}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -153,7 +155,7 @@ eset2b$`age:ch1` <- NULL
 eset2b$`gender:ch1` <- NULL
 eset2b$`stage:ch1` <- NULL
 eset2b$`tissue:ch1` <- NULL
-colnames(pData(eset2b))[8] = targetcol
+colnames(Biobase::pData(eset2b))[8] = targetcol
 levels(eset2b[[targetcol]]) = c(controlname, targetname)
 dim(eset2b)
 
@@ -243,7 +245,8 @@ studyMetadata <- data.frame(
   cbind(study = c("GSE18842", "GSE19804", "GSE19188", "GSE30219"),
         discovery = as.logical(c(1, 1, 1, 0)),
         validation = as.logical(c(0, 0, 0, 1))
-  )
+  ),
+  stringsAsFactors = FALSE
 )
 ```
 
@@ -643,7 +646,71 @@ sigident::createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet,
 knitr::include_graphics(filename)
 ```
 
+# Analysis of Diagnostic Models 
 
+## Comparing Model Performance  
+
+These models can be included into one big list and the results can then be printed using the function `compareDiagnosticModels()`.
+
+```{r}
+diagnosticModels <- list(
+  lasso.min = list(model = diagnostic_lasso$lambda.min,
+                   confmat = diagnostic_lasso$confmat.min,
+                   auc = as.numeric(diagnostic_lasso$roc.min$auc)),
+  lasso.1se = list(model = diagnostic_lasso$lambda.1se,
+                   confmat = diagnostic_lasso$confmat.1se,
+                   auc = as.numeric(diagnostic_lasso$roc.1se$auc)),
+  elastic.min = list(model = diagnostic_elasticnet$lambda.min,
+                     confmat = diagnostic_elasticnet$confmat.min,
+                     auc = as.numeric(diagnostic_elasticnet$roc.min$auc)),
+  elastic.1se = list(model = diagnostic_elasticnet$lambda.1se,
+                     confmat = diagnostic_elasticnet$confmat.1se,
+                     auc = as.numeric(diagnostic_elasticnet$roc.1se$auc)),
+  elastic.grid = list(model = diagnostic_glmGrid$elasticNet.auto,
+                      confmat = diagnostic_glmGrid$confmat.elasticNet,
+                      auc = as.numeric(diagnostic_glmGrid$roc.elasticNet$auc))
+  )
+```
+
+```{r}
+knitr::kable(
+  sigident::compareDiagnosticModels(diagnosticModels)
+)
+```
+
+## Export selected Entrez-IDs
+
+```{r}
+# map selected variables and export 
+signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnostic_lasso$lambda.min)
+data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_model1.csv"))
+```
+
+# Identification of Prognostic Signature
+
+## Create a list that contains specifications of the study/studies that contain(s) survival time information 
+
+```{r}
+discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
+                                                      statuscol = "characteristics_ch1.3",
+                                                      targetcolname = "characteristics_ch1"))
+```
+
+
+```{r}
+#---------------------------------------------------#
+##### 8. Identification of Prognostic Signature #####
+#---------------------------------------------------#
+
+### 8.A Identification of survival correlated genes
+survivalDataTable <- getSurvivalTime_(studyMetadata = studyMetadata,
+                                      sampleMetadata = sampleMetadata,
+                                      discoverystudies.w.timedata = discoverystudies.w.timedata,
+                                      targetname = targetname,
+                                      controlname = controlname,
+                                      targetcol = targetcol,
+                                      datadir = datadir)
+```
 
 
 # An alternative workflow: one generic function 

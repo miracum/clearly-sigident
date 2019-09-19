@@ -144,7 +144,8 @@ createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCa
 #' @export
 colorHeatmap_ <- function(sampleMetadata, studyMetadata, targetcol, controlname){
 
-  discovery <- studyMetadata[which(studyMetadata$discovery==TRUE), "study"]
+  discovery <- discovery_(sampleMetadata = sampleMetadata,
+                          studyMetadata = studyMetadata)
   discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
 
   return(

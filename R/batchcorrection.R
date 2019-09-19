@@ -15,7 +15,8 @@ createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, t
     is.character(targetcol)
   )
 
-  discovery <- studyMetadata[which(studyMetadata$discovery == TRUE), "study"]
+  discovery <- discovery_(sampleMetadata = sampleMetadata,
+                          studyMetadata = studyMetadata)
   discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
 
   diag <- as.vector(discoverydata)
@@ -38,7 +39,8 @@ createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, t
 # create batch
 createBatch_ <- function(sampleMetadata, studyMetadata){
 
-  discovery <- studyMetadata[which(studyMetadata$discovery == TRUE), "study"]
+  discovery <- discovery_(sampleMetadata = sampleMetadata,
+                          studyMetadata = studyMetadata)
   studylist <- list()
 
   for (d in discovery){

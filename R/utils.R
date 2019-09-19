@@ -9,3 +9,7 @@
 cleanPathName_ <- function(pathname){
   return(gsub("([[:alnum:]])$", "\\1/", pathname))
 }
+
+discovery_ <- function(sampleMetadata, studyMetadata){
+  return(studyMetadata[which(studyMetadata$discovery == TRUE), "study"])
+}

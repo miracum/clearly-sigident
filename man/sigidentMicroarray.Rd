@@ -29,7 +29,7 @@ sigidentMicroarray(mergeset, controlname, targetname, studyMetadata,
 \item{pathwayid}{A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".}
 
 \item{deg.q.selection}{A numeric value between 0 and 1 indicating the desired q-Value during DEG analysis. Default: NULL, which means, that q is
-calculated the following: \emph{1/length(mergeset@featureData@data$ID)}.}
+calculated the following: \emph{1/length(sample-IDs in discovery studies)}.}
 
 \item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
 
