@@ -696,7 +696,6 @@ discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics
                                                       targetcolname = "characteristics_ch1"))
 ```
 
-
 ```{r}
 #---------------------------------------------------#
 ##### 8. Identification of Prognostic Signature #####
