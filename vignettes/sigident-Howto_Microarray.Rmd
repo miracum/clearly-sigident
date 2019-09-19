@@ -36,7 +36,7 @@ This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE191
 
 ## Download of GEO datasets and normalization
 
-TODO description
+To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The objects `targetcol` should also be entitled "target". To run this package analyzing DEGs and identifying diagnostic and prognostic gene signatures for the seperation of two groups (or subtypes, healthy vs cancer, etc) we here named `controlname` and `targetname` exemplary as "control" and "Lung Cancer".  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # initialize filePath:
@@ -50,19 +50,22 @@ dir.create(datadir)
 targetcol <- "target" # should be named "target"
 controlname <- "Control"
 targetname <- "Lung Cancer"
+```
 
-#------------------------------------------------------#
-###### 1. Download of GEO datasets & Normalization #####
-#------------------------------------------------------#
+Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expressin data, pheno and feature data as well as the annotation of the probe sets and store it as .txt.gz files in the "data" folder. 
 
-# insert the desired GEO dataset into the getGEO() function
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
 GSE19804 <- GEOquery::getGEO("GSE19804", destdir = datadir)
 
-# extract expressionSets
+# extracting expressionSets
 eset1 <- GSE18842[[1]]
 eset2 <- GSE19804[[1]]
+```
 
+Morover, the approach enables to download raw data as CEL files, uncompress it and conduct GCRMA normalization. For this, further commands are necessary to subsequently import the CEL files into the R environment. Accordingly `esetC` represents a normalized epressionSet though only containing expression data without pheno and feature data. These data can be added later. (Don't be confused by our example. We could have downloaded the study GSE19188 directly by applying `getGEO()` instead of downlaoding the raw data and adding pheno and feature data afterwards. We just wanted to demonstrating you how to use raw data in form of CEL files)
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # download raw data, uncompress them and execute GCRMA normalization
 # actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
 GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
@@ -110,19 +113,9 @@ eset3 <- esetC
 
 ## Formatting the phenoData 
 
-TODO description here.
+The phenoData of the expresssionSets need to be formatted that the phenoData columns overlap perfectly. This means that all expressionSets should contain identical columns in the same order. Not consistent columns need to get removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
 
 ```{r}
-#-------------------------------------#
-##### 2. Formatting the phenoData #####
-#-------------------------------------#
-
-# the phenoData of the expresssionSets must be formatted in such a way as that the phenoData columns overlap perfectly
-# all expressionSets should have the same columns in the same order
-# not consistent columns must get removed
-# for simpler handling only phenoData columns of interest should be retained
-# we here retained all consistent phenoData
-
 # create version b, that original expressionSets persist
 eset1b <- eset1
 eset2b <- eset2
@@ -182,24 +175,8 @@ Biobase::pData(eset3b) = pNew
 dim(eset3b)
 
 # now, all phenoData columns are consistent
-cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), colnames(Biobase::pData(eset3b)))
-```
-
-## Checking normalization
-
-```{r}
-#-----------------------------------#
-##### 3. Checking normalization #####
-#-----------------------------------#
-
-graphics::boxplot(Biobase::exprs(eset1b))
-graphics::boxplot(Biobase::exprs(eset2b))
-graphics::boxplot(Biobase::exprs(eset3b))
-
-#overview of how many tumor and cancer samples are in esets
-table(Biobase::pData(eset1b)[,targetcol])
-table(Biobase::pData(eset2b)[,targetcol])
-table(Biobase::pData(eset3b)[,targetcol])
+cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), 
+      colnames(Biobase::pData(eset3b)))
 ```
 
 
