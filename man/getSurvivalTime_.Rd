@@ -19,10 +19,6 @@ getSurvivalTime_(studyMetadata, sampleMetadata,
 \item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
 
 \item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
-
-\item{timecol}{A character string. The name of the column containing the survival time information.}
-
-\item{statuscol}{A character string. The name of the column containing the survival status information.}
 }
 \description{
 Helper function to get survival time.
