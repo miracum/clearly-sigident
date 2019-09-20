@@ -10,6 +10,7 @@ geneMapSig_ <- function(mergeset, model){
   entrez <- rownames(mergeset)
   # TODO warum i+1?
   index <- model[["beta"]]@i+1
+  # TODO map entrez_id on gene symbol here and include as second columen to ouput
   return(as.data.frame(x = cbind("Entrez_ID" = entrez[index])))
 }
 
@@ -66,7 +67,7 @@ getSurvivalTime_ <- function(studyMetadata,
     time <- timestatus$time
     status <- timestatus$status
 
-    survTable <- data.frame(time,status) # generating a table: columns: survivaltime, status; rows: individual samples
+    survTable <- data.frame(time, status) # generating a table: columns: survivaltime, status; rows: individual samples
 
     expr <- Biobase::exprs(esetTargets)
     rownames(expr) <- as.character(esetTargets@featureData@data$ENTREZ_GENE_ID)
@@ -83,7 +84,7 @@ getSurvivalTime_ <- function(studyMetadata,
       survTable <- cbind(survTable, DF) # DF without batch effect removal, alternative would be rmBatch
     }
 
-    rownames(survTable) = colnames(Biobase::exprs(esetTargets))
+    rownames(survTable) = colnames(expr)
 
     outlist[[st]] <- list(survTable = survTable,
                           entrezIDs = entrezIDs)
@@ -152,6 +153,8 @@ univCox_ <- function(survTable, entrezIDs){
   result$p.value <- as.numeric(result$p.value) #
   indices <- which(result$p.value <= 0.05) # selecting indices with a significant p-value
   IDs <- entrezIDs[indices] # IDs now contains Entrez-IDs of all genes with significant p-values
+
+  # TODO symbols?
 
   sigCov <- result[with(result, which(result$p.value <= 0.05)),]
   rownames(sigCov) <- IDs
@@ -272,11 +275,14 @@ expressionPattern_ <- function(mergeset, entrezID, tumor, control){
 #' @description Helper function to get survival time.
 #'
 #' @param validationstudiesinfo A list that contains specifications on the study that contains the validation information.
+#' @param PatternCom A data.frame. The output of the function `generateExpressionPattern_()`.
 #'
 #' @inheritParams sigidentMicroarray
 #'
 #' @export
 prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datatdir, targetcol, targetname, controlname){
+
+  outlist <- list()
 
   for (st in names(validationstudiesinfo)){
     eset <- loadEset_(name = st,
@@ -309,10 +315,66 @@ prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datatdir, t
     status <- timestatus$status
     RiskTable <- data.frame(time, status)
 
+    expr <- Biobase::exprs(esetTargets)
+    rownames(expr) <- as.character(esetTargets@featureData@data$ENTREZ_GENE_ID)
+    # remove empty characters and replicates in EntrezIDs
+    expr <- expr[rownames(expr)!="",]
+    expr <- expr[!duplicated(rownames(expr)),]
+
     # classification and Kaplan-Meier estimator
-    Sig <- sigAnalysis_(eset = esetTargets, PatternCom = PatternCom)
+    Sig <- sigAnalysis_(expr = expr, PatternCom = PatternCom)
+    RiskTable.Sig <- classify_(Sig)
+
+    # prepare classification and required data for Kaplan-Meier estimator
+    Groups <- RiskTable.Sig[, "RiskGroup"]
+    RiskTable <- cbind(RiskTable, Groups)
+    rownames(RiskTable) = colnames(expr)
+
+    kap <- fitKaplanEstimator_(RiskTable = RiskTable)
+
+    # prepare classification and required data for Kaplan-Meier estimator
+    outlist[[st]] <- list(kaplan.estimator = kap,
+                          risktable = RiskTable)
+
   }
+  return(outlist)
 }
+
+fitKaplanEstimator_ <- function(RiskTable){
+
+  # fit proportional hazards regression model
+  res.cox <- survival::coxph(survival::Surv(time, status) ~ Groups, data = RiskTable)
+  new_df <- with(RiskTable,
+                 data.frame(Groups = c(0, 1),
+                            survival_time = rep(mean(time, na.rm = TRUE), 2),
+                            ph.ecog = c(1, 1)
+                 )
+  )
+  fit <- survival::survfit(res.cox, newdata = new_df)
+  return(list(res.cox = res.cox,
+              fit = fit))
+}
+
+
+classify_ <- function(Sigtable){
+  table <- Sigtable
+  Sums <- rowSums(table)
+  vector <- c()
+  for(i in 1:length(Sums)){
+    if(Sums[i] > 0.5*length(colnames(table))){
+      a <- 1
+    }
+    else{
+      a <- 0
+    }
+    vector <- append(vector,a)
+  }
+  newColumn <- data.frame(vector)
+  colnames(newColumn)[1] = "RiskGroup"
+  table <- cbind(table,newColumn)
+  return(table)
+}
+
 
 extractTimeStatus_ <- function(esetTargets, timecol, statuscol){
   time <- eval(parse(text=paste0("esetTargets$", timecol)))
@@ -351,19 +413,13 @@ under <- function(avrg, level){ # if expression pattern is matching the signatur
   return(a)
 }
 
-sigAnalysis_ <- function(eset, PatternCom){ # Input is an eset, consisting of tumor-samples only and the signature to be tested
-
-  expr <- Biobase::exprs(eset)
-  rownames(expr) <- as.character(esetTargets@featureData@data$ENTREZ_GENE_ID)
-  # remove empty characters and replicates in EntrezIDs
-  expr <- expr[rownames(expr)!="",]
-  expr <- expr[!duplicated(rownames(expr)),]
+sigAnalysis_ <- function(expr, PatternCom){ # Input is an eset, consisting of tumor-samples only and the signature to be tested
 
   Sigframe <- data.frame(c(1:length(colnames(expr))))
 
   for(i in 1:length(PatternCom[,"Gene"])){
     entrID <- as.character(PatternCom[i,"Gene"])
-    avrg <- mean(Biobase::exprs(eset)[which(rownames(eset)==entrID),])
+    avrg <- mean(expr[which(rownames(expr)==entrID),])
     vector <- c()
 
     for(j in 1:length(colnames(expr))){
