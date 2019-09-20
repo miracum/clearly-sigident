@@ -23,7 +23,7 @@ BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 Copyright: Universitätsklinikum Erlangen
 VignetteBuilder: knitr
-Date/Publication: 2019-09-20 15:06:58 UTC
+Date/Publication: 2019-09-20 17:11:41 UTC
 biocViews: 
 Imports: 
     data.table,
@@ -47,6 +47,7 @@ Imports:
     e1071,
     survival,
     plyr,
+    survminer,
     BiocManager,
     Biobase,
     sva,
@@ -67,4 +68,3 @@ Suggests:
     rmarkdown,
     qpdf,
     knitr
-RoxygenNote: 6.1.1
