@@ -235,7 +235,7 @@ sigidentMicroarray <- function(mergeset,
 
 
   # compare aucs
-  model.list <- list(
+  diagnosticModels <- list(
     lasso.min = list(model = rv$diagnostic_lasso$lambda.min,
                      confmat = rv$diagnostic_lasso$confmat.min,
                      auc = as.numeric(rv$diagnostic_lasso$roc.min$auc)),
@@ -252,7 +252,12 @@ sigidentMicroarray <- function(mergeset,
                         confmat = rv$diagnostic_glmGrid$confmat.elasticNet,
                         auc = as.numeric(rv$diagnostic_glmGrid$roc.elasticNet$auc))
   )
-  return(model.list)
+  return(list(utils = list(batch = rv$batch,
+                           genes = rv$genes,
+                           diagnosis = rv$diagnosis,
+                           design = rv$design),
+              diagnosticModels = diagnosticModels)
+  )
 }
 
 
