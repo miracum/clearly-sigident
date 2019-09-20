@@ -364,7 +364,8 @@ TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 q_selection <- NULL # use default setting
-deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata,
+deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata, 
+                               studyMetadata = studyMetadata,
                                deg.q.selection = q_selection)
 
 genes <- sigident::identifyDEGs_(mergeset = mergeset,
@@ -693,8 +694,14 @@ data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_model1.csv")
 ```{r}
 discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
                                                       statuscol = "characteristics_ch1.3",
-                                                      targetcolname = "characteristics_ch1"))
+                                                      targetcolname = "characteristics_ch1",
+                                                      controllevelname = "tissue type: healthy",
+                                                      targetlevelname = "tissue type: tumor"))
 ```
+
+## Identification of survival correlated genes 
+
+### Extract survival data 
 
 ```{r}
 #---------------------------------------------------#
@@ -702,14 +709,64 @@ discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics
 #---------------------------------------------------#
 
 ### 8.A Identification of survival correlated genes
-survivalDataTable <- getSurvivalTime_(studyMetadata = studyMetadata,
-                                      sampleMetadata = sampleMetadata,
-                                      discoverystudies.w.timedata = discoverystudies.w.timedata,
-                                      targetname = targetname,
-                                      controlname = controlname,
-                                      targetcol = targetcol,
-                                      datadir = datadir)
+survivalData <- sigident::getSurvivalTime_(studyMetadata = studyMetadata,
+                                           sampleMetadata = sampleMetadata,
+                                           discoverystudies.w.timedata = discoverystudies.w.timedata,
+                                           targetname = targetname,
+                                           controlname = controlname,
+                                           targetcol = targetcol,
+                                           datadir = datadir)
+survTable <- survivalData[["GSE19188"]]$survTable
+entrezIDs <- survivalData[["GSE19188"]]$entrezIDs
 ```
+
+### Compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions 
+
+```{r}
+surv_correlated <- sigident::univCox_(survTable = survTable,
+                                      entrezIDs = entrezIDs)
+# export table with survival correlated genes
+data.table::fwrite(surv_correlated, paste0(csvdir, "survival_correlated_genes.csv"))
+```
+
+## Prognostic classifier and Kaplan-Meier estimator
+
+classification of patients into high and low risk groups regarding to expression profile of signature genes
+
+due to selection bias, only GSE18842 and GSE19804 are used for calculating classifier
+
+```{r}
+classifier_studies <- c("GSE18842", "GSE19804")
+```
+
+
+### Evaluate expression pattern (over-/underrepresentation)
+
+generate vectors 'control' and 'tumor' for function expressionPattern_
+
+```{r}
+exprPattern <- generateExpressionPattern_(classifier_studies = classifier_studies,
+                                       sigCov = surv_correlated,
+                                       mergeset = mergeset,
+                                       studyMetadata = studyMetadata,
+                                       sampleMetadata = sampleMetadata,
+                                       controlname = controlname,
+                                       targetname = targetname,
+                                       targetcol = targetcol)
+```
+
+### Apply the prognostic classifier on validation data set
+
+#### Create a list that contains specifications of the study that contains the validation information
+
+```{r}
+validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
+                                                statuscol = "characteristics_ch1.8",
+                                                targetcolname = "source_name_ch1",
+                                                controllevelname = "Non Tumoral Lung",
+                                                targetlevelname = "Lung Tumour"))
+```
+
 
 
 # An alternative workflow: one generic function 
@@ -724,7 +781,7 @@ The preprocessing needs to be conform with the above described approach.
 
 
 ```{r eval = FALSE}
-diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,
+results <- sigident::sigidentMicroarray(mergeset = mergeset,
                                                  controlname = "Control",
                                                  targetname = "Lung Cancer",
                                                  studyMetadata = studyMetadata,
@@ -741,4 +798,16 @@ diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,
                                                  csvdir = "./tables/",
                                                  targetcol = "target")
 ```
+
+```{r eval = FALSE}
+diagnosticModels <- results$diagnosticModels
+sigUtils <- results$utils
+```
+
+```{r eval = FALSE}
+knitr::kable(
+  sigident::compareDiagnosticModels(diagnosticModels)
+)
+```
+
 
