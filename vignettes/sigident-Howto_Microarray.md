@@ -3,8 +3,10 @@ title: "sigident - Howto Microarray"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{sigident-Howto_Microarray}
-  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::knitr}
+editor_options: 
+  chunk_output_type: inline
 ---
 
 
@@ -33,7 +35,7 @@ This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE191
 
 ## Download of GEO datasets and normalization
 
-TODO description
+To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The objects `targetcol` should also be entitled "target". To run this package analyzing DEGs and identifying diagnostic and prognostic gene signatures for the seperation of two groups (or subtypes, healthy vs cancer, etc) we here named `controlname` and `targetname` exemplary as "control" and "Lung Cancer".  
 
 
 ```r
@@ -48,19 +50,24 @@ dir.create(datadir)
 targetcol <- "target" # should be named "target"
 controlname <- "Control"
 targetname <- "Lung Cancer"
+```
 
-#------------------------------------------------------#
-###### 1. Download of GEO datasets & Normalization #####
-#------------------------------------------------------#
+Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expressin data, pheno and feature data as well as the annotation of the probe sets and store it as .txt.gz files in the "data" folder. 
 
-# insert the desired GEO dataset into the getGEO() function
+
+```r
 GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
 GSE19804 <- GEOquery::getGEO("GSE19804", destdir = datadir)
 
-# extract expressionSets
+# extracting expressionSets
 eset1 <- GSE18842[[1]]
 eset2 <- GSE19804[[1]]
+```
 
+Morover, the approach enables to download raw data as CEL files, uncompress it and conduct GCRMA normalization. For this, further commands are necessary to subsequently import the CEL files into the R environment. Accordingly `esetC` represents a normalized epressionSet though only containing expression data without pheno and feature data. These data can be added later. (Don't be confused by our example. We could have downloaded the study GSE19188 directly by applying `getGEO()` instead of downlaoding the raw data and adding pheno and feature data afterwards. We just wanted to demonstrating you how to use raw data in form of CEL files)
+
+
+```r
 # download raw data, uncompress them and execute GCRMA normalization
 # actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
 GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
@@ -108,20 +115,10 @@ eset3 <- esetC
 
 ## Formatting the phenoData 
 
-TODO description here.
+The phenoData of the expresssionSets need to be formatted that the phenoData columns overlap perfectly. This means that all expressionSets should contain identical columns in the same order. Not consistent columns need to get removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
 
 
 ```r
-#-------------------------------------#
-##### 2. Formatting the phenoData #####
-#-------------------------------------#
-
-# the phenoData of the expresssionSets must be formatted in such a way as that the phenoData columns overlap perfectly
-# all expressionSets should have the same columns in the same order
-# not consistent columns must get removed
-# for simpler handling only phenoData columns of interest should be retained
-# we here retained all consistent phenoData
-
 # create version b, that original expressionSets persist
 eset1b <- eset1
 eset2b <- eset2
@@ -222,7 +219,7 @@ eset2b$`age:ch1` <- NULL
 eset2b$`gender:ch1` <- NULL
 eset2b$`stage:ch1` <- NULL
 eset2b$`tissue:ch1` <- NULL
-colnames(pData(eset2b))[8] = targetcol
+colnames(Biobase::pData(eset2b))[8] = targetcol
 levels(eset2b[[targetcol]]) = c(controlname, targetname)
 dim(eset2b)
 #> Features  Samples 
@@ -248,7 +245,8 @@ dim(eset3b)
 #>    54675      156
 
 # now, all phenoData columns are consistent
-cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), colnames(Biobase::pData(eset3b)))
+cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), 
+      colnames(Biobase::pData(eset3b)))
 #>       [,1]                      [,2]                     
 #>  [1,] "title"                   "title"                  
 #>  [2,] "geo_accession"           "geo_accession"          
@@ -309,48 +307,6 @@ cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), colnam
 #> [27,] "contact_country"        
 #> [28,] "supplementary_file"     
 #> [29,] "data_row_count"
-```
-
-## Checking normalization
-
-
-```r
-#-----------------------------------#
-##### 3. Checking normalization #####
-#-----------------------------------#
-
-graphics::boxplot(Biobase::exprs(eset1b))
-```
-
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
-
-```r
-graphics::boxplot(Biobase::exprs(eset2b))
-```
-
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-2.png)
-
-```r
-graphics::boxplot(Biobase::exprs(eset3b))
-```
-
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-3.png)
-
-```r
-
-#overview of how many tumor and cancer samples are in esets
-table(Biobase::pData(eset1b)[,targetcol])
-#> 
-#>     Control Lung Cancer 
-#>          45          46
-table(Biobase::pData(eset2b)[,targetcol])
-#> 
-#>     Control Lung Cancer 
-#>          60          60
-table(Biobase::pData(eset3b)[,targetcol])
-#> 
-#>     Control Lung Cancer 
-#>          65          91
 ```
 
 
@@ -422,7 +378,8 @@ studyMetadata <- data.frame(
   cbind(study = c("GSE18842", "GSE19804", "GSE19188", "GSE30219"),
         discovery = as.logical(c(1, 1, 1, 0)),
         validation = as.logical(c(0, 0, 0, 1))
-  )
+  ),
+  stringsAsFactors = FALSE
 )
 ```
 
@@ -442,7 +399,11 @@ First, a boxplot is created with the included samples on the x-axis and the stan
 esets=c(eset1b,eset2b,eset3b)
 mergedset <- sigident::merge_(esets)
 # merging 3 esets, resulting in a mergeset containing 367 samples and 54675 genes
+```
 
+
+
+```r
 # visualize log2 transformed expression values of the merged data set
 filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
 jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
@@ -458,7 +419,7 @@ dev.off()
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/boxplot_merged_data.jpeg" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" width="80%" />
+<img src="./plots/boxplot_merged_data.jpeg" title="plot of chunk unnamed-chunk-12" alt="plot of chunk unnamed-chunk-12" width="80%" />
 
 ### Discovering Batch Effects 
 
@@ -500,6 +461,8 @@ length(batch)
 # removing batch effects computing linear models, take variance between the diagnosis into consideration
 mergeset <- sigident::createCombat_(mergedset = mergedset, batch = batch, design = design)
 #> Standardizing Data across genes
+dim(mergeset)
+#> [1] 21879   367
 ```
 
 `mergeset` results as output from above described merging and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
@@ -520,7 +483,7 @@ sigident::createBatchPlot_(correction_obj = gPCA_before,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/PCplot_before.png" title="plot of chunk unnamed-chunk-13" alt="plot of chunk unnamed-chunk-13" width="80%" />
+<img src="./plots/PCplot_before.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="80%" />
 
 
 ```r
@@ -533,7 +496,7 @@ sigident::createImportBoxplot_(mergeset, filename)
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/import_boxplot.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="80%" />
+<img src="./plots/import_boxplot.png" title="plot of chunk unnamed-chunk-17" alt="plot of chunk unnamed-chunk-17" width="80%" />
 
 
 ```r
@@ -561,7 +524,7 @@ sigident::createBatchPlot_(correction_obj = gPCA_after,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/PCplot_after.png" title="plot of chunk unnamed-chunk-18" alt="plot of chunk unnamed-chunk-18" width="80%" />
+<img src="./plots/PCplot_after.png" title="plot of chunk unnamed-chunk-20" alt="plot of chunk unnamed-chunk-20" width="80%" />
 
 # DEG Analysis 
 
@@ -570,7 +533,8 @@ TODO Description here.
 
 ```r
 q_selection <- NULL # use default setting
-deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata,
+deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata, 
+                               studyMetadata = studyMetadata,
                                deg.q.selection = q_selection)
 
 genes <- sigident::identifyDEGs_(mergeset = mergeset,
@@ -595,7 +559,7 @@ sigident::createDEGheatmap_(mergeset = mergeset,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/DEG_heatmap.png" title="plot of chunk unnamed-chunk-20" alt="plot of chunk unnamed-chunk-20" width="80%" />
+<img src="./plots/DEG_heatmap.png" title="plot of chunk unnamed-chunk-22" alt="plot of chunk unnamed-chunk-22" width="80%" />
 
 TODO description here
 
@@ -607,6 +571,8 @@ data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 
 
 ```r
+dim(deg_info)
+#> [1] 54675     5
 knitr::kable(head(deg_info))
 ```
 
@@ -631,6 +597,8 @@ data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 
 
 ```r
+dim(deg_results)
+#> [1] 370   3
 knitr::kable(head(deg_results))
 ```
 
@@ -702,10 +670,10 @@ knitr::kable(head(enr_topkegg))
 |:-------------|:-------------------------------------------------------------|---:|--:|---------:|
 |path:hsa04110 |Cell cycle                                                    | 124| 13| 0.0000009|
 |path:hsa05144 |Malaria                                                       |  49|  8| 0.0000043|
-|path:hsa04512 |ECM-receptor interaction                                      |  88|  8| 0.0003220|
-|path:hsa05418 |Fluid shear stress and atherosclerosis                        | 139| 10| 0.0004003|
-|path:hsa04061 |Viral protein interaction with cytokine and cytokine receptor | 100|  8| 0.0007640|
-|path:hsa04610 |Complement and coagulation cascades                           |  79|  7| 0.0008924|
+|path:hsa04512 |ECM-receptor interaction                                      |  88|  8| 0.0003218|
+|path:hsa05418 |Fluid shear stress and atherosclerosis                        | 139| 10| 0.0003999|
+|path:hsa04061 |Viral protein interaction with cytokine and cytokine receptor | 100|  8| 0.0007634|
+|path:hsa04610 |Complement and coagulation cascades                           |  79|  7| 0.0008918|
 
 TODO Description here.
 
@@ -784,7 +752,7 @@ filename <- paste0(plotdir, "/", organism, "04110.png")
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots//hsa04110.png" title="plot of chunk unnamed-chunk-36" alt="plot of chunk unnamed-chunk-36" width="80%" />
+<img src="./plots//hsa04110.png" title="plot of chunk unnamed-chunk-38" alt="plot of chunk unnamed-chunk-38" width="80%" />
 
 ```r
 filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
@@ -794,7 +762,7 @@ filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots//hsa04110.pathview.png" title="plot of chunk unnamed-chunk-38" alt="plot of chunk unnamed-chunk-38" width="80%" />
+<img src="./plots//hsa04110.pathview.png" title="plot of chunk unnamed-chunk-40" alt="plot of chunk unnamed-chunk-40" width="80%" />
 
 TODO Description here.
 
@@ -810,7 +778,7 @@ sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$go,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/Enriched_GO.png" title="plot of chunk unnamed-chunk-40" alt="plot of chunk unnamed-chunk-40" width="80%" />
+<img src="./plots/Enriched_GO.png" title="plot of chunk unnamed-chunk-42" alt="plot of chunk unnamed-chunk-42" width="80%" />
 
 TODO Description here.
 
@@ -826,7 +794,7 @@ sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/Enriched_KEGG.png" title="plot of chunk unnamed-chunk-42" alt="plot of chunk unnamed-chunk-42" width="80%" />
+<img src="./plots/Enriched_KEGG.png" title="plot of chunk unnamed-chunk-44" alt="plot of chunk unnamed-chunk-44" width="80%" />
 
 
 # Identification of diagnostic signatures 
@@ -864,7 +832,7 @@ sigident::createCVPlot_(cv_obj = diagnostic_lasso$fitCV,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/CV_lasso.png" title="plot of chunk unnamed-chunk-45" alt="plot of chunk unnamed-chunk-45" width="80%" />
+<img src="./plots/CV_lasso.png" title="plot of chunk unnamed-chunk-47" alt="plot of chunk unnamed-chunk-47" width="80%" />
 
 
 ```r
@@ -877,7 +845,7 @@ sigident::createROCplot_(roc = diagnostic_lasso$roc.min,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/ROC_Lasso.min.png" title="plot of chunk unnamed-chunk-47" alt="plot of chunk unnamed-chunk-47" width="80%" />
+<img src="./plots/ROC_Lasso.min.png" title="plot of chunk unnamed-chunk-49" alt="plot of chunk unnamed-chunk-49" width="80%" />
 
 
 ```r
@@ -890,7 +858,7 @@ sigident::createROCplot_(roc = diagnostic_lasso$roc.1se,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/ROC_Lasso.1se.png" title="plot of chunk unnamed-chunk-49" alt="plot of chunk unnamed-chunk-49" width="80%" />
+<img src="./plots/ROC_Lasso.1se.png" title="plot of chunk unnamed-chunk-51" alt="plot of chunk unnamed-chunk-51" width="80%" />
 
 
 ## Elastic net regression 
@@ -913,7 +881,7 @@ sigident::createCVPlot_(cv_obj = diagnostic_elasticnet$fitCV,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/CV_elasticNet.png" title="plot of chunk unnamed-chunk-51" alt="plot of chunk unnamed-chunk-51" width="80%" />
+<img src="./plots/CV_elasticNet.png" title="plot of chunk unnamed-chunk-53" alt="plot of chunk unnamed-chunk-53" width="80%" />
 
 
 ```r
@@ -926,7 +894,7 @@ sigident::createROCplot_(roc = diagnostic_elasticnet$roc.min,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/ROC_elasticNet.min.png" title="plot of chunk unnamed-chunk-53" alt="plot of chunk unnamed-chunk-53" width="80%" />
+<img src="./plots/ROC_elasticNet.min.png" title="plot of chunk unnamed-chunk-55" alt="plot of chunk unnamed-chunk-55" width="80%" />
 
 
 ```r
@@ -939,7 +907,7 @@ sigident::createROCplot_(roc = diagnostic_elasticnet$roc.1se,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/ROC_elasticNet.1se.png" title="plot of chunk unnamed-chunk-55" alt="plot of chunk unnamed-chunk-55" width="80%" />
+<img src="./plots/ROC_elasticNet.1se.png" title="plot of chunk unnamed-chunk-57" alt="plot of chunk unnamed-chunk-57" width="80%" />
 
 
 ## Gridsearch to find alpha and lambda
@@ -962,7 +930,7 @@ sigident::createGridModelPlot_(model = diagnostic_glmGrid$caret.train,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/Gridsearch_model.png" title="plot of chunk unnamed-chunk-57" alt="plot of chunk unnamed-chunk-57" width="80%" />
+<img src="./plots/Gridsearch_model.png" title="plot of chunk unnamed-chunk-59" alt="plot of chunk unnamed-chunk-59" width="80%" />
 
 
 ```r
@@ -976,7 +944,7 @@ sigident::createGridVarImpPlot_(model = diagnostic_glmGrid$caret.train,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/Gridsearch_variable_importance.png" title="plot of chunk unnamed-chunk-59" alt="plot of chunk unnamed-chunk-59" width="80%" />
+<img src="./plots/Gridsearch_variable_importance.png" title="plot of chunk unnamed-chunk-61" alt="plot of chunk unnamed-chunk-61" width="80%" />
 
 
 ```r
@@ -990,10 +958,428 @@ sigident::createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet,
 knitr::include_graphics(filename)
 ```
 
-<img src="./plots/ROC_elasticNet.grid.png" title="plot of chunk unnamed-chunk-61" alt="plot of chunk unnamed-chunk-61" width="80%" />
+<img src="./plots/ROC_elasticNet.grid.png" title="plot of chunk unnamed-chunk-63" alt="plot of chunk unnamed-chunk-63" width="80%" />
+
+# Analysis of Diagnostic Models 
+
+## Comparing Model Performance  
+
+These models can be included into one big list and the results can then be printed using the function `compareDiagnosticModels()`.
+
+
+```r
+diagnosticModels <- list(
+  lasso.min = list(model = diagnostic_lasso$lambda.min,
+                   confmat = diagnostic_lasso$confmat.min,
+                   auc = as.numeric(diagnostic_lasso$roc.min$auc)),
+  lasso.1se = list(model = diagnostic_lasso$lambda.1se,
+                   confmat = diagnostic_lasso$confmat.1se,
+                   auc = as.numeric(diagnostic_lasso$roc.1se$auc)),
+  elastic.min = list(model = diagnostic_elasticnet$lambda.min,
+                     confmat = diagnostic_elasticnet$confmat.min,
+                     auc = as.numeric(diagnostic_elasticnet$roc.min$auc)),
+  elastic.1se = list(model = diagnostic_elasticnet$lambda.1se,
+                     confmat = diagnostic_elasticnet$confmat.1se,
+                     auc = as.numeric(diagnostic_elasticnet$roc.1se$auc)),
+  elastic.grid = list(model = diagnostic_glmGrid$elasticNet.auto,
+                      confmat = diagnostic_glmGrid$confmat.elasticNet,
+                      auc = as.numeric(diagnostic_glmGrid$roc.elasticNet$auc))
+  )
+```
+
+
+```r
+knitr::kable(
+  sigident::compareDiagnosticModels(diagnosticModels)
+)
+```
 
 
 
+|Model        |   AUC|
+|:------------|-----:|
+|lasso.min    | 0.983|
+|lasso.1se    | 0.983|
+|elastic.min  | 0.982|
+|elastic.1se  | 0.983|
+|elastic.grid | 0.975|
+
+## Export selected Entrez-IDs
+
+
+```r
+# map selected variables and export 
+signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnostic_lasso$lambda.min)
+data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_model1.csv"))
+```
+
+
+```r
+dim(signature_genes)
+#> [1] 53  1
+head(signature_genes)
+#>            Entrez_ID
+#> 1             123591
+#> 2             151306
+#> 3             158158
+#> 4             284656
+#> 5 8974 /// 101927705
+#> 6              64399
+```
+
+
+# Identification of Prognostic Signature
+
+## Create a list that contains specifications of the study/studies that contain(s) survival time information 
+
+
+```r
+discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
+                                                      statuscol = "characteristics_ch1.3",
+                                                      targetcolname = "characteristics_ch1",
+                                                      controllevelname = "tissue type: healthy",
+                                                      targetlevelname = "tissue type: tumor"))
+```
+
+## Identification of survival correlated genes 
+
+### Extract survival data 
+
+
+```r
+#---------------------------------------------------#
+##### 8. Identification of Prognostic Signature #####
+#---------------------------------------------------#
+
+### 8.A Identification of survival correlated genes
+survivalData <- sigident::getSurvivalTime_(studyMetadata = studyMetadata,
+                                           sampleMetadata = sampleMetadata,
+                                           discoverystudies.w.timedata = discoverystudies.w.timedata,
+                                           targetname = targetname,
+                                           controlname = controlname,
+                                           targetcol = targetcol,
+                                           datadir = datadir)
+survTable <- survivalData[["GSE19188"]]$survTable
+entrezIDs <- survivalData[["GSE19188"]]$entrezIDs
+```
+
+
+```r
+dim(survTable)
+#> [1] 156  84
+head(survTable)
+#>           time status 780 /// 100616237 7318 /// 100847079        7067
+#> GSM475656 12.5     NA       0.278536376         -0.3665863  0.47354494
+#> GSM475657   NA      1      -0.005101812          0.1405779  0.43960675
+#> GSM475658   NA      1      -0.619296868          0.3662965 -0.52670499
+#> GSM475659   NA      1      -0.400919703          0.6306993 -0.08487694
+#> GSM475660   NA      1      -0.025467569          0.4217360  0.09975505
+#> GSM475661   NA      1      -1.277200911         -1.5330581  0.07878199
+#>                 6352        1548      23170       10406        5594
+#> GSM475656  0.8875675  0.38299987  0.2955272  0.91245794 -1.16121413
+#> GSM475657  0.9791955  0.16722715 -0.3997257 -0.19852185 -0.44646059
+#> GSM475658  0.2855274 -0.19247590 -0.4227795 -0.22619978 -0.07487306
+#> GSM475659  0.7294725 -0.18182166 -0.5488857 -0.06133111  0.10894611
+#> GSM475660 -0.1806954  0.05652838 -0.2739466  0.13451377 -0.22083194
+#> GSM475661 -4.4714688 -0.20820236  1.1235085 -0.22022012 -0.36546548
+#>                128153      163154      54899       57617      113235
+#> GSM475656 -0.07582036  0.12431423 -1.1389247  0.53926500  0.07835584
+#> GSM475657  0.73072404 -0.27225240 -0.4493079 -0.17457677 -0.41100526
+#> GSM475658 -0.11863885 -0.36833212  0.7679284  0.08809509 -0.42789991
+#> GSM475659 -0.28841898 -0.17162174 -0.5296897  0.19254496  0.15441037
+#> GSM475660  0.13282074 -0.01726770 -0.2708726  0.44122320 -0.31260598
+#> GSM475661  0.26276471  0.03603483  2.2488019 -0.04348902 -0.28182835
+#>                91937 79844 /// 653082        172     148113       54965
+#> GSM475656 -0.1617181        0.1318657 -0.2801627  0.5408657  0.97308481
+#> GSM475657 -0.3877970        2.1742008  0.6111931 -0.8620225 -0.27847977
+#> GSM475658 -0.2950219        1.1420088  0.1214691 -0.7928894 -0.64063761
+#> GSM475659 -0.2509978        1.8861580  0.6650443 -0.7168694 -0.08739238
+#> GSM475660 -0.2523125       -0.2037104 -0.2957881 -0.5780904 -0.55568117
+#> GSM475661 -0.1408117       -2.2607172  0.7984810 -0.2761466  0.95754971
+#>                 91252      221264      113277      84920      91624
+#> GSM475656  0.10406473  0.61309769 -0.27860441  0.1174461 -1.3514100
+#> GSM475657 -0.25599605 -0.15101972  0.47419215 -0.3135123  0.9981771
+#> GSM475658 -0.27187265 -0.05174585 -0.70553514 -0.5018055  1.1186026
+#> GSM475659 -0.58801060 -0.27440977  0.01214489 -0.3266313  1.5886667
+#> GSM475660  0.08653026 -0.30907107 -0.31270477 -0.2501872  0.1419729
+#> GSM475661  0.00526674 -0.40916447  0.03347595 -0.2346556 -1.9271205
+#>                 4238     170575       85478      159091     220136
+#> GSM475656 -0.2078267 -0.9112034 -0.15163468  0.12178865 -0.7252915
+#> GSM475657 -0.3294961  0.7381955  0.83172874  0.24266971  2.8881303
+#> GSM475658 -0.2357807  0.8773266 -0.01261386  0.08480011 -0.5941382
+#> GSM475659 -0.4746650  1.2085270 -0.16921275  0.14216124  0.1375772
+#> GSM475660 -0.5325492  0.4102301  0.88760538 -0.19504977  2.2262432
+#> GSM475661  0.2801247 -1.5761351 -0.17531030 -0.06676253 -0.6752415
+#>                  5930      92806       11078        3233        5150
+#> GSM475656 -0.16110583  0.2431688 -0.65124772  0.56759661 -0.02645938
+#> GSM475657 -0.06302431 -0.2619877  0.82603106 -0.16573512  0.54508755
+#> GSM475658  0.29415973 -0.2954114 -0.48354213 -0.12874636 -0.69667993
+#> GSM475659  0.29858607  0.3345876  1.03017049 -0.36890757  0.39476103
+#> GSM475660 -1.17882497  0.4414852 -0.45822590  0.15854543  0.18927089
+#> GSM475661  0.96915173  1.4120668 -0.04659303  0.03343629  0.31892804
+#>                29883     260429      255057      114609     124540
+#> GSM475656 -0.3841586  0.1625087  0.42836254 -0.35342172 -0.1196380
+#> GSM475657 -0.3885528 -0.1149259  0.05422687  0.37183347 -0.9238617
+#> GSM475658 -0.1486220 -0.0856261 -0.00042600  0.13887136 -0.9781208
+#> GSM475659 -0.2093516 -0.1394833 -0.02706574  0.19682419 -0.8358295
+#> GSM475660 -0.9767422  0.4303705  0.36854862 -0.07562991 -0.2147314
+#> GSM475661  2.8255018 -0.4330280  0.31337882 -0.21008887  1.5669405
+#>                85477      132321       84449       157506       135295
+#> GSM475656  2.0469556 -1.28852588 -0.10839580 -0.078252838 -0.137168565
+#> GSM475657 -0.4765486  0.45659061  0.53593648  0.040095106 -0.326381726
+#> GSM475658 -0.4150521  0.28437154  0.29818371 -0.002294732  0.272287357
+#> GSM475659 -0.4384465  0.45064700  0.54803838  0.142776263 -0.008534535
+#> GSM475660 -0.6432211  0.04404273  0.02614389 -0.130727883 -0.233841553
+#> GSM475661 -1.1557350 -0.41218374  0.18249916 -0.057319801  1.063468311
+#>                 202309     203111      150350       81629      140870
+#> GSM475656 -0.637652966  0.5243408  0.13300716  0.27115411 -0.09117015
+#> GSM475657 -0.111551519  0.3378671 -0.05389970  0.05574549  0.51269486
+#> GSM475658  0.009126382 -0.2029729  0.03736802 -0.40694137 -0.32229488
+#> GSM475659  0.411190558 -0.3834744 -0.01008170 -0.48586082  0.04661639
+#> GSM475660 -0.181443306 -0.2896606  0.18044051  0.23407509 -0.12340252
+#> GSM475661 -0.855063105 -0.5154584 -0.16857919  0.20740689  0.13874551
+#>               160364         2972      123591 571 /// 100379661
+#> GSM475656 -1.3158803  0.224653987  0.04450449        0.10701042
+#> GSM475657 -0.2223639 -0.042325894 -0.20482490        0.09389595
+#> GSM475658  2.5103626 -0.156351653 -0.18044753       -0.02005741
+#> GSM475659  0.6968696 -0.148395252 -0.16658369       -0.24895364
+#> GSM475660  1.3723640 -0.007567775 -0.19924807        0.02025438
+#> GSM475661 -2.4132640 -0.009225840 -0.15952311        0.05768440
+#>                126206      165530 245909 /// 503841      259240     121441
+#> GSM475656  0.09760723  0.02604634        0.10865766  0.06613000 -0.4525503
+#> GSM475657 -0.13054675 -0.04842479        0.03704578 -0.04696868  0.0806653
+#> GSM475658 -0.23724318 -0.35664951       -0.72306703 -0.14210613 -0.2063048
+#> GSM475659 -0.23964383  0.09686435        0.07284487 -0.12954904 -0.3802460
+#> GSM475660  0.42173484  0.23982987        0.20812146  0.26165222 -0.3935905
+#> GSM475661  0.12728337  0.07415260        0.49254374  0.17126916  0.9658228
+#>                254173      125972      220979        2117       317719
+#> GSM475656  0.28960049 -0.25707171  0.62106444 -0.47101319 -0.014389032
+#> GSM475657 -0.02496260 -0.10924410 -0.08845968  0.12716405  0.023269085
+#> GSM475658 -0.19333057 -0.18773429  0.68069336  0.42587910 -0.005139628
+#> GSM475659 -0.02966311 -0.08009281  0.52800933 -0.64405488 -0.190897384
+#> GSM475660  0.64369195 -0.04114249  0.10938982 -0.27645374 -0.106289287
+#> GSM475661  0.16597716 -0.15212603 -0.15332420 -0.07025383  0.086453224
+#>                220992      162387 64072 /// 100653137       84465
+#> GSM475656  0.38467515 -0.09202981          0.03046847  2.44610616
+#> GSM475657 -0.06545603 -0.22127891         -0.06839991  0.46251777
+#> GSM475658  0.18012662 -0.81065784         -0.37587378 -0.04861362
+#> GSM475659 -0.08222380 -0.16606038         -0.33936931  0.57853291
+#> GSM475660 -0.24850125 -0.02731787          0.01067467 -0.28217290
+#> GSM475661  1.30315497  0.09767578          0.11140833 -0.18640771
+#>                 11318       80712 147199 /// 653486      285126
+#> GSM475656 -0.13368814  0.12754646       0.009682731  0.16993225
+#> GSM475657 -0.31987640 -0.09137923      -0.286299152 -0.29759720
+#> GSM475658  1.06945924 -0.06434080      -0.155012869 -0.07046859
+#> GSM475659  0.04024538  0.04079875       0.112325121 -0.07768369
+#> GSM475660  0.01116855  0.07382120      -0.146128999  0.36579427
+#> GSM475661  0.04528832  0.11639248      -0.100699510  0.04117625
+#>                126248      158471       125997        92949        85509
+#> GSM475656 -0.06117258  1.55819034 -0.300846986  0.017812505  0.371721193
+#> GSM475657  0.16679397 -0.07261160 -0.434666422  0.011226717  0.126828186
+#> GSM475658 -0.01910797 -0.11760205 -0.119045969 -0.009253004 -0.424766600
+#> GSM475659 -0.02114144  0.21192769 -0.006409731 -0.075286382 -0.121452997
+#> GSM475660  0.19095790 -0.04059053 -0.185981481 -0.175078145 -0.003727694
+#> GSM475661  0.10019611 -0.51028690  0.190430798  2.177766365  0.178767803
+#>                89778      118421      259234        83451      23527
+#> GSM475656 -0.3373551 -0.11676088  0.56101992 -0.314147138  0.2128014
+#> GSM475657  2.0518806 -0.07544516 -0.08450644  0.136568284 -0.6620996
+#> GSM475658 -0.2639671  0.39272939 -0.09101155 -0.290484843 -0.2358734
+#> GSM475659 -0.3418193 -0.21847370 -0.47412441 -0.208416239 -0.7324841
+#> GSM475660  0.2374486 -0.04384302  0.13974709 -0.004050877 -1.0119304
+#> GSM475661 -0.3363428  0.12474152 -0.10206668  0.447004465 -0.8630060
+#>                  2593       3664
+#> GSM475656 -0.12241182  0.4714302
+#> GSM475657 -0.39589762 -0.9062970
+#> GSM475658 -0.60780261 -1.3907893
+#> GSM475659 -0.53227797 -1.6478505
+#> GSM475660 -0.05546723 -0.8218098
+#> GSM475661 -0.33322556 -2.4100944
+```
+
+
+```r
+print(entrezIDs)
+#>  [1] "780 /// 100616237"   "7318 /// 100847079"  "7067"               
+#>  [4] "6352"                "1548"                "23170"              
+#>  [7] "10406"               "5594"                "128153"             
+#> [10] "163154"              "54899"               "57617"              
+#> [13] "113235"              "91937"               "79844 /// 653082"   
+#> [16] "172"                 "148113"              "54965"              
+#> [19] "91252"               "221264"              "113277"             
+#> [22] "84920"               "91624"               "4238"               
+#> [25] "170575"              "85478"               "159091"             
+#> [28] "220136"              "5930"                "92806"              
+#> [31] "11078"               "3233"                "5150"               
+#> [34] "29883"               "260429"              "255057"             
+#> [37] "114609"              "124540"              "85477"              
+#> [40] "132321"              "84449"               "157506"             
+#> [43] "135295"              "202309"              "203111"             
+#> [46] "150350"              "81629"               "140870"             
+#> [49] "160364"              "2972"                "123591"             
+#> [52] "571 /// 100379661"   "126206"              "165530"             
+#> [55] "245909 /// 503841"   "259240"              "121441"             
+#> [58] "254173"              "125972"              "220979"             
+#> [61] "2117"                "317719"              "220992"             
+#> [64] "162387"              "64072 /// 100653137" "84465"              
+#> [67] "11318"               "80712"               "147199 /// 653486"  
+#> [70] "285126"              "126248"              "158471"             
+#> [73] "125997"              "92949"               "85509"              
+#> [76] "89778"               "118421"              "259234"             
+#> [79] "83451"               "23527"               "2593"               
+#> [82] "3664"
+```
+
+### Compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions 
+
+
+```r
+surv_correlated <- sigident::univCox_(survTable = survTable,
+                                      entrezIDs = entrezIDs)
+# export table with survival correlated genes
+data.table::fwrite(surv_correlated, paste0(csvdir, "survival_correlated_genes.csv"))
+```
+
+
+```r
+dim(surv_correlated)
+#> [1] 8 5
+head(surv_correlated)
+#>        Entrez_ID  beta HR (95% CI for HR) wald.test p.value
+#> 7067        7067     2       7.4 (1.6-34)       6.5  0.0110
+#> 6352        6352 -0.31   0.73 (0.57-0.94)         6  0.0140
+#> 221264    221264   1.6       4.9 (1.6-15)       7.6  0.0058
+#> 113277    113277  -1.1   0.34 (0.16-0.73)       7.6  0.0060
+#> 29883      29883  0.74      2.1 (1.2-3.8)       6.2  0.0130
+#> 255057    255057   3.8       45 (4.6-440)        11  0.0011
+```
+
+
+## Prognostic classifier and Kaplan-Meier estimator
+
+classification of patients into high and low risk groups regarding to expression profile of signature genes
+
+due to selection bias, only GSE18842 and GSE19804 are used for calculating classifier
+
+
+```r
+classifier_studies <- c("GSE18842", "GSE19804")
+```
+
+
+### Evaluate expression pattern (over-/underrepresentation)
+
+generate vectors 'control' and 'tumor' for function expressionPattern_
+
+
+```r
+exprPattern <- sigident::generateExpressionPattern_(classifier_studies = classifier_studies,
+                                                    sigCov = surv_correlated,
+                                                    mergeset = mergeset,
+                                                    studyMetadata = studyMetadata,
+                                                    sampleMetadata = sampleMetadata,
+                                                    controlname = controlname,
+                                                    targetname = targetname,
+                                                    targetcol = targetcol)
+```
+
+
+```r
+dim(exprPattern)
+#> [1] 8 2
+head(exprPattern)
+#>     Gene Over/Under
+#> 1   7067      Under
+#> 2   6352      Under
+#> 3 221264       Over
+#> 4 113277       Over
+#> 5  29883      Under
+#> 6 255057       Over
+```
+
+### Apply the prognostic classifier on validation data set
+
+#### Create a list that contains specifications of the study that contains the validation information
+
+
+```r
+validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
+                                                statuscol = "characteristics_ch1.8",
+                                                targetcolname = "source_name_ch1",
+                                                controllevelname = "Non Tumoral Lung",
+                                                targetlevelname = "Lung Tumour"))
+```
+
+
+```r
+pC <- sigident::prognosticClassifier_(PatternCom = exprPattern,
+                                      validationstudiesinfo = validationstudiesinfo,
+                                      datatdir = datadir,
+                                      controlname = controlname,
+                                      targetname = targetname,
+                                      targetcol = targetcol)
+fit <- pC[["GSE30219"]]$kaplan.estimator$fit
+RiskTable <- pC[["GSE30219"]]$risktable
+```
+
+
+```r
+dim(RiskTable)
+#> [1] 307   3
+head(RiskTable)
+#>           time status Groups
+#> GSM748053  121      1      1
+#> GSM748054   21      2      0
+#> GSM748055   86      2      1
+#> GSM748056   10      2      1
+#> GSM748057   81      2      0
+#> GSM748058   68      1      1
+```
+
+#### View proportional hazards regression models
+
+
+```r
+pC[["GSE30219"]]$kaplan.estimator$res.cox
+#> Call:
+#> survival::coxph(formula = survival::Surv(time, status) ~ Groups, 
+#>     data = RiskTable)
+#> 
+#>           coef exp(coef) se(coef)      z    p
+#> Groups -0.1243    0.8831   0.1574 -0.789 0.43
+#> 
+#> Likelihood ratio test=0.63  on 1 df, p=0.4264
+#> n= 278, number of events= 188 
+#>    (29 observations deleted due to missingness)
+```
+
+
+```r
+fit
+#> Call: survfit(formula = res.cox, newdata = new_df)
+#> 
+#>     n events median 0.95LCL 0.95UCL
+#> 1 278    188     48      28      70
+#> 2 278    188     57      33     103
+```
+
+
+#### Plot prognostic Kaplan-Meier plot
+
+
+```r
+# create roc plot
+filename <- paste0(plotdir, "Prognostic_Kaplan-Meier_Plot.png")
+sigident::createSurvPlot_(fit = fit,
+                          RiskTable = RiskTable,
+                          filename = filename)
+```
+
+
+```r
+knitr::include_graphics(filename)
+```
+
+<img src="./plots/Prognostic_Kaplan-Meier_Plot.png" title="plot of chunk unnamed-chunk-83" alt="plot of chunk unnamed-chunk-83" width="80%" />
 
 # An alternative workflow: one generic function 
 
@@ -1008,21 +1394,35 @@ The preprocessing needs to be conform with the above described approach.
 
 
 ```r
-diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,
-                                                 controlname = "Control",
-                                                 targetname = "Lung Cancer",
-                                                 studyMetadata = studyMetadata,
-                                                 sampleMetadata = sampleMetadata,
-                                                 species = "Hs",
-                                                 OrgDb = "org.Hs.eg.db",
-                                                 organism = "hsa",
-                                                 pathwayid = "hsa04110",
-                                                 deg.q.selection = NULL,
-                                                 seed = 111,
-                                                 nfolds = 10,
-                                                 split = 0.8,
-                                                 plotdir = "./plots/",
-                                                 csvdir = "./tables/",
-                                                 targetcol = "target"))
+results <- sigident::sigidentMicroarray(mergeset = mergeset,
+                                        controlname = "Control",
+                                        targetname = "Lung Cancer",
+                                        studyMetadata = studyMetadata,
+                                        sampleMetadata = sampleMetadata,
+                                        species = "Hs",
+                                        OrgDB = "org.Hs.eg.db",
+                                        organism = "hsa",
+                                        pathwayid = "hsa04110",
+                                        deg.q.selection = NULL,
+                                        seed = 111,
+                                        nfolds = 10,
+                                        split = 0.8,
+                                        plotdir = "./plots/",
+                                        csvdir = "./tables/",
+                                        targetcol = "target")
 ```
+
+
+```r
+diagnosticModels <- results$diagnosticModels
+sigUtils <- results$utils
+```
+
+
+```r
+knitr::kable(
+  sigident::compareDiagnosticModels(diagnosticModels)
+)
+```
+
 
