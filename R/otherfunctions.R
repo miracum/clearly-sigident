@@ -1,8 +1,8 @@
 #' @title merge_
 #'
-#' @description Helper function to merge expression sets
+#' @description Helper function to merge ExpressionSets
 #'
-#' @param esetlist A list of expression sets to merge
+#' @param esetlist A list of ExpressionSets with consistent phenoData to merge
 #'
 #' @export
 merge_ <- function(esetlist){
@@ -20,7 +20,7 @@ merge_ <- function(esetlist){
     #get list of all overlapping genes
     overlap <- sort(intersect(rownames(e1),rownames(e2))) # overlap is used to select only overlapping genes -> genes that are only present in one eset will be discarded
     # --> allows for combination of different chips (with differing feature numbers), as long as the IDs are mapped
-    #Merging Expressionsets
+    #Merging ExpressionSets
     #Generate fData
     fDataNew = Biobase::fData(set1)[overlap,]
     #Generate pData
@@ -31,7 +31,7 @@ merge_ <- function(esetlist){
     #dim(p2)
     #Annotation
     #annoNew = c(annotation(set1),annotation(set2))
-    #Merge Expressiondata
+    #Merge expression data
     eNew <- cbind(e1[overlap,],e2[overlap,]) # expression matrices are bound columnwise, therefor sample-order is unaffected
     #dim(eNew)
     # Rebuild eset
@@ -44,27 +44,6 @@ merge_ <- function(esetlist){
   return(esetNew) # loop is finished after combining all esets; result is returned here
 }
 
-#' @title createCombat_
-#'
-#' @description Helper function to create a matrix with genes as rows and samples as columns
-#'
-#' @param mergedset A large expression set. The output of the function `merge_()`.
-#'
-#' @inheritParams batchDetection_
-#' @inheritParams goDiffReg_
-#'
-#' @export
-createCombat_ <- function(mergedset, batch, design){
-  # generate data frame with expression values and model matrix regardarding diagnosis
-  DF <- mergedset@assayData$exprs
-  edata <- sva::ComBat(DF, batch = batch, mod = design, par.prior = T)
-  # mapping Entrez-IDs to expression matrix
-  rownames(edata) <- as.character(mergedset@featureData@data$ENTREZ_GENE_ID)
-  # remove empty characters and replicates in EntrezIDs
-  edata <- edata[rownames(edata)!="",]
-  edata <- edata[!duplicated(rownames(edata)),]
-  return(edata)
-}
 
 #' @title exportDEGannotations_
 #'

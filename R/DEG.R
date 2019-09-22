@@ -7,7 +7,7 @@ DEG.limma_ <- function(mergeset, design){
 
 #' @title identifyDEGs_
 #'
-#' @description Helper function to identify DEGs
+#' @description Helper function to identify DEGs based on the limma package
 #'
 #' @param design A object. The output of the function `createDiagnosisDesign_()`.
 #' @param qValue A numeric value. The output of the function `qSelection_()`.

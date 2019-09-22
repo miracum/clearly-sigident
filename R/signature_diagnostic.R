@@ -2,7 +2,7 @@
 #'
 #' @description Helper function to split data into training and test set
 #'
-#' @param diagnosis A object. The output of the function `createDiagnosisDesign_()`.
+#' @param diagnosis An object. The output of the function `createDiagnosisDesign_()`.
 #'
 #' @inheritParams sigidentMicroarray
 #'

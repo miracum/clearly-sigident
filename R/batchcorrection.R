@@ -68,3 +68,34 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
 batchDetection_ <- function(mergeset, batch){
   return(gPCA::gPCA.batchdetect(x = t(mergeset), batch = batch, center = FALSE))
 }
+
+#' @title batchCorrection_
+#'
+#' @description Helper function correcting for batch effects and mapping affy probes to Entrez IDs
+#'
+#' @param mergedset An ExpressionSet. The output of the function `merge_()`.
+#'
+#' @details This function takes a Bioconductor's ExpressionSet class (the output of the function `merge()`) and outputs a batch corrected 
+#' matrix containing expression data. In order to correct for occurring batch effects and other unwanted variation in high-throughput 
+#' experiments the `ComBat` function from the sva package is conducted.  
+#' The affy probes are mapped to their Entrez IDs. Thereby, empty and replicated character strings are
+#' removed.  
+#'  
+#' @inheritParams batchDetection_
+#' @inheritParams goDiffReg_
+#'
+#' @references W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.
+#' Jeffrey T. Leek, W. Evan Johnson, Hilary S. Parker, Elana J. Fertig, Andrew E. Jaffe, John D. Storey, Yuqing Zhang and Leonardo Collado Torres (2019). sva: Surrogate Variable Analysis. R package version 3.30.1.
+#'
+#' @export
+batchCorrection_ <- function(mergedset, batch, design){
+  # generate data frame with expression values and model matrix regardarding diagnosis
+  DF <- mergedset@assayData$exprs
+  edata <- sva::ComBat(DF, batch = batch, mod = design, par.prior = T)
+  # mapping Entrez-IDs to expression matrix
+  rownames(edata) <- as.character(mergedset@featureData@data$ENTREZ_GENE_ID)
+  # remove empty characters and replicates in EntrezIDs
+  edata <- edata[rownames(edata)!="",]
+  edata <- edata[!duplicated(rownames(edata)),]
+  return(edata)
+}

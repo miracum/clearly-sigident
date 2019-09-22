@@ -7,7 +7,7 @@
 createTrainingTest_(diagnosis, mergeset, split = 0.8, seed = 111)
 }
 \arguments{
-\item{diagnosis}{A object. The output of the function `createDiagnosisDesign_()`.}
+\item{diagnosis}{An object. The output of the function `createDiagnosisDesign_()`.}
 
 \item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
 

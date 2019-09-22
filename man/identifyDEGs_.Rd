@@ -14,5 +14,5 @@ identifyDEGs_(mergeset, design, qValue)
 \item{qValue}{A numeric value. The output of the function `qSelection_()`.}
 }
 \description{
-Helper function to identify DEGs
+Helper function to identify DEGs based on the limma package
 }

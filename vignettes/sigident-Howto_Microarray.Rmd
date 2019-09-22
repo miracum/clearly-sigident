@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+# sigident 
+
 ```{r setup}
 library(sigident)
 library(knitr)
@@ -34,11 +36,11 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 # Data Preparation 
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. 
-This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts gained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).
+This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).
 
 ## Download of GEO datasets and normalization
 
-To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The objects `targetcol` should also be entitled "target". To run this package analyzing DEGs and identifying diagnostic and prognostic gene signatures for the seperation of two groups (or subtypes, healthy vs cancer, etc) we here named `controlname` and `targetname` exemplary as "control" and "Lung Cancer".  
+To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The objects `targetcol` should also be entitled "target". To run this package analyzing DEGs and identifying diagnostic and prognostic gene signatures for the seperation of two groups (or subtypes, healthy vs cancer, etc) we here named `controlname` and `targetname` exemplary as "control" and "Lung Cancer". `targetcol` contains the outcome variable of interest for subsequent analysis.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # initialize filePath:
@@ -203,7 +205,7 @@ split <- 0.8
 
 ## Extract Metadata 
 
-TODO Description here.
+The metadata are exrtracted directly from the expressionSets and are deposited for a easyier applicability in the data frame `sampleMetadata`. This data frame consists of the GEO accession numbers of the study (GPLxxx), the sample accession numbers (GSMxxx) and the `targetcol` containing the outcome of interest. 
 
 ### Extract sample metadata 
 
@@ -240,6 +242,8 @@ sampleMetadata <- rbind(GSE18842_meta,
 
 ### Define study metadata 
 
+`sutdyMetadata` contains the GEO series accssion numbers of the studies and the assignment due to its usage as discovery or validation dataset. 
+
 ```{r}
 studyMetadata <- data.frame(
   cbind(study = c("GSE18842", "GSE19804", "GSE19188", "GSE30219"),
@@ -252,24 +256,20 @@ studyMetadata <- data.frame(
 
 ## Merging and Batch Correction
 
-TODO description here
-
-First, a boxplot is created with the included samples on the x-axis and the standardised expression values on the y-axis. `mergedset` results as output from above described merging and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
+In this framework for merging, only genes that are present in all datasets are preserved. In our example the entire probe set of 54675 transcripts remains. `mergedset` contains the samples of the studies grouped as discovery and represents an "ExpressionSet" object describing samples, annotations and informations about the features.
 
 ```{r}
-#-----------------------------------------#
-##### 4. Merging and Batch Correction #####
-#-----------------------------------------#
-
-
 esets=c(eset1b,eset2b,eset3b)
 mergedset <- sigident::merge_(esets)
-# merging 3 esets, resulting in a mergeset containing 367 samples and 54675 genes
 ```
 
+### Discovering Batch Effects 
+
+Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studes can already be recognized apparently. 
+A more powerfull approach for batch effect detection is conducting a guided Principle Component Analysis (gPCA) implemented in the [gPCA](https://CRAN.R-project.org/package=gPCA) package.
 
 ```{r}
-# visualize log2 transformed expression values of the merged data set
+# visualize log2 transformed expression values of the merged data set as boxplot
 filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
 jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
 boxplot(mergedset@assayData$exprs, main = "Merged data before batch correction", 
@@ -281,38 +281,9 @@ dev.off()
 knitr::include_graphics(filename)
 ```
 
-### Discovering Batch Effects 
-
-```{r message=FALSE, warning=FALSE, error=FALSE}
-# generate vector with column diagnosis
-table(mergedset@phenoData@data[[targetcol]])
-
-dd <- sigident::createDiagnosisDesign_(sampleMetadata = sampleMetadata,
-                                       studyMetadata = studyMetadata,
-                                       controlname = controlname,
-                                       targetname = targetname,
-                                       targetcol = targetcol)
-diagnosis <- dd$diagnosis
-length(diagnosis)
-table(diagnosis)
-
-design <- dd$design
-
-# determine batches with number of samples
-batch <- sigident::createBatch_(studyMetadata = studyMetadata,
-                                sampleMetadata = sampleMetadata)
-# check batch assignment
-table(batch)
-length(batch)
-
-# Batch Effect Correction 
-# removing batch effects computing linear models, take variance between the diagnosis into consideration
-mergeset <- sigident::createCombat_(mergedset = mergedset, batch = batch, design = design)
-```
-
-`mergeset` results as output from above described merging and represents a matrix containing the genes (Entrez ID) as rows and the samples as columns.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# conducting gPCA for batch effect detection
 DF <- mergedset@assayData$exprs
 gPCA_before <- sigident::batchDetection_(mergeset = DF,
                                           batch = batch)
@@ -326,6 +297,48 @@ sigident::createBatchPlot_(correction_obj = gPCA_before,
 knitr::include_graphics(filename)
 ```
 
+
+In order to correct for occurring batch effects and other unwanted variation in high-throughput experiments the `ComBat` function from the [sva](10.1093/bioinformatics/bts034) package is conducted. The `ComBat` function adjusts for known batches using an empirical Bayesian framework[1].  
+
+```{r message=FALSE, warning=FALSE, error=FALSE}
+table(mergedset@phenoData@data[[targetcol]])
+
+# generate list dd with diagnosis and design
+dd <- sigident::createDiagnosisDesign_(sampleMetadata = sampleMetadata,
+                                       studyMetadata = studyMetadata,
+                                       controlname = controlname,
+                                       targetname = targetname,
+                                       targetcol = targetcol)
+diagnosis <- dd$diagnosis
+length(diagnosis)
+table(diagnosis)
+
+design <- dd$design
+
+# define batches with number of samples
+batch <- sigident::createBatch_(studyMetadata = studyMetadata,
+                                sampleMetadata = sampleMetadata)
+# check batch assignment
+table(batch)
+length(batch)
+
+# removing batch effects computing linear models, take variance between the diagnosis into consideration
+mergeset <- sigident::batchCorrection_(mergedset = mergedset, batch = batch, design = design)
+dim(mergeset)
+```
+
+`mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet any more. During this process the affy probes are mapped to the appropriate Entrez ID and empty and replicated character strings get removed. Therefore, only 21879 Entrez IDs remain.  
+
+
+### Visualize batch effect removal
+
+Creating a boxplot and a gPCA plot with `mergeset` points out that no batch effect is present no more. 
+
+```{r}
+# boxplot(mergeset, main = "Merged data after batch correction", 
+#         xlab = "Samples", ylab ="Expression value")
+```
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "import_boxplot.png")
 sigident::createImportBoxplot_(mergeset, filename)
@@ -335,15 +348,6 @@ sigident::createImportBoxplot_(mergeset, filename)
 knitr::include_graphics(filename)
 ```
 
-```{r results='hide'}
-# remove unneeded objects
-rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
-```
-
-
-### Visualize batch effects  
-
-TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 gPCA_after <- sigident::batchDetection_(mergeset = mergeset,
@@ -358,18 +362,31 @@ sigident::createBatchPlot_(correction_obj = gPCA_after,
 knitr::include_graphics(filename)
 ```
 
+
+```{r results='hide'}
+# remove unneeded objects
+rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
+# also no further purpose, but takes a lot of memory and may slow down your computer
+rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804")
+```
+
+
 # DEG Analysis 
 
-TODO Description here.
+A common task proceeding expression data is to perform statistical analysis to discover quantitative changes in expression levels between experimental groups. For this reason we here offer the identification of differentially expressed genes (DEGs) based on the limma package. In order to multiple testing correction we considered the p-value adjustment by conducting the "BH" method, which controls the expected false discovery rate (FDR).  
+A heatmap based on the selected DEGs is created and clear differences regarding the expression profiles between the groups (Control and Lung Cancer) can be recognized. 
+
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-q_selection <- NULL # use default setting
-deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata,
-                               deg.q.selection = q_selection)
+# q_selection <- NULL # use default setting
+# deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata,
+#                                studyMetadata = studyMetadata,
+#                                deg.q.selection = q_selection)
+FDR <- 0.05
 
 genes <- sigident::identifyDEGs_(mergeset = mergeset,
                                  design = design,
-                                 qValue = deg_q)
+                                 qValue = FDR)
 
 # heatmap creation
 filename <- paste0(plotdir, "DEG_heatmap.png")
@@ -388,10 +405,14 @@ sigident::createDEGheatmap_(mergeset = mergeset,
 knitr::include_graphics(filename)
 ```
 
-TODO description here
+Some investigations may have been finished at this point, receiving the DEGs. Additionally, we provide a table containing annotations like gene symbols and the results from the limma analysis including log2 fold changes and the adjusted p-values. 
+
+TODO subsetting DEGs (genes) and combining table deg_info and deg_results
 
 ```{r}
 deg_info <- sigident::exportDEGannotations_(mergedset = mergedset)
+# deg_info <- subset(deg_info, entrez_id == genes) # something like this
+
 data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
@@ -402,7 +423,7 @@ knitr::kable(head(deg_info))
 ```{r}
 deg_results <- sigident::limmaTopTable_(mergeset = mergeset,
                                         design = design,
-                                        qValue = deg_q)
+                                        qValue = FDR)
 data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
@@ -412,8 +433,9 @@ knitr::kable(head(deg_results))
 
 # Gene enrichment 
 
-TODO Description here.
+A common investigation regarding differentially expressed genes analysis is the functional annotation of the DEGs. Furthermore, it is useful to find out if the DEGs are associated with  biological processes or molecular functions. 
 
+TODO do we need this any more regarding the removal of duplicated entrez-IDs in former step?
 ```{r}
 deg_entrez <- unique(genes)
 ```
@@ -421,7 +443,13 @@ deg_entrez <- unique(genes)
 
 ## Test for over-representation 
 
-TODO Description here.
+For the identification of enriched GO terms and KEGG pathways a over-representation analysis is performed based on linear models. As input it needs the Entrez-IDs and the definition of the species. `extractGOterms_` and `extractKEGGterms` outputs a table conatining the most significant top GO and KEGG terms. In either case, rows are sorted by the minimum p-value with   
+* Term: GO term  
+* (Pathway: KEGG pathway)
+* Ont: ontology that GO term belongs to  
+* N: number of genes in the GO term  
+* DE: number of genes in the input Entrez Gene IDs (deg_entrez)  
+* P.DE: p-value for over-representation of the GO term in the set
 
 ```{r}
 enr_topgo <- sigident::extractGOterms_(entrez = deg_entrez,
@@ -432,7 +460,6 @@ dim(enr_topgo)
 knitr::kable(head(enr_topgo))
 ```
 
-TODO Description here.
 
 ```{r}
 enr_topkegg <- sigident::extractKEGGterms_(entrez = deg_entrez,
@@ -443,7 +470,15 @@ dim(enr_topkegg)
 knitr::kable(head(enr_topkegg))
 ```
 
-TODO Description here.
+
+The following test for over-representation is based on the same method, but also taking into account for over and under expression in enriched terms with
+* Term: GO term  
+* Ont: ontology that GO term belongs to  
+* N: number of genes in the GO term  
+* Up: number of up-regulated DEGs  
+* Down: number of down-regulated DEGs
+* P.Up: p-value for over-representation of GO term in up-regulated genes  
+* P.Down: p-value for over-representation of GO term in down-regulated genes
 
 ```{r}
 enr_fitlm <- sigident::goDiffReg_(mergeset = mergeset,
@@ -652,6 +687,8 @@ knitr::include_graphics(filename)
 
 These models can be included into one big list and the results can then be printed using the function `compareDiagnosticModels()`.
 
+TODO maybe provide sensitivity, specificity ... from confusion matrix
+
 ```{r}
 diagnosticModels <- list(
   lasso.min = list(model = diagnostic_lasso$lambda.min,
@@ -742,3 +779,5 @@ diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,
                                                  targetcol = "target")
 ```
 
+# References
+[1] W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.

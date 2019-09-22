@@ -14,7 +14,7 @@ goEnrichmentAnalysis_(entrez, OrgDB, organism, fitlm, pathwayid, species,
 
 \item{organism}{A character string indicating the organism. Currently supported: "hsa".}
 
-\item{fitlm}{A object, returned by `goDiffReg_()`.}
+\item{fitlm}{An object, returned by `goDiffReg_()`.}
 
 \item{pathwayid}{A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".}
 

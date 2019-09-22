@@ -31,7 +31,7 @@ extractKEGGterms_ <- function(entrez, species){
 
 #' @title goDiffReg_
 #'
-#' @description Helper function to ... (TODO what do we do here?)
+#' @description Helper function to fitting linear models
 #'
 #' @inheritParams identifyDEGs_
 #'
@@ -46,7 +46,7 @@ goDiffReg_ <- function(mergeset, design){
 #'
 #' @description Helper function to perform enrichment analysis
 #'
-#' @param fitlm A object, returned by `goDiffReg_()`.
+#' @param fitlm An object, returned by `goDiffReg_()`.
 #'
 #' @inheritParams sigidentMicroarray
 #' @inheritParams extractGOterms_

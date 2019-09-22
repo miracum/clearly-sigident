@@ -7,8 +7,8 @@
 merge_(esetlist)
 }
 \arguments{
-\item{esetlist}{A list of expression sets to merge}
+\item{esetlist}{A list of ExpressionSets with consistent phenoData to merge}
 }
 \description{
-Helper function to merge expression sets
+Helper function to merge ExpressionSets
 }
