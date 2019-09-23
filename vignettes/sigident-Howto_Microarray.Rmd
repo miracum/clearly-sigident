@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::knitr}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r, include = FALSE}
@@ -323,7 +323,11 @@ table(batch)
 length(batch)
 
 # removing batch effects computing linear models, take variance between the diagnosis into consideration
+<<<<<<< HEAD
 mergeset <- sigident::batchCorrection_(mergedset = mergedset, batch = batch, design = design)
+=======
+mergeset <- sigident::createCombat_(mergedset = mergedset, batch = batch, design = design)
+>>>>>>> 4056237715416d03d93495062b382a97a2554970
 dim(mergeset)
 ```
 
@@ -378,11 +382,18 @@ A heatmap based on the selected DEGs is created and clear differences regarding 
 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+<<<<<<< HEAD
 # q_selection <- NULL # use default setting
 # deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata,
 #                                studyMetadata = studyMetadata,
 #                                deg.q.selection = q_selection)
 FDR <- 0.05
+=======
+q_selection <- NULL # use default setting
+deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata, 
+                               studyMetadata = studyMetadata,
+                               deg.q.selection = q_selection)
+>>>>>>> 4056237715416d03d93495062b382a97a2554970
 
 genes <- sigident::identifyDEGs_(mergeset = mergeset,
                                  design = design,
@@ -417,6 +428,7 @@ data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
 ```{r}
+dim(deg_info)
 knitr::kable(head(deg_info))
 ```
 
@@ -428,6 +440,7 @@ data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
 ```{r}
+dim(deg_results)
 knitr::kable(head(deg_results))
 ```
 
@@ -723,6 +736,12 @@ signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnostic
 data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_model1.csv"))
 ```
 
+```{r}
+dim(signature_genes)
+head(signature_genes)
+```
+
+
 # Identification of Prognostic Signature
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
@@ -730,24 +749,139 @@ data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_model1.csv")
 ```{r}
 discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
                                                       statuscol = "characteristics_ch1.3",
-                                                      targetcolname = "characteristics_ch1"))
+                                                      targetcolname = "characteristics_ch1",
+                                                      controllevelname = "tissue type: healthy",
+                                                      targetlevelname = "tissue type: tumor"))
 ```
 
-```{r}
+## Identification of survival correlated genes 
+
+### Extract survival data 
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 #---------------------------------------------------#
 ##### 8. Identification of Prognostic Signature #####
 #---------------------------------------------------#
 
 ### 8.A Identification of survival correlated genes
-survivalDataTable <- getSurvivalTime_(studyMetadata = studyMetadata,
-                                      sampleMetadata = sampleMetadata,
-                                      discoverystudies.w.timedata = discoverystudies.w.timedata,
-                                      targetname = targetname,
-                                      controlname = controlname,
-                                      targetcol = targetcol,
-                                      datadir = datadir)
+survivalData <- sigident::getSurvivalTime_(studyMetadata = studyMetadata,
+                                           sampleMetadata = sampleMetadata,
+                                           discoverystudies.w.timedata = discoverystudies.w.timedata,
+                                           targetname = targetname,
+                                           controlname = controlname,
+                                           targetcol = targetcol,
+                                           datadir = datadir)
+survTable <- survivalData[["GSE19188"]]$survTable
+entrezIDs <- survivalData[["GSE19188"]]$entrezIDs
 ```
 
+```{r}
+dim(survTable)
+head(survTable)
+```
+
+```{r}
+print(entrezIDs)
+```
+
+### Compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions 
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+surv_correlated <- sigident::univCox_(survTable = survTable,
+                                      entrezIDs = entrezIDs)
+# export table with survival correlated genes
+data.table::fwrite(surv_correlated, paste0(csvdir, "survival_correlated_genes.csv"))
+```
+
+```{r}
+dim(surv_correlated)
+head(surv_correlated)
+```
+
+
+## Prognostic classifier and Kaplan-Meier estimator
+
+classification of patients into high and low risk groups regarding to expression profile of signature genes
+
+due to selection bias, only GSE18842 and GSE19804 are used for calculating classifier
+
+```{r}
+classifier_studies <- c("GSE18842", "GSE19804")
+```
+
+
+### Evaluate expression pattern (over-/underrepresentation)
+
+generate vectors 'control' and 'tumor' for function expressionPattern_
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+exprPattern <- sigident::generateExpressionPattern_(classifier_studies = classifier_studies,
+                                                    sigCov = surv_correlated,
+                                                    mergeset = mergeset,
+                                                    studyMetadata = studyMetadata,
+                                                    sampleMetadata = sampleMetadata,
+                                                    controlname = controlname,
+                                                    targetname = targetname,
+                                                    targetcol = targetcol)
+```
+
+```{r}
+dim(exprPattern)
+head(exprPattern)
+```
+
+### Apply the prognostic classifier on validation data set
+
+#### Create a list that contains specifications of the study that contains the validation information
+
+```{r}
+validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
+                                                statuscol = "characteristics_ch1.8",
+                                                targetcolname = "source_name_ch1",
+                                                controllevelname = "Non Tumoral Lung",
+                                                targetlevelname = "Lung Tumour"))
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+pC <- sigident::prognosticClassifier_(PatternCom = exprPattern,
+                                      validationstudiesinfo = validationstudiesinfo,
+                                      datatdir = datadir,
+                                      controlname = controlname,
+                                      targetname = targetname,
+                                      targetcol = targetcol)
+fit <- pC[["GSE30219"]]$kaplan.estimator$fit
+RiskTable <- pC[["GSE30219"]]$risktable
+```
+
+```{r}
+dim(RiskTable)
+head(RiskTable)
+```
+
+#### View proportional hazards regression models
+
+```{r}
+pC[["GSE30219"]]$kaplan.estimator$res.cox
+```
+
+```{r}
+fit
+```
+
+
+#### Plot prognostic Kaplan-Meier plot
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "Prognostic_Kaplan-Meier_Plot.png")
+sigident::createSurvPlot_(fit = fit,
+                          RiskTable = RiskTable,
+                          filename = filename)
+```
+
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
 
 # An alternative workflow: one generic function 
 
@@ -761,23 +895,38 @@ The preprocessing needs to be conform with the above described approach.
 
 
 ```{r eval = FALSE}
-diagnosticModels <- sigident::sigidentMicroarray(mergeset = mergeset,
-                                                 controlname = "Control",
-                                                 targetname = "Lung Cancer",
-                                                 studyMetadata = studyMetadata,
-                                                 sampleMetadata = sampleMetadata,
-                                                 species = "Hs",
-                                                 OrgDB = "org.Hs.eg.db",
-                                                 organism = "hsa",
-                                                 pathwayid = "hsa04110",
-                                                 deg.q.selection = NULL,
-                                                 seed = 111,
-                                                 nfolds = 10,
-                                                 split = 0.8,
-                                                 plotdir = "./plots/",
-                                                 csvdir = "./tables/",
-                                                 targetcol = "target")
+results <- sigident::sigidentMicroarray(mergeset = mergeset,
+                                        controlname = "Control",
+                                        targetname = "Lung Cancer",
+                                        studyMetadata = studyMetadata,
+                                        sampleMetadata = sampleMetadata,
+                                        species = "Hs",
+                                        OrgDB = "org.Hs.eg.db",
+                                        organism = "hsa",
+                                        pathwayid = "hsa04110",
+                                        deg.q.selection = NULL,
+                                        seed = 111,
+                                        nfolds = 10,
+                                        split = 0.8,
+                                        plotdir = "./plots/",
+                                        csvdir = "./tables/",
+                                        targetcol = "target")
 ```
 
+<<<<<<< HEAD
 # References
 [1] W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.
+=======
+```{r eval = FALSE}
+diagnosticModels <- results$diagnosticModels
+sigUtils <- results$utils
+```
+
+```{r eval = FALSE}
+knitr::kable(
+  sigident::compareDiagnosticModels(diagnosticModels)
+)
+```
+
+
+>>>>>>> 4056237715416d03d93495062b382a97a2554970

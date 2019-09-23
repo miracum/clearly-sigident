@@ -234,3 +234,25 @@ createGridVarImpPlot_ <- function(model, filename){
   height = 1000,
   width = 1500)
 }
+
+
+#' @title createSurvPlot_
+#'
+#' @description Helper function to create survival plot
+#'
+#' @param fit A cox proportional hazards model. The output of the function `fitKaplanEstimator_()` or `prognosticClassifier_()`.
+#' @param RiskTable A data.frame. The output of the function `prognosticClassifier_()`.
+#'
+#' @inheritParams createGridModelPlot_
+#'
+#' @export
+createSurvPlot_ <- function(fit, RiskTable, filename){
+  shiny::plotPNG({
+    return(print({
+      survminer::ggsurvplot(fit, RiskTable, conf.int = TRUE, legend.labs=c("Low-Risk", "High-Risk"), ggtheme = ggplot2::theme_minimal())
+    }))
+  },
+  filename = filename,
+  height = 1000,
+  width = 1500)
+}

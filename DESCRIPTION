@@ -9,8 +9,11 @@ Authors@R:
       person(given = "Johannes",
              family = "Vey",
              role = "aut"),
-      person(given = "Maximilian",
-             family = "Fuchs",
+      person(given = "Meik",
+             family = "Kunz",
+             role = "aut"),
+      person(given = "Andreas",
+             family = "Pittroff",
              role = "aut"))
 Description: Identify diagnostic and prognostic signatures from gene expression datasets.
 License: GPL-3
@@ -20,7 +23,7 @@ BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 Copyright: Universitätsklinikum Erlangen
 VignetteBuilder: knitr
-Date/Publication: 2019-09-19 11:46:03 UTC
+Date/Publication: 2019-09-20 17:11:41 UTC
 biocViews: 
 Imports: 
     data.table,
@@ -42,6 +45,9 @@ Imports:
     parallel,
     doParallel,
     e1071,
+    survival,
+    plyr,
+    survminer,
     BiocManager,
     Biobase,
     sva,
@@ -62,4 +68,3 @@ Suggests:
     rmarkdown,
     qpdf,
     knitr
-RoxygenNote: 6.1.1

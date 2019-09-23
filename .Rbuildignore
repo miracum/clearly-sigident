@@ -22,3 +22,5 @@
 ^vignettes/*\.csv$
 ^vignettes/figure$
 ^vignettes/tables$
+^csv$
+^plots$

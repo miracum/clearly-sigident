@@ -10,7 +10,8 @@ my_desc$set("Package", packagename)
 my_desc$set_authors(c(
   person("Lorenz A.", "Kapsner", email = "lorenz.kapsner@uk-erlangen.de", role = c('cre', 'aut')),
   person("Johannes", "Vey", role = c('aut')),
-  person("Maximilian", "Fuchs", role = c('aut'))
+  person("Meik", "Kunz", role = c('aut')),
+  person("Andreas", "Pittroff", role = c('aut'))
 ))
 # Set copyright
 my_desc$set("Copyright", "Universitätsklinikum Erlangen")
@@ -28,8 +29,7 @@ my_desc$set(Description = "Identify diagnostic and prognostic signatures from ge
 my_desc$set("Date/Publication" = paste(as.character(Sys.time()), "UTC"))
 # The urls
 my_desc$set("URL", "https://gitlab.miracum.org/clearly/sigident")
-my_desc$set("BugReports",
-            "https://gitlab.miracum.org/clearly/sigident/issues")
+my_desc$set("BugReports", "https://gitlab.miracum.org/clearly/sigident/issues")
 # License
 my_desc$set("License", "GPL-3")
 
@@ -80,6 +80,10 @@ usethis::use_package("caret", type="Imports")
 usethis::use_package("parallel", type="Imports")
 usethis::use_package("doParallel", type="Imports")
 usethis::use_package("e1071", type="Imports")
+usethis::use_package("survival", type="Imports")
+usethis::use_package("plyr", type="Imports")
+usethis::use_package("survminer", type="Imports")
+
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700
@@ -124,6 +128,9 @@ usethis::use_build_ignore("vignettes/preview.dir")
 usethis::use_build_ignore("vignettes/*.csv")
 usethis::use_build_ignore("vignettes/figure")
 usethis::use_build_ignore("vignettes/tables")
+usethis::use_build_ignore("geodata")
+usethis::use_build_ignore("csv")
+usethis::use_build_ignore("plots")
 usethis::use_git_ignore("inst/application/data")
 usethis::use_git_ignore("data")
 usethis::use_git_ignore("vignettes/geodata")
@@ -132,6 +139,8 @@ usethis::use_git_ignore("vignettes/csv")
 usethis::use_git_ignore("vignettes/GSE19188")
 usethis::use_git_ignore("vignettes/preview.dir")
 usethis::use_git_ignore("geodata")
+usethis::use_git_ignore("csv")
+usethis::use_git_ignore("plots")
 usethis::use_git_ignore("*.Rproj")
 usethis::use_git_ignore(".Rproj*")
 usethis::use_git_ignore(".Rhistory")

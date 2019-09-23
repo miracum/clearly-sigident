@@ -19,14 +19,21 @@ createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, t
                           studyMetadata = studyMetadata)
   discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
 
-  diag <- as.vector(discoverydata)
+  diagnosis <- diagnosis_(vector = discoverydata,
+                          controlname = controlname,
+                          targetname = targetname)
+
+  design <- stats::model.matrix(~diagnosis)
+  return(list(diagnosis = diagnosis, design = design))
+}
+
+diagnosis_ <- function(vector, controlname, targetname){
+  diag <- as.vector(vector)
 
   diagnosis <- gsub(controlname, "0", diag)
   diagnosis <- gsub(targetname, "1", diagnosis)
 
-  diagnosis <- as.integer(diagnosis)
-  design <- stats::model.matrix(~diagnosis)
-  return(list(diagnosis = diagnosis, design = design))
+  return(as.integer(diagnosis))
 }
 
 #' @title createBatch_
