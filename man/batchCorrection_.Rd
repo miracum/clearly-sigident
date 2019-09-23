@@ -17,9 +17,9 @@ batchCorrection_(mergedset, batch, design)
 Helper function correcting for batch effects and mapping affy probes to Entrez IDs
 }
 \details{
-This function takes a Bioconductor's ExpressionSet class (the output of the function `merge()`) and outputs a batch corrected 
-matrix containing expression data. In order to correct for occurring batch effects and other unwanted variation in high-throughput 
-experiments the `ComBat` function from the sva package is conducted.  
+This function takes a Bioconductor's ExpressionSet class (the output of the function `merge()`) and outputs a batch corrected
+matrix containing expression data. In order to correct for occurring batch effects and other unwanted variation in high-throughput
+experiments the `ComBat` function from the sva package is conducted.
 The affy probes are mapped to their Entrez IDs. Thereby, empty and replicated character strings are
 removed.
 }
