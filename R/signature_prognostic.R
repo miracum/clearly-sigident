@@ -114,21 +114,21 @@ loadEset_ <- function(name, datadir, targetcolname, targetcol, targetname, contr
 #'
 #' @description Helper function to compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions
 #'
-#' @param survTable A data.frame. Output of the function `getSurvivalTime_()`.
-#' @param entrezIDs A character string. Output of the function `getSurvivalTime_()`.
+#' @param survtable A data.frame. Output of the function `getSurvivalTime_()`.
+#' @param entrezids A character string. Output of the function `getSurvivalTime_()`.
 #'
 #' @export
-univCox_ <- function(survTable, entrezIDs){
+univCox_ <- function(survtable, entrezids){
 
-  covariates <- colnames(survTable)[-c(1:2)]
+  covariates <- colnames(survtable)[-c(1:2)]
   covariates <- gsub("_|/","",covariates)
   covariates <- paste("ENTREZID",covariates)
   covariates <- gsub(" ","",covariates)
 
-  colnames(survTable)[-c(1:2)] <- covariates
+  colnames(survtable)[-c(1:2)] <- covariates
 
   univ_formulas <- sapply(covariates, function(x) stats::as.formula(paste('survival::Surv(time, status) ~', x))) # build separate formula for each variable
-  univ_models <- lapply(univ_formulas, function(f){survival::coxph(formula = f, data = survTable)}) # build cox model for each variable separatly
+  univ_models <- lapply(univ_formulas, function(f){survival::coxph(formula = f, data = survtable)}) # build cox model for each variable separatly
   # extract results
   univ_results <- lapply(univ_models, #
                          function(x){ #
@@ -153,7 +153,7 @@ univCox_ <- function(survTable, entrezIDs){
   result$p.value <- as.character(result$p.value) # reforamtting of p.value-column
   result$p.value <- as.numeric(result$p.value) #
   indices <- which(result$p.value <= 0.05) # selecting indices with a significant p-value
-  IDs <- entrezIDs[indices] # IDs now contains Entrez-IDs of all genes with significant p-values
+  IDs <- entrezids[indices] # IDs now contains Entrez-IDs of all genes with significant p-values
 
   # TODO symbols?
 

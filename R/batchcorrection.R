@@ -82,12 +82,12 @@ batchDetection_ <- function(mergeset, batch){
 #'
 #' @param mergedset An ExpressionSet. The output of the function `merge_()`.
 #'
-#' @details This function takes a Bioconductor's ExpressionSet class (the output of the function `merge()`) and outputs a batch corrected 
-#' matrix containing expression data. In order to correct for occurring batch effects and other unwanted variation in high-throughput 
-#' experiments the `ComBat` function from the sva package is conducted.  
+#' @details This function takes a Bioconductor's ExpressionSet class (the output of the function `merge()`) and outputs a batch corrected
+#' matrix containing expression data. In order to correct for occurring batch effects and other unwanted variation in high-throughput
+#' experiments the `ComBat` function from the sva package is conducted.
 #' The affy probes are mapped to their Entrez IDs. Thereby, empty and replicated character strings are
-#' removed.  
-#'  
+#' removed.
+#'
 #' @inheritParams batchDetection_
 #' @inheritParams goDiffReg_
 #'

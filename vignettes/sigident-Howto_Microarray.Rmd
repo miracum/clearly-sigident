@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::knitr}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r, include = FALSE}
@@ -765,7 +765,7 @@ entrezIDs <- survivalData[["GSE19188"]]$entrezIDs
 
 ```{r}
 dim(survTable)
-head(survTable)
+head(survTable[,1:4])
 ```
 
 ```{r}
@@ -775,11 +775,13 @@ print(entrezIDs)
 ### Compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-surv_correlated <- sigident::univCox_(survTable = survTable,
-                                      entrezIDs = entrezIDs)
+surv_correlated <- sigident::univCox_(survtable = survTable,
+                                      entrezids = entrezIDs)
 # export table with survival correlated genes
 data.table::fwrite(surv_correlated, paste0(csvdir, "survival_correlated_genes.csv"))
 ```
+
+TODO here we have a difference compared with compiled vignette 
 
 ```{r}
 dim(surv_correlated)
