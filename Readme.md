@@ -2,15 +2,15 @@
 
 This is the repository of the R package 'sigident'. It provides core functionalities to identify diagnostic and prognostic signatures from gene expression datasets.
 
-Currently implemented features are: 
+Currently implemented features are:
 
 - DEG analysis
 - Gene enrichment
 - Identification of diagnostic signatures, using
   + Lasso regression
-  + Elastic net regression 
-  + glmnet (grid search for best alpha and lambda) 
-- Identification of prognostic signatures 
+  + Elastic net regression
+  + glmnet (grid search for best alpha and lambda)
+- Identification of prognostic signatures
 
 ## Installation
 
@@ -24,6 +24,5 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 ## Example
 
-Please view the package vignette to see a detailled description how to perform signature analyses of microarray and RNA-seq data. 
-
+Please view the package vignette to see a detailled description how to perform signature analyses of DNA microarray data.
 

@@ -3,7 +3,7 @@
 #' @description Helper function to map relevant input variables of a diagnostic model to Entrez IDs.
 #'
 #' @inheritParams createGridModelPlot_
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 geneMapSig_ <- function(mergeset, model){
@@ -21,8 +21,9 @@ geneMapSig_ <- function(mergeset, model){
 #' @description Helper function to get survival time.
 #'
 #' @param discoverystudies.w.timedata A list that contains specifications on the study/studies that contain(s) survival time information.
+#' @param datadir A character string. Path to the data-folder inside the metadata folder.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 getSurvivalTime_ <- function(studyMetadata,
@@ -126,7 +127,7 @@ univCox_ <- function(survTable, entrezIDs){
 
   colnames(survTable)[-c(1:2)] <- covariates
 
-  univ_formulas <- sapply(covariates, function(x) as.formula(paste('survival::Surv(time, status) ~', x))) # build separate formula for each variable
+  univ_formulas <- sapply(covariates, function(x) stats::as.formula(paste('survival::Surv(time, status) ~', x))) # build separate formula for each variable
   univ_models <- lapply(univ_formulas, function(f){survival::coxph(formula = f, data = survTable)}) # build cox model for each variable separatly
   # extract results
   univ_results <- lapply(univ_models, #
@@ -180,7 +181,7 @@ exprsVector_ <- function(DEG){
 #' @param classifier_studies A character vector. Names of the studies used to train the classifier.
 #' @param sigCov A data.frame. Output of the function `univCox_()`.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 generateExpressionPattern_ <- function(classifier_studies,
@@ -277,10 +278,11 @@ expressionPattern_ <- function(mergeset, entrezID, tumor, control){
 #' @param validationstudiesinfo A list that contains specifications on the study that contains the validation information.
 #' @param PatternCom A data.frame. The output of the function `generateExpressionPattern_()`.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
+#' @inheritParams getSurvivalTime_
 #'
 #' @export
-prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datatdir, targetcol, targetname, controlname){
+prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datadir, targetcol, targetname, controlname){
 
   outlist <- list()
 

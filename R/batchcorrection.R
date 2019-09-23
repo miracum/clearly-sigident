@@ -2,7 +2,7 @@
 #'
 #' @description Helper function to create diagnosis and design
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 # create design
@@ -40,7 +40,7 @@ diagnosis_ <- function(vector, controlname, targetname){
 #'
 #' @description Helper function to create batch
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 # create batch
@@ -69,7 +69,7 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
 #'
 #' @param batch Takes the results from \code{createBatch_()} as input.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 batchDetection_ <- function(mergeset, batch){
