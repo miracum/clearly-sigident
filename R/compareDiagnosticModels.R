@@ -2,7 +2,7 @@
 #'
 #' @description Print an overview of all diagnostic models included in `modellist`.
 #'
-#' @param modellist A list object containing a list of diagnostic models. The output of the function `sigidentMicroarray()`.
+#' @param modellist A list object containing a list of diagnostic models. The output of the function `sigidentDiagnostic()`.
 #'
 #' @export
 compareDiagnosticModels <- function(modellist){

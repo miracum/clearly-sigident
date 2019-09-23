@@ -4,13 +4,15 @@
 \alias{prognosticClassifier_}
 \title{prognosticClassifier_}
 \usage{
-prognosticClassifier_(PatternCom, validationstudiesinfo, datatdir,
+prognosticClassifier_(PatternCom, validationstudiesinfo, datadir,
   targetcol, targetname, controlname)
 }
 \arguments{
 \item{PatternCom}{A data.frame. The output of the function `generateExpressionPattern_()`.}
 
 \item{validationstudiesinfo}{A list that contains specifications on the study that contains the validation information.}
+
+\item{datadir}{A character string. Path to the data-folder inside the metadata folder.}
 
 \item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
 

@@ -4,7 +4,7 @@
 #'
 #' @param diagnosis An object. The output of the function `createDiagnosisDesign_()`.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 createTrainingTest_ <- function(diagnosis, mergeset, split = 0.8, seed = 111){
@@ -94,7 +94,7 @@ glmPrediction_ <- function(model, test.x, test.y, s = NULL){
 #'   \emph{"ridge"}.
 #' @param alpha A numeric between 0 and 1. The elasticnet mixing parameter passed to `glmnet::glmnet()`.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 signature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){

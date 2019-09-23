@@ -19,6 +19,8 @@ getSurvivalTime_(studyMetadata, sampleMetadata,
 \item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
 
 \item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
+
+\item{datadir}{A character string. Path to the data-folder inside the metadata folder.}
 }
 \description{
 Helper function to get survival time.

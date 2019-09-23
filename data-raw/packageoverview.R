@@ -1,0 +1,42 @@
+pkg <- c("data.table",
+"shiny",
+"ggplot2",
+"gplots",
+"grDevices",
+"magrittr",
+"methods",
+"stats",
+"graphics",
+"DT",
+"jsonlite",
+"gPCA",
+"caret",
+"glmnet",
+"pROC",
+"utils",
+"parallel",
+"doParallel",
+"e1071",
+"survival",
+"plyr",
+"survminer",
+"BiocManager",
+"Biobase",
+"sva",
+"GEOquery",
+"limma",
+"affy",
+"gcrma",
+"hgu133plus2cdf",
+"GO.db",
+"org.Hs.eg.db",
+"hgu133plus2probe",
+"clusterProfiler",
+"pathfindR",
+"pathview")
+
+for (i in pkg){
+  cat(i, "\n")
+  print(citation(i))
+  cat("\n#########\n\n")
+}

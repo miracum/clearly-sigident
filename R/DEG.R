@@ -12,7 +12,7 @@ DEG.limma_ <- function(mergeset, design){
 #' @param design A object. The output of the function `createDiagnosisDesign_()`.
 #' @param qValue A numeric value. The output of the function `qSelection_()`.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 identifyDEGs_ <- function(mergeset, design, qValue){
@@ -31,7 +31,7 @@ fitLimma_ <- function(mergeset, design){
 #'
 #' @description Helper function to get DEG results
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #' @inheritParams identifyDEGs_
 #'
 #' @export
@@ -55,7 +55,7 @@ limmaTopTable_ <- function(mergeset, design, qValue){
 #'
 #' @description Helper function to select qValues
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 qSelection_ <- function(sampleMetadata, studyMetadata, deg.q.selection = NULL){
