@@ -5,7 +5,7 @@
 #' @param entrez A character vector containing the Entrez-IDs.
 #' @param FDR The false discovery rate passed to `limma::goana`.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 extractGOterms_ <- function(entrez, species, FDR = NULL){
@@ -48,7 +48,7 @@ goDiffReg_ <- function(mergeset, design){
 #'
 #' @param fitlm A object, returned by `goDiffReg_()`.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #' @inheritParams extractGOterms_
 #'
 #' @export
@@ -95,7 +95,7 @@ goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, spe
 
   # pathview
   # https://github.com/egeulgen/pathfindR/issues/10
-  require(pathfindR)
+  requireNamespace("pathfindR")
   # workaround to set correct workingdir for pathview
   oldwd <- getwd()
   setwd(paste0(oldwd, "/", plotdir))

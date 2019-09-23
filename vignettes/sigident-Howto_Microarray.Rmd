@@ -837,7 +837,7 @@ sigident::createSurvPlot_(fit = fit,
 knitr::include_graphics(filename)
 ```
 
-# An alternative workflow: one generic function 
+# An alternative workflow: two generic functions for signature identification 
 
 In order to simplify the whole abovedescribed workflow, we wrapped all these functions into one big function.
 
@@ -845,11 +845,11 @@ In order to simplify the whole abovedescribed workflow, we wrapped all these fun
 
 The preprocessing needs to be conform with the above described approach.
 
-## Run `sigidentMicroarray`-Function 
+## Run `sigidentDiagnostic`-Function 
 
 
 ```{r eval = FALSE}
-results <- sigident::sigidentMicroarray(mergeset = mergeset,
+results <- sigident::sigidentDiagnostic(mergeset = mergeset,
                                         controlname = "Control",
                                         targetname = "Lung Cancer",
                                         studyMetadata = studyMetadata,
@@ -878,4 +878,20 @@ knitr::kable(
 )
 ```
 
+## Run `sigidentPrognostic`-Function 
+
+```{r eval = FALSE}
+progn_results <- sigident::sigidentPrognostic(mergeset = mergeset,
+                                              studyMetadata = studyMetadata,
+                                              sampleMetadata = sampleMetadata,
+                                              discoverystudies.w.timedata = discoverystudies.w.timedata,
+                                              classifier_studies = classifier_studies,
+                                              validationstudiesinfo = validationstudiesinfo,
+                                              controlname = "Control",
+                                              targetname = "Lung Cancer",
+                                              datadir = datadir,
+                                              plotdir = "./plots/",
+                                              csvdir = "./tables/",
+                                              targetcol = "target")
+```
 

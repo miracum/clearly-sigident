@@ -7,7 +7,7 @@
 compareDiagnosticModels(modellist)
 }
 \arguments{
-\item{modellist}{A list object containing a list of diagnostic models. The output of the function `sigidentMicroarray()`.}
+\item{modellist}{A list object containing a list of diagnostic models. The output of the function `sigidentDiagnostic()`.}
 }
 \description{
 Print an overview of all diagnostic models included in `modellist`.

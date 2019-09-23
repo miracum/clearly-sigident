@@ -5,7 +5,7 @@
 #' @param filename A character string indicating the filename. If default (\code{NULL}) a plot named `import_boxplot.png` will be created
 #'   inside the directory "./plots".
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 createImportBoxplot_ <- function(mergeset, filename = NULL){
@@ -68,7 +68,7 @@ createBatchPlot_ <- function(correction_obj, filename = NULL, time){
 #' @param genes A object. The output of the function `identifyDEGs_()`.
 #' @param patientcolors A object. The ouput of the function `colorHeatmap_()`.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 createDEGheatmap_ <- function(mergeset, genes, patientcolors, filename = NULL){
@@ -108,7 +108,7 @@ createDEGheatmap_ <- function(mergeset, genes, patientcolors, filename = NULL){
 #' @param type A character string. One of eiter "GO" or "KEGG".
 #' @param showCategory An integer. Indicating the number of maximum categories to show in barplot.
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCategory = 20){
@@ -139,7 +139,7 @@ createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCa
 #'
 #' @description Helper function to color the heatmap
 #'
-#' @inheritParams sigidentMicroarray
+#' @inheritParams sigidentDiagnostic
 #'
 #' @export
 colorHeatmap_ <- function(sampleMetadata, studyMetadata, targetcol, controlname){
