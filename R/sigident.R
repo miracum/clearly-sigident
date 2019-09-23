@@ -119,7 +119,8 @@ sigidentDiagnostic <- function(mergeset,
 
 
   ### DEG Analysis ###
-  rv$deg_q <- qSelection_(sampleMetadata = sampleMetadata,
+  rv$deg_q <- qSelection_(studyMetadata = studyMetadata,
+                          sampleMetadata = sampleMetadata,
                           deg.q.selection = deg.q.selection)
 
   rv$genes <- identifyDEGs_(mergeset = rv$mergeset,
@@ -368,7 +369,7 @@ sigidentPrognostic <- function(mergeset,
     # apply prognostic classifier
     rv$pC[[i]] <- prognosticClassifier_(PatternCom = rv$exprPattern[[i]],
                                         validationstudiesinfo = validationstudiesinfo,
-                                        datatdir = rv$datadir,
+                                        datadir = rv$datadir,
                                         controlname = rv$controlname,
                                         targetname = rv$targetname,
                                         targetcol = rv$targetcol)
