@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::knitr}
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 
@@ -1313,7 +1313,7 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
 ```r
 pC <- sigident::prognosticClassifier_(PatternCom = exprPattern,
                                       validationstudiesinfo = validationstudiesinfo,
-                                      datatdir = datadir,
+                                      datadir = datadir,
                                       controlname = controlname,
                                       targetname = targetname,
                                       targetcol = targetcol)
@@ -1381,7 +1381,7 @@ knitr::include_graphics(filename)
 
 <img src="./plots/Prognostic_Kaplan-Meier_Plot.png" title="plot of chunk unnamed-chunk-83" alt="plot of chunk unnamed-chunk-83" width="80%" />
 
-# An alternative workflow: one generic function 
+# An alternative workflow: two generic functions for signature identification 
 
 In order to simplify the whole abovedescribed workflow, we wrapped all these functions into one big function.
 
@@ -1389,12 +1389,12 @@ In order to simplify the whole abovedescribed workflow, we wrapped all these fun
 
 The preprocessing needs to be conform with the above described approach.
 
-## Run `sigidentMicroarray`-Function 
+## Run `sigidentDiagnostic`-Function 
 
 
 
 ```r
-results <- sigident::sigidentMicroarray(mergeset = mergeset,
+results <- sigident::sigidentDiagnostic(mergeset = mergeset,
                                         controlname = "Control",
                                         targetname = "Lung Cancer",
                                         studyMetadata = studyMetadata,
@@ -1425,4 +1425,35 @@ knitr::kable(
 )
 ```
 
+## Run `sigidentPrognostic`-Function 
+
+
+```r
+progn_results <- sigident::sigidentPrognostic(mergeset = mergeset,
+                                              studyMetadata = studyMetadata,
+                                              sampleMetadata = sampleMetadata,
+                                              discoverystudies.w.timedata = discoverystudies.w.timedata,
+                                              classifier_studies = classifier_studies,
+                                              validationstudiesinfo = validationstudiesinfo,
+                                              controlname = "Control",
+                                              targetname = "Lung Cancer",
+                                              datadir = datadir,
+                                              plotdir = "./plots/",
+                                              csvdir = "./tables/",
+                                              targetcol = "target")
+```
+
+
+```r
+# create roc plot
+filename <- paste0(plotdir, "Prognostic_Kaplan-Meier_Plot.png")
+sigident::createSurvPlot_(fit = progn_results$GSE19188$GSE30219$fit,
+                          RiskTable = progn_results$GSE19188$GSE30219$risktable,
+                          filename = filename)
+```
+
+
+```r
+knitr::include_graphics(filename)
+```
 

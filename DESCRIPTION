@@ -68,3 +68,4 @@ Suggests:
     rmarkdown,
     qpdf,
     knitr
+RoxygenNote: 6.1.1
