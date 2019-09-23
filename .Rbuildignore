@@ -24,3 +24,4 @@
 ^vignettes/tables$
 ^csv$
 ^plots$
+^Readme\.md$
