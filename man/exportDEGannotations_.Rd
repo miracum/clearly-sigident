@@ -4,10 +4,12 @@
 \alias{exportDEGannotations_}
 \title{exportDEGannotations_}
 \usage{
-exportDEGannotations_(mergedset)
+exportDEGannotations_(mergedset, genes)
 }
 \arguments{
 \item{mergedset}{An ExpressionSet. The output of the function `merge_()`.}
+
+\item{genes}{A object. The output of the function `identifyDEGs_()`.}
 }
 \description{
 Helper function to export DEG annotations from mergedset.

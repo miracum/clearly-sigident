@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-# sigident 
 
 ```{r setup}
 library(sigident)
@@ -285,6 +284,11 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # conducting gPCA for batch effect detection
 DF <- mergedset@assayData$exprs
+
+# define batches with number of samples
+batch <- sigident::createBatch_(studyMetadata = studyMetadata,
+                                sampleMetadata = sampleMetadata)
+
 gPCA_before <- sigident::batchDetection_(mergeset = DF,
                                           batch = batch)
 filename <- paste0(plotdir, "PCplot_before.png")
@@ -315,9 +319,7 @@ table(diagnosis)
 
 design <- dd$design
 
-# define batches with number of samples
-batch <- sigident::createBatch_(studyMetadata = studyMetadata,
-                                sampleMetadata = sampleMetadata)
+
 # check batch assignment
 table(batch)
 length(batch)
@@ -406,12 +408,10 @@ knitr::include_graphics(filename)
 
 Some investigations may have been finished at this point, receiving the DEGs. Additionally, we provide a table containing annotations like gene symbols and the results from the limma analysis including log2 fold changes and the adjusted p-values. 
 
-TODO subsetting DEGs (genes) and combining table deg_info and deg_results
+TODO  combining table deg_info and deg_results
 
 ```{r}
-deg_info <- sigident::exportDEGannotations_(mergedset = mergedset)
-# deg_info <- subset(deg_info, entrez_id == genes) # something like this
-
+deg_info <- sigident::exportDEGannotations_(mergedset = mergedset, genes = genes)
 data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
@@ -558,11 +558,11 @@ knitr::include_graphics(filename)
 
 # Identification of diagnostic signatures 
 
-TODO Description here.
+A common task regarding gene expression data is to distuingishing between different groups or subtypes. For this a multi-gene classifier trained using a large amount of expression data is required. Due to the superiority of features over observations an appropriate method is needed. The lasso and elastic net regularization to fit generalied linear models are powerfull and versatile methods for feature selection and is well suited to genomic data with p>>n. Therefore, we implemented the elastic net regularization method for the identification of a diagnostic multi-gene signature.  
 
 ## Split data into training and test dataset
 
-TODO Description here.
+A statistical prediction model is usually trained on 70%-80% percent of the present data. `createTrainingTest` randomly splits the merged data set into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). 
 
 ```{r}
 training_list <- sigident::createTrainingTest_(diagnosis = diagnosis,
@@ -573,7 +573,8 @@ training_list <- sigident::createTrainingTest_(diagnosis = diagnosis,
 
 ## Lasso regression
 
-TODO Description here.
+The function `signature_` trains the prediction model performing `nfolds` cross-validation. The plot depicts the mean squared error as the criteron for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features above the plot.  
+At least a ROC curve is plotted.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_lasso <- sigident::signature_(traininglist = training_list,
@@ -688,7 +689,6 @@ knitr::include_graphics(filename)
 
 These models can be included into one big list and the results can then be printed using the function `compareDiagnosticModels()`.
 
-TODO maybe provide sensitivity, specificity ... from confusion matrix
 
 ```{r}
 diagnosticModels <- list(
@@ -715,6 +715,39 @@ knitr::kable(
   sigident::compareDiagnosticModels(diagnosticModels)
 )
 ```
+
+## Model Diagnostics 
+
+### Lasso (min)
+
+```{r}
+diagnosticModels$lasso.min$confmat
+```
+
+### Lasso (1se)
+
+```{r}
+diagnosticModels$lasso.1se$confmat
+```
+
+### Elastic (min)
+
+```{r}
+diagnosticModels$elastic.min$confmat
+```
+
+### Elastic (1se)
+
+```{r}
+diagnosticModels$elastic.1se$confmat
+```
+
+### Elastic net (grid search)
+
+```{r}
+diagnosticModels$elastic.grid$confmat
+```
+
 
 ## Export selected Entrez-IDs
 

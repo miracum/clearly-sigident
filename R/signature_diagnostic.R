@@ -87,7 +87,7 @@ glmPrediction_ <- function(model, test.x, test.y, s = NULL){
 
 #' @title signature_
 #'
-#' @description Helper function to perform calculation of diagnostic signature (TODO is this the correct description???)
+#' @description Helper function to conduct lasso or elastic net regualization for fitting a GLM in order to identify a multi-gene classifier 
 #'
 #' @param traininglist A list object containint the training data. The output of the function `createTrainingTest_()`.
 #' @param type A character string. The algorihm used to perform calculations. Currently implemented are \emph{"grid", "lasso", "elastic"} and
