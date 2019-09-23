@@ -799,7 +799,7 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 pC <- sigident::prognosticClassifier_(PatternCom = exprPattern,
                                       validationstudiesinfo = validationstudiesinfo,
-                                      datatdir = datadir,
+                                      datadir = datadir,
                                       controlname = controlname,
                                       targetname = targetname,
                                       targetcol = targetcol)
@@ -881,7 +881,7 @@ knitr::kable(
 ## Run `sigidentPrognostic`-Function 
 
 ```{r eval = FALSE}
-progn_results <- sigident::sigidentPrognostic(mergeset = mergeset,
+progn_results <- sigidentPrognostic(mergeset = mergeset,
                                               studyMetadata = studyMetadata,
                                               sampleMetadata = sampleMetadata,
                                               discoverystudies.w.timedata = discoverystudies.w.timedata,
@@ -893,5 +893,17 @@ progn_results <- sigident::sigidentPrognostic(mergeset = mergeset,
                                               plotdir = "./plots/",
                                               csvdir = "./tables/",
                                               targetcol = "target")
+```
+
+```{r eval = FALSE}
+# create roc plot
+filename <- paste0(plotdir, "Prognostic_Kaplan-Meier_Plot.png")
+sigident::createSurvPlot_(fit = progn_results$GSE19188$GSE30219$fit,
+                          RiskTable = progn_results$GSE19188$GSE30219$risktable,
+                          filename = filename)
+```
+
+```{r eval = FALSE}
+knitr::include_graphics(filename)
 ```
 

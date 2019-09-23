@@ -95,7 +95,7 @@ goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, spe
 
   # pathview
   # https://github.com/egeulgen/pathfindR/issues/10
-  requireNamespace("pathfindR")
+  require(pathfindR)
   # workaround to set correct workingdir for pathview
   oldwd <- getwd()
   setwd(paste0(oldwd, "/", plotdir))
