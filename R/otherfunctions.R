@@ -49,7 +49,7 @@ merge_ <- function(esetlist){
 #'
 #' @description Helper function to export DEG annotations from mergedset.
 #'
-#' @inheritParams createCombat_
+#' @inheritParams batchCorrection_
 #' @inheritParams createDEGheatmap_
 #'
 #' @export

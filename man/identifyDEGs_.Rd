@@ -4,14 +4,14 @@
 \alias{identifyDEGs_}
 \title{identifyDEGs_}
 \usage{
-identifyDEGs_(mergeset, design, qValue)
+identifyDEGs_(mergeset, design, qValue = 0.01)
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
 
 \item{design}{A object. The output of the function `createDiagnosisDesign_()`.}
 
-\item{qValue}{A numeric value. The output of the function `qSelection_()`.}
+\item{qValue}{A numeric value for the q-value (false discovery rate) (default=0.01).}
 }
 \description{
 Helper function to identify DEGs based on the limma package

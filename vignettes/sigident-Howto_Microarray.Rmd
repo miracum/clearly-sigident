@@ -323,11 +323,9 @@ table(batch)
 length(batch)
 
 # removing batch effects computing linear models, take variance between the diagnosis into consideration
-<<<<<<< HEAD
+
 mergeset <- sigident::batchCorrection_(mergedset = mergedset, batch = batch, design = design)
-=======
-mergeset <- sigident::createCombat_(mergedset = mergedset, batch = batch, design = design)
->>>>>>> 4056237715416d03d93495062b382a97a2554970
+
 dim(mergeset)
 ```
 
@@ -382,18 +380,8 @@ A heatmap based on the selected DEGs is created and clear differences regarding 
 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-<<<<<<< HEAD
-# q_selection <- NULL # use default setting
-# deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata,
-#                                studyMetadata = studyMetadata,
-#                                deg.q.selection = q_selection)
+# define the false discovery rate here
 FDR <- 0.05
-=======
-q_selection <- NULL # use default setting
-deg_q <- sigident::qSelection_(sampleMetadata = sampleMetadata, 
-                               studyMetadata = studyMetadata,
-                               deg.q.selection = q_selection)
->>>>>>> 4056237715416d03d93495062b382a97a2554970
 
 genes <- sigident::identifyDEGs_(mergeset = mergeset,
                                  design = design,
@@ -904,7 +892,7 @@ results <- sigident::sigidentDiagnostic(mergeset = mergeset,
                                         OrgDB = "org.Hs.eg.db",
                                         organism = "hsa",
                                         pathwayid = "hsa04110",
-                                        deg.q.selection = NULL,
+                                        FDR = 0.01,
                                         seed = 111,
                                         nfolds = 10,
                                         split = 0.8,
@@ -913,10 +901,6 @@ results <- sigident::sigidentDiagnostic(mergeset = mergeset,
                                         targetcol = "target")
 ```
 
-<<<<<<< HEAD
-# References
-[1] W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.
-=======
 ```{r eval = FALSE}
 diagnosticModels <- results$diagnosticModels
 sigUtils <- results$utils
@@ -957,4 +941,6 @@ sigident::createSurvPlot_(fit = progn_results$GSE19188$GSE30219$fit,
 knitr::include_graphics(filename)
 ```
 
->>>>>>> 4056237715416d03d93495062b382a97a2554970
+# References 
+
+[1] W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.

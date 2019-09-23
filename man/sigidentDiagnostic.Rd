@@ -5,9 +5,9 @@
 \title{Perform Diagnostic Signature Analyses in Gene Expression Datasets Derived from MicroArrays}
 \usage{
 sigidentDiagnostic(mergeset, controlname, targetname, studyMetadata,
-  sampleMetadata, species, OrgDB, organism, pathwayid,
-  deg.q.selection = NULL, seed = 111, nfolds = 10, split = 0.8,
-  plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
+  sampleMetadata, species, OrgDB, organism, pathwayid, FDR = 0.01,
+  seed = 111, nfolds = 10, split = 0.8, plotdir = "./plots/",
+  csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
@@ -28,8 +28,7 @@ sigidentDiagnostic(mergeset, controlname, targetname, studyMetadata,
 
 \item{pathwayid}{A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".}
 
-\item{deg.q.selection}{A numeric value between 0 and 1 indicating the desired q-Value during DEG analysis. Default: NULL, which means, that q is
-calculated the following: \emph{1/length(sample-IDs in discovery studies)}.}
+\item{FDR}{A positive numeric value between (max. 0.05) indicating the desired q-Value during DEG analysis (Default: 0.01).}
 
 \item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
 

@@ -10,12 +10,16 @@ DEG.limma_ <- function(mergeset, design){
 #' @description Helper function to identify DEGs based on the limma package
 #'
 #' @param design A object. The output of the function `createDiagnosisDesign_()`.
-#' @param qValue A numeric value. The output of the function `qSelection_()`.
+#' @param qValue A numeric value for the q-value (false discovery rate) (default=0.01).
 #'
 #' @inheritParams sigidentDiagnostic
 #'
 #' @export
-identifyDEGs_ <- function(mergeset, design, qValue){
+identifyDEGs_ <- function(mergeset, design, qValue=0.01){
+  stopifnot(
+    qValue > 0 | qValue <= 0.05,
+    is.numeric(qValue)
+  )
   fit <- fitLimma_(mergeset, design)
   t <- limma::topTable(fit, coef=2,number=Inf,p.value=qValue, lfc=2, adjust.method = "BH")
   genes <- rownames(t)
@@ -51,20 +55,20 @@ limmaTopTable_ <- function(mergeset, design, qValue){
 }
 
 
-#' @title qSelection_
-#'
-#' @description Helper function to select qValues
-#'
-#' @inheritParams sigidentDiagnostic
-#'
-#' @export
-qSelection_ <- function(sampleMetadata, studyMetadata, deg.q.selection = NULL){
-  if (is.null(deg.q.selection)){
-    discovery <- discovery_(sampleMetadata = sampleMetadata,
-                            studyMetadata = studyMetadata)
-    deg_q <- 1/length(sampleMetadata[sampleMetadata$study %in% discovery, "sample"])
-  } else {
-    deg_q <- as.numeric(deg.q.selection)
-  }
-  return(deg_q)
-}
+#' #' @title qSelection_
+#' #'
+#' #' @description Helper function to select qValues
+#' #'
+#' #' @inheritParams sigidentDiagnostic
+#' #'
+#' #' @export
+#' qSelection_ <- function(sampleMetadata, studyMetadata, deg.q.selection = NULL){
+#'   if (is.null(deg.q.selection)){
+#'     discovery <- discovery_(sampleMetadata = sampleMetadata,
+#'                             studyMetadata = studyMetadata)
+#'     deg_q <- 1/length(sampleMetadata[sampleMetadata$study %in% discovery, "sample"])
+#'   } else {
+#'     deg_q <- as.numeric(deg.q.selection)
+#'   }
+#'   return(deg_q)
+#' }

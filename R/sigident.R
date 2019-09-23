@@ -11,8 +11,7 @@
 #' @param OrgDB A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".
 #' @param organism A character string indicating the organism. Currently supported: "hsa".
 #' @param pathwayid A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".
-#' @param deg.q.selection A numeric value between 0 and 1 indicating the desired q-Value during DEG analysis. Default: NULL, which means, that q is
-#'   calculated the following: \emph{1/length(sample-IDs in discovery studies)}.
+#' @param FDR A positive numeric value between (max. 0.05) indicating the desired q-Value during DEG analysis (Default: 0.01).
 #' @param seed A integer value. Seed to make machine learning algorithms reproducible. Default: 111.
 #' @param nfolds A integer. The number of folds used for cross validation. Default: 10.
 #' @param split A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.
@@ -35,7 +34,7 @@ sigidentDiagnostic <- function(mergeset,
                                OrgDB,
                                organism,
                                pathwayid,
-                               deg.q.selection = NULL,
+                               FDR = 0.01,
                                seed = 111,
                                nfolds = 10,
                                split = 0.8,
@@ -51,18 +50,13 @@ sigidentDiagnostic <- function(mergeset,
     is.character(targetname),
     is.character(targetcol),
     is.character(species),
-    is.numeric(deg.q.selection) | is.null(deg.q.selection),
+    is.numeric(FDR),
+    FDR > 0 | FDR <= 0.05,
     is.numeric(seed),
     is.numeric(split),
     is.numeric(nfolds),
     split < 1 & split > 0
   )
-
-  if (!is.null(deg.q.selection)){
-    stopifnot(
-      deg.q.selection > 0 | deg.q.selection < 1
-    )
-  }
 
   # create internal list for storage
   rv <- list()
@@ -71,6 +65,8 @@ sigidentDiagnostic <- function(mergeset,
   rv$controlname <- controlname
   rv$targetname <- targetname
   rv$targetcol <- targetcol
+  
+  rv$deg_q <- FDR
 
   # store species, orgdb and orgamism
   rv$species <- species
@@ -119,10 +115,6 @@ sigidentDiagnostic <- function(mergeset,
 
 
   ### DEG Analysis ###
-  rv$deg_q <- qSelection_(studyMetadata = studyMetadata,
-                          sampleMetadata = sampleMetadata,
-                          deg.q.selection = deg.q.selection)
-
   rv$genes <- identifyDEGs_(mergeset = rv$mergeset,
                             design = rv$design,
                             qValue = rv$deg_q)

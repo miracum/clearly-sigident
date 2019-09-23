@@ -6,6 +6,9 @@
 \usage{
 exportDEGannotations_(mergedset)
 }
+\arguments{
+\item{mergedset}{An ExpressionSet. The output of the function `merge_()`.}
+}
 \description{
 Helper function to export DEG annotations from mergedset.
 }

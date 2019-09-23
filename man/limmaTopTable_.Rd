@@ -11,7 +11,7 @@ limmaTopTable_(mergeset, design, qValue)
 
 \item{design}{A object. The output of the function `createDiagnosisDesign_()`.}
 
-\item{qValue}{A numeric value. The output of the function `qSelection_()`.}
+\item{qValue}{A numeric value for the q-value (false discovery rate) (default=0.01).}
 }
 \description{
 Helper function to get DEG results
