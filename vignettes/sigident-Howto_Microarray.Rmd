@@ -769,20 +769,20 @@ head(signature_genes)
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
 
-```{r eval = TRUE}
-discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
-                                                      status = list(statuscol = "characteristics_ch1.3",
-                                                                    levels = list(alive = "status: alive",
-                                                                                  deceased = "status: deceased",
-                                                                                  na = "status: Not available")),
-                                                      targetcolname = "characteristics_ch1",
-                                                      controllevelname = "tissue type: healthy",
-                                                      targetlevelname = "tissue type: tumor",
-                                                      idtype = "affy",
-                                                      idcol = "ID"))
-```
+<!-- ```{r eval = FALSE} -->
+<!-- discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2", -->
+<!--                                                       status = list(statuscol = "characteristics_ch1.3", -->
+<!--                                                                     levels = list(alive = "status: alive", -->
+<!--                                                                                   deceased = "status: deceased", -->
+<!--                                                                                   na = "status: Not available")), -->
+<!--                                                       targetcolname = "characteristics_ch1", -->
+<!--                                                       controllevelname = "tissue type: healthy", -->
+<!--                                                       targetlevelname = "tissue type: tumor", -->
+<!--                                                       idtype = "affy", -->
+<!--                                                       idcol = "ID")) -->
+<!-- ``` -->
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
                                                       status = list(statuscol = "characteristics_ch1.3",
                                                                     levels = list(alive = "status: alive",
@@ -807,6 +807,7 @@ discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics
 ### 8.A Identification of survival correlated genes
 survivalData <- sigident::getSurvivalTime_(studyMetadata = studyMetadata,
                                            sampleMetadata = sampleMetadata,
+                                           genes = genes,
                                            discoverystudies.w.timedata = discoverystudies.w.timedata,
                                            targetname = targetname,
                                            controlname = controlname,
@@ -877,33 +878,33 @@ head(exprPattern)
 
 #### Create a list that contains specifications of the study that contains the validation information
 
-```{r eval = TRUE}
-validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
-                                                status = list(statuscol = "characteristics_ch1.8",
-                                                              levels = list(alive = "status: ALIVE",
-                                                                            deceased = "status: DEAD",
-                                                                            na = "status: NTL")),
-                                                targetcolname = "source_name_ch1",
-                                                controllevelname = "Non Tumoral Lung",
-                                                targetlevelname = "Lung Tumour",
-                                                idtype = "affy",
-                                                idcol = "ID"),
-                              
-                              "GSE50081" = list(timecol = "characteristics_ch1.8",
-                                                status = list(statuscol = "characteristics_ch1.9",
-                                                              levels = list(alive = "status: alive",
-                                                                            deceased = "status: dead",
-                                                                            na = NA)),
-                                                targetcolname = "characteristics_ch1.1",
-                                                targetlevelname = NULL, 
-                                                controllevelname = NULL,
-                                                idcol = "ID", 
-                                                idtype = "affy"))
-# if targetlevelname == NULL, the expression set will not be filtered further 
-# but instead, all samples will be used for calculations
-```
+<!-- ```{r eval = FALSE} -->
+<!-- validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9", -->
+<!--                                                 status = list(statuscol = "characteristics_ch1.8", -->
+<!--                                                               levels = list(alive = "status: ALIVE", -->
+<!--                                                                             deceased = "status: DEAD", -->
+<!--                                                                             na = "status: NTL")), -->
+<!--                                                 targetcolname = "source_name_ch1", -->
+<!--                                                 controllevelname = "Non Tumoral Lung", -->
+<!--                                                 targetlevelname = "Lung Tumour", -->
+<!--                                                 idtype = "affy", -->
+<!--                                                 idcol = "ID"), -->
 
-```{r eval = FALSE}
+<!--                               "GSE50081" = list(timecol = "characteristics_ch1.8", -->
+<!--                                                 status = list(statuscol = "characteristics_ch1.9", -->
+<!--                                                               levels = list(alive = "status: alive", -->
+<!--                                                                             deceased = "status: dead", -->
+<!--                                                                             na = NA)), -->
+<!--                                                 targetcolname = "characteristics_ch1.1", -->
+<!--                                                 targetlevelname = NULL,  -->
+<!--                                                 controllevelname = NULL, -->
+<!--                                                 idcol = "ID",  -->
+<!--                                                 idtype = "affy")) -->
+<!-- # if targetlevelname == NULL, the expression set will not be filtered further  -->
+<!-- # but instead, all samples will be used for calculations -->
+<!-- ``` -->
+
+```{r eval = TRUE}
 # alternative approach, using entrez ids
 validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
                                                 status = list(statuscol = "characteristics_ch1.8",
