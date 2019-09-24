@@ -24,10 +24,12 @@ geneMapSig_ <- function(mergeset, model){
 #' @param datadir A character string. Path to the data-folder inside the metadata folder.
 #'
 #' @inheritParams sigidentDiagnostic
+#' @inheritParams createDEGheatmap_
 #'
 #' @export
 getSurvivalTime_ <- function(studyMetadata,
                              sampleMetadata,
+                             genes,
                              discoverystudies.w.timedata,
                              targetname,
                              controlname,
@@ -82,7 +84,7 @@ getSurvivalTime_ <- function(studyMetadata,
 
     ids <- rownames(expr)
 
-    for (DEG in ids){
+    for (DEG in genes){
       exp <- exprsVector_(expr[DEG,]) # loop to bind a new column filled with exprs-values for each DEG
       DF <- data.frame(exp)
       colnames(DF) <- DEG
@@ -134,12 +136,12 @@ univCox_ <- function(survtable, ids){
   colnames(survtable)[-c(1:2)] <- covariates
 
   univ_formulas <- sapply(covariates, function(x) stats::as.formula(paste('survival::Surv(time, status) ~', x))) # build separate formula for each variable
-  #univ_models <- lapply(univ_formulas, function(f){survival::coxph(formula = f, data = survtable)}) # build cox model for each variable separatly
+  univ_models <- lapply(univ_formulas, function(f){survival::coxph(formula = f, data = survtable)}) # build cox model for each variable separatly
 
-  # parallel:
-  univ_models <- mcmapply(univ_formulas, FUN =  function(f) {
-    survival::coxph(formula = f, data = survtable)},
-    mc.cores = parallel::detectCores(), mc.preschedule = TRUE)
+  # # parallel:
+  # univ_models <- mcmapply(univ_formulas, FUN =  function(f) {
+  #   survival::coxph(formula = f, data = survtable)},
+  #   mc.cores = parallel::detectCores(), mc.preschedule = TRUE)
 
   # extract results
   univ_results <- lapply(univ_models, #
