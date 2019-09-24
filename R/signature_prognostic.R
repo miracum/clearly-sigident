@@ -46,8 +46,8 @@ getSurvivalTime_ <- function(studyMetadata,
   outlist <- list()
 
   for (st in names(discoverystudies.w.timedata)){
-    whichsamples <- sampleMetadata[get("study")==st,]
-    whichtumorsamples <- whichsamples[eval(parse(text=paste0("whichsamples$",targetcol)))==targetname,]
+    samples <- sampleMetadata[sampleMetadata$study==st,]
+    tumorsamples <- samples[eval(parse(text=paste0("whichsamples$",targetcol)))==targetname,]
 
 
     eset <- loadEset_(name = st,
@@ -61,7 +61,7 @@ getSurvivalTime_ <- function(studyMetadata,
 
     # filter only data of tumor samples
     if (!is.null(discoverystudies.w.timedata[[st]]$targetlevelname)){
-      esetTargets <- eset[which(eset$geo_accession %in% whichtumorsamples$sample),]
+      esetTargets <- eset[,which(eset$geo_accession %in% tumorsamples$sample)]
     } else {
       # use the whole dataset
       esetTargets <- eset
@@ -127,7 +127,7 @@ loadEset_ <- function(name, datadir, targetcolname, targetcol, targetname, contr
 univCox_ <- function(survtable, ids){
 
   covariates <- colnames(survtable)[-c(1:2)]
-  covariates <- gsub("_|/","",covariates)
+  covariates <- gsub("[[:punct:]]","",covariates)
   covariates <- paste("ID",covariates)
   covariates <- gsub(" ","",covariates)
 
@@ -313,7 +313,7 @@ prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datadir, ta
 
     # filter only data of tumor samples
     if (!is.null(validationstudiesinfo[[st]]$targetlevelname)){
-      esetTargets <- eset[which(eset[[targetcol]] == targetname),]
+      esetTargets <- eset[,which(eset[[targetcol]] == targetname)]
     } else {
       # use the whole dataset
       esetTargets <- eset

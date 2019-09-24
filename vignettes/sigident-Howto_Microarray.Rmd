@@ -769,7 +769,7 @@ head(signature_genes)
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
                                                       status = list(statuscol = "characteristics_ch1.3",
                                                                     levels = list(alive = "status: alive",
@@ -782,7 +782,7 @@ discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics
                                                       idcol = "ID"))
 ```
 
-```{r eval = TRUE}
+```{r eval = FALSE}
 discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
                                                       status = list(statuscol = "characteristics_ch1.3",
                                                                     levels = list(alive = "status: alive",
@@ -877,7 +877,7 @@ head(exprPattern)
 
 #### Create a list that contains specifications of the study that contains the validation information
 
-```{r eval=F}
+```{r eval = TRUE}
 validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
                                                 status = list(statuscol = "characteristics_ch1.8",
                                                               levels = list(alive = "status: ALIVE",
@@ -903,7 +903,7 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
 # but instead, all samples will be used for calculations
 ```
 
-```{r eval = TRUE}
+```{r eval = FALSE}
 # alternative approach, using entrez ids
 validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
                                                 status = list(statuscol = "characteristics_ch1.8",
