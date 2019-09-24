@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -864,7 +864,7 @@ head(exprPattern)
 
 #### Create a list that contains specifications of the study that contains the validation information
 
-```{r}
+```{r eval=F}
 validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
                                                 status = list(statuscol = "characteristics_ch1.8",
                                                               levels = list(alive = "status: ALIVE",
@@ -890,7 +890,7 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
 # but instead, all samples will be used for calculations
 ```
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 # alternative approach, using entrez ids
 validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
                                                 status = list(statuscol = "characteristics_ch1.8",
@@ -909,7 +909,7 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
                                                                             deceased = "status: dead",
                                                                             na = NA)),
                                                 targetcolname = "characteristics_ch1.1",
-                                                targetlevelname = NULL,
+                                                targetlevelname = NULL, 
                                                 controllevelname = NULL,
                                                 idcol = "ENTREZ_GENE_ID", 
                                                 idtype = "entrez"))
