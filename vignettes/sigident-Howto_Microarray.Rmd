@@ -769,7 +769,7 @@ head(signature_genes)
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
 
-```{r}
+```{r eval = FALSE}
 discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
                                                       status = list(statuscol = "characteristics_ch1.3",
                                                                     levels = list(alive = "status: alive",
@@ -780,6 +780,19 @@ discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics
                                                       targetlevelname = "tissue type: tumor",
                                                       idtype = "affy",
                                                       idcol = "ID"))
+```
+
+```{r eval = TRUE}
+discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
+                                                      status = list(statuscol = "characteristics_ch1.3",
+                                                                    levels = list(alive = "status: alive",
+                                                                                  deceased = "status: deceased",
+                                                                                  na = "status: Not available")),
+                                                      targetcolname = "characteristics_ch1",
+                                                      controllevelname = "tissue type: healthy",
+                                                      targetlevelname = "tissue type: tumor",
+                                                      idtype = "entrez",
+                                                      idcol = "ENTREZ_GENE_ID"))
 ```
 
 ## Identification of survival correlated genes 

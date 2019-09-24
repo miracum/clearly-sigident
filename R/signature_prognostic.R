@@ -60,7 +60,7 @@ getSurvivalTime_ <- function(studyMetadata,
                       controlname = controlname)
 
     # filter only data of tumor samples
-    if (! is.null(discoverystudies.w.timedata[[st]]$targetlevelname)){
+    if (!is.null(discoverystudies.w.timedata[[st]]$targetlevelname)){
       esetTargets <- eset[which(eset$geo_accession %in% whichtumorsamples$sample),]
     } else {
       # use the whole dataset
