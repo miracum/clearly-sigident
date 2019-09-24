@@ -65,7 +65,7 @@ sigidentDiagnostic <- function(mergeset,
   rv$controlname <- controlname
   rv$targetname <- targetname
   rv$targetcol <- targetcol
-  
+
   rv$deg_q <- FDR
 
   # store species, orgdb and orgamism
@@ -343,8 +343,8 @@ sigidentPrognostic <- function(mergeset,
     rv$entrezIDs[[i]] <- rv$survivalData[[i]]$entrezIDs
 
     # compute univariat cox regression
-    rv$surv_correlated[[i]] <- univCox_(survTable = rv$survTable[[i]],
-                                        entrezIDs = rv$entrezIDs[[i]])
+    rv$surv_correlated[[i]] <- univCox_(survtable = rv$survTable[[i]],
+                                        entrezids = rv$entrezIDs[[i]])
     # export table with survival correlated genes
     data.table::fwrite(rv$surv_correlated[[i]], paste0(rv$csvdir, i, "_survival_correlated_genes.csv"))
 

@@ -7,11 +7,11 @@
 #'
 #' @export
 geneMapSig_ <- function(mergeset, model){
-  entrez <- rownames(mergeset)
+  id <- rownames(mergeset)
   # TODO warum i+1?
   index <- model[["beta"]]@i+1
   # TODO map entrez_id on gene symbol here and include as second columen to ouput
-  return(as.data.frame(x = cbind("Entrez_ID" = entrez[index])))
+  return(as.data.frame(x = cbind("ID" = entrez[index])))
 }
 
 
@@ -60,7 +60,12 @@ getSurvivalTime_ <- function(studyMetadata,
                       controlname = controlname)
 
     # filter only data of tumor samples
+    if (! is.null(discoverystudies.w.timedata[[st]]$targetlevelname)){
     esetTargets <- eset[which(eset$geo_accession %in% whichtumorsamples$sample),]
+    } else {
+      # use the whole dataset
+      esetTargets <- eset
+    }
 
     timestatus <- extractTimeStatus_(esetTargets = esetTargets,
                                      timecol = discoverystudies.w.timedata[[st]]$timecol,
@@ -70,15 +75,13 @@ getSurvivalTime_ <- function(studyMetadata,
 
     survTable <- data.frame(time, status) # generating a table: columns: survivaltime, status; rows: individual samples
 
-    expr <- Biobase::exprs(esetTargets)
-    rownames(expr) <- as.character(esetTargets@featureData@data$ENTREZ_GENE_ID)
-    # remove empty characters and replicates in EntrezIDs
-    expr <- expr[rownames(expr)!="",]
-    expr <- expr[!duplicated(rownames(expr)),]
+    expr <- createExpressionSet_(eset = esetTargets,
+                                 idtype = discoverystudies.w.timedata[[st]]$idtype,
+                                 idcol = discoverystudies.w.timedata[[st]]$idcol)
 
-    entrezIDs <- rownames(expr)
+    ids <- rownames(expr)
 
-    for (DEG in entrezIDs){
+    for (DEG in ids){
       exp <- exprsVector_(expr[DEG,]) # loop to bind a new column filled with exprs-values for each DEG
       DF <- data.frame(exp)
       colnames(DF) <- DEG
@@ -88,7 +91,7 @@ getSurvivalTime_ <- function(studyMetadata,
     rownames(survTable) = colnames(expr)
 
     outlist[[st]] <- list(survTable = survTable,
-                          entrezIDs = entrezIDs)
+                          ids = ids)
 
   }
   return(outlist)
@@ -102,10 +105,12 @@ loadEset_ <- function(name, datadir, targetcolname, targetcol, targetname, contr
   colnames(Biobase::pData(eset))[which(colnames(Biobase::pData(eset)) == targetcolname)] <- targetcol
 
   # rename levels of targetcol
-  levelnames <- c(targetname, controlname)
-  names(levelnames) <- c(targetlevelname,
-                         controllevelname)
-  eset[[targetcol]] <- plyr::revalue(eset[[targetcol]], levelnames)
+  if (!is.null(targetlevelname)){
+    levelnames <- c(targetname, controlname)
+    names(levelnames) <- c(targetlevelname,
+                           controllevelname)
+    eset[[targetcol]] <- plyr::revalue(eset[[targetcol]], levelnames)
+  }
   return(eset)
 }
 
@@ -115,14 +120,14 @@ loadEset_ <- function(name, datadir, targetcolname, targetcol, targetname, contr
 #' @description Helper function to compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions
 #'
 #' @param survtable A data.frame. Output of the function `getSurvivalTime_()`.
-#' @param entrezids A character string. Output of the function `getSurvivalTime_()`.
+#' @param ids A character string. Output of the function `getSurvivalTime_()`.
 #'
 #' @export
-univCox_ <- function(survtable, entrezids){
+univCox_ <- function(survtable, ids){
 
   covariates <- colnames(survtable)[-c(1:2)]
   covariates <- gsub("_|/","",covariates)
-  covariates <- paste("ENTREZID",covariates)
+  covariates <- paste("ID",covariates)
   covariates <- gsub(" ","",covariates)
 
   colnames(survtable)[-c(1:2)] <- covariates
@@ -153,13 +158,13 @@ univCox_ <- function(survtable, entrezids){
   result$p.value <- as.character(result$p.value) # reforamtting of p.value-column
   result$p.value <- as.numeric(result$p.value) #
   indices <- which(result$p.value <= 0.05) # selecting indices with a significant p-value
-  IDs <- entrezids[indices] # IDs now contains Entrez-IDs of all genes with significant p-values
+  IDs <- ids[indices] # IDs now contains Entrez-IDs of all genes with significant p-values
 
   # TODO symbols?
 
   sigCov <- result[with(result, which(result$p.value <= 0.05)),]
   rownames(sigCov) <- IDs
-  sigCov <- cbind(Entrez_ID = IDs, sigCov)
+  sigCov <- cbind(id = IDs, sigCov)
 
   return(sigCov)
 }
@@ -215,13 +220,13 @@ generateExpressionPattern_ <- function(classifier_studies,
   control <- ctrl.vec_(classifier_data, diagnosis)
   tumor <- tum.vec_(classifier_data, diagnosis)
 
-  IDs <- sigCov[,"Entrez_ID"]
+  IDs <- sigCov[,"id"]
 
   # train the prognostic classifier
   pattern <- c()
   for(i in 1:length(IDs)){
     pattern <- append(pattern, expressionPattern_(mergeset = classifier_data,
-                                                  entrezID = IDs[i],
+                                                  ids = IDs[i],
                                                   tumor = tumor,
                                                   control = control))
   }
@@ -255,9 +260,9 @@ tum.vec_ <- function(mergeset, diagnosis){
 
 
 
-expressionPattern_ <- function(mergeset, entrezID, tumor, control){
-  ctrl <- (mean(mergeset[entrezID, control])) # selecting control-samples and computing mean
-  tum <-(mean(mergeset[entrezID, tumor])) # selecting tumor-samples and computing mean
+expressionPattern_ <- function(mergeset, ids, tumor, control){
+  ctrl <- (mean(mergeset[ids, control])) # selecting control-samples and computing mean
+  tum <-(mean(mergeset[ids, tumor])) # selecting tumor-samples and computing mean
   pattern=c() # creating empty vecotr
   if(ctrl < tum){
     pattern = "Over"
@@ -306,7 +311,12 @@ prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datadir, ta
     tumor <- tum.vec_(classifier_data, diagnosis)
 
     # filter only data of tumor samples
-    esetTargets <- eset[which(eset[[targetcol]] == targetname),]
+    if (!is.null(validationstudiesinfo[[st]]$targetlevelname)){
+      esetTargets <- eset[which(eset[[targetcol]] == targetname),]
+    } else {
+      # use the whole dataset
+      esetTargets <- eset
+    }
 
     timestatus <- extractTimeStatus_(esetTargets = esetTargets,
                                      timecol = validationstudiesinfo[[st]]$timecol,
@@ -317,11 +327,9 @@ prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datadir, ta
     status <- timestatus$status
     RiskTable <- data.frame(time, status)
 
-    expr <- Biobase::exprs(esetTargets)
-    rownames(expr) <- as.character(esetTargets@featureData@data$ENTREZ_GENE_ID)
-    # remove empty characters and replicates in EntrezIDs
-    expr <- expr[rownames(expr)!="",]
-    expr <- expr[!duplicated(rownames(expr)),]
+    expr <- createExpressionSet_(eset = esetTargets,
+                                 idtype = validationstudiesinfo[[st]]$idtype,
+                                 idcol = validationstudiesinfo[[st]]$idcol)
 
     # classification and Kaplan-Meier estimator
     Sig <- sigAnalysis_(expr = expr, PatternCom = PatternCom)
@@ -446,4 +454,20 @@ sigAnalysis_ <- function(expr, PatternCom){ # Input is an eset, consisting of tu
   }
   Sigframe <- Sigframe[-1]
   return(Sigframe)
+}
+
+createExpressionSet_ <- function(eset, idtype, idcol){
+  stopifnot(
+    idtype %in% c("entrez", "affy")
+  )
+  expr <- Biobase::exprs(eset)
+  if (idtype == "entrez"){
+    rownames(expr) <- as.character(eset@featureData@data[, idcol])
+    # remove empty characters and replicates in EntrezIDs
+    expr <- expr[rownames(expr)!="",]
+    expr <- expr[!duplicated(rownames(expr)),]
+  } else if (idtype == "affy") {
+    rownames(expr) <- as.character(eset@featureData@data[, idcol])
+  }
+  return(expr)
 }

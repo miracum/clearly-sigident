@@ -4,7 +4,7 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{sigident-Howto_Microarray}
   %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: inline
 ---
@@ -371,7 +371,8 @@ knitr::include_graphics(filename)
 # remove unneeded objects
 rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
 # also no further purpose, but takes a lot of memory and may slow down your computer
-rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804")
+rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804", "fData3", "esetC")
+gc()
 ```
 
 
@@ -772,7 +773,9 @@ discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics
                                                       statuscol = "characteristics_ch1.3",
                                                       targetcolname = "characteristics_ch1",
                                                       controllevelname = "tissue type: healthy",
-                                                      targetlevelname = "tissue type: tumor"))
+                                                      targetlevelname = "tissue type: tumor",
+                                                      idtype = "affy",
+                                                      idcol = "ID"))
 ```
 
 ## Identification of survival correlated genes 
@@ -793,7 +796,7 @@ survivalData <- sigident::getSurvivalTime_(studyMetadata = studyMetadata,
                                            targetcol = targetcol,
                                            datadir = datadir)
 survTable <- survivalData[["GSE19188"]]$survTable
-entrezIDs <- survivalData[["GSE19188"]]$entrezIDs
+ids <- survivalData[["GSE19188"]]$ids
 ```
 
 ```{r}
@@ -802,14 +805,14 @@ head(survTable[,1:4])
 ```
 
 ```{r}
-print(entrezIDs)
+print(ids)
 ```
 
 ### Compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 surv_correlated <- sigident::univCox_(survtable = survTable,
-                                      entrezids = entrezIDs)
+                                      ids = ids)
 # export table with survival correlated genes
 data.table::fwrite(surv_correlated, paste0(csvdir, "survival_correlated_genes.csv"))
 ```
@@ -862,7 +865,16 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
                                                 statuscol = "characteristics_ch1.8",
                                                 targetcolname = "source_name_ch1",
                                                 controllevelname = "Non Tumoral Lung",
-                                                targetlevelname = "Lung Tumour"))
+                                                targetlevelname = "Lung Tumour",
+                                                idtype = "affy",
+                                                idcol = "ID"),
+                              "GSE50081" = list(idcol = "ID", 
+                                                idtype = "affy",
+                                                timecol = "characteristics_ch1.8",
+                                                statuscol = "characteristics_ch1.9",
+                                                targetcolname = "characteristics_ch1.1",
+                                                targetlevelname = NULL,
+                                                controllevelname = NULL))
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -872,6 +884,11 @@ pC <- sigident::prognosticClassifier_(PatternCom = exprPattern,
                                       controlname = controlname,
                                       targetname = targetname,
                                       targetcol = targetcol)
+```
+
+### Validation study: GSE30219
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 fit <- pC[["GSE30219"]]$kaplan.estimator$fit
 RiskTable <- pC[["GSE30219"]]$risktable
 ```
@@ -896,7 +913,44 @@ fit
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
-filename <- paste0(plotdir, "Prognostic_Kaplan-Meier_Plot.png")
+filename <- paste0(plotdir, "GSE30219_Prognostic_Kaplan-Meier_Plot.png")
+sigident::createSurvPlot_(fit = fit,
+                          RiskTable = RiskTable,
+                          filename = filename)
+```
+
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+### Validation study: GSE50081
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+fit <- pC[["GSE50081"]]$kaplan.estimator$fit
+RiskTable <- pC[["GSE50081"]]$risktable
+```
+
+```{r}
+dim(RiskTable)
+head(RiskTable)
+```
+
+#### View proportional hazards regression models
+
+```{r}
+pC[["GSE50081"]]$kaplan.estimator$res.cox
+```
+
+```{r}
+fit
+```
+
+
+#### Plot prognostic Kaplan-Meier plot
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "GSE50081_Prognostic_Kaplan-Meier_Plot.png")
 sigident::createSurvPlot_(fit = fit,
                           RiskTable = RiskTable,
                           filename = filename)
