@@ -868,6 +868,7 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
                                                 targetlevelname = "Lung Tumour",
                                                 idtype = "affy",
                                                 idcol = "ID"),
+                              
                               "GSE50081" = list(idcol = "ID", 
                                                 idtype = "affy",
                                                 timecol = "characteristics_ch1.8",
@@ -876,6 +877,26 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
                                                 targetlevelname = NULL,
                                                 controllevelname = NULL))
 ```
+
+```{r eval = FALSE}
+# alternative approach, using entrez ids
+validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
+                                                statuscol = "characteristics_ch1.8",
+                                                targetcolname = "source_name_ch1",
+                                                controllevelname = "Non Tumoral Lung",
+                                                targetlevelname = "Lung Tumour",
+                                                idtype = "entrez",
+                                                idcol = "ENTREZ_GENE_ID"),
+                              
+                              "GSE50081" = list(idcol = "ENTREZ_GENE_ID", 
+                                                idtype = "entrez",
+                                                timecol = "characteristics_ch1.8",
+                                                statuscol = "characteristics_ch1.9",
+                                                targetcolname = "characteristics_ch1.1",
+                                                targetlevelname = NULL,
+                                                controllevelname = NULL))
+```
+
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 pC <- sigident::prognosticClassifier_(PatternCom = exprPattern,

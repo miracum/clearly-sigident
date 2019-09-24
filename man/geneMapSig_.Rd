@@ -12,5 +12,5 @@ geneMapSig_(mergeset, model)
 \item{model}{An object containing the model information. The ouput of the function `glmnetSignature_()` with \code{type = "grid"}.}
 }
 \description{
-Helper function to map relevant input variables of a diagnostic model to Entrez IDs.
+Helper function to map relevant input variables of a diagnostic model to corresponding IDs.
 }

@@ -1,6 +1,6 @@
 #' @title geneMapSig_
 #'
-#' @description Helper function to map relevant input variables of a diagnostic model to Entrez IDs.
+#' @description Helper function to map relevant input variables of a diagnostic model to corresponding IDs.
 #'
 #' @inheritParams createGridModelPlot_
 #' @inheritParams sigidentDiagnostic
@@ -387,14 +387,14 @@ classify_ <- function(Sigtable){
 
 
 extractTimeStatus_ <- function(esetTargets, timecol, statuscol){
-  time <- eval(parse(text=paste0("esetTargets$", timecol)))
+  time <- esetTargets[, get("timecol")]
   time <- as.character(time)
   time[which(time=="")] <- "time: not available"
   time <- unlist(lapply(time, strsplit, ": ")) # string is split
   time <- time[c(FALSE,TRUE)] # first part of string ("overall survival") is discarded
   time <- as.numeric(time) # results in a vector of survival times (in sample order)
 
-  status <- eval(parse(text=paste0("esetTargets$", statuscol))) # coding if patient survived or not
+  status <- esetTargets[, get("statuscol")] # coding if patient survived or not
   levels(status) <- c(1,2,NA) # 1 = no event/alive; 2 = event/death
   status <- as.numeric(status)
   return(list(time=time, status=status))
@@ -428,12 +428,12 @@ sigAnalysis_ <- function(expr, PatternCom){ # Input is an eset, consisting of tu
   Sigframe <- data.frame(c(1:length(colnames(expr))))
 
   for(i in 1:length(PatternCom[,"Gene"])){
-    entrID <- as.character(PatternCom[i,"Gene"])
-    avrg <- mean(expr[which(rownames(expr)==entrID),])
+    id <- as.character(PatternCom[i,"Gene"])
+    avrg <- mean(expr[which(rownames(expr)==id),])
     vector <- c()
 
     for(j in 1:length(colnames(expr))){
-      level <- expr[entrID,j]
+      level <- expr[id,j]
 
       if(PatternCom[i,"Over/Under"] == "Over"){
         a <- over(avrg, level)
@@ -448,7 +448,7 @@ sigAnalysis_ <- function(expr, PatternCom){ # Input is an eset, consisting of tu
     }
 
     newColumn <- data.frame(vector)
-    colnames(newColumn)[1] = entrID
+    colnames(newColumn)[1] = id
     Sigframe <- cbind(Sigframe, newColumn)
     rownames(Sigframe) = colnames(expr)
   }
