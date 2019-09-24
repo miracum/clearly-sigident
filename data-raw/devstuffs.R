@@ -13,8 +13,6 @@ my_desc$set_authors(c(
   person("Meik", "Kunz", role = c('aut')),
   person("Andreas", "Pittroff", role = c('aut'))
 ))
-# Set copyright
-my_desc$set("Copyright", "Universitätsklinikum Erlangen")
 # Remove some author fields
 my_desc$del("Maintainer")
 # Vignette Builder
