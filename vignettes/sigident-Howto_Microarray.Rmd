@@ -438,6 +438,7 @@ knitr::kable(head(deg_results))
 A common investigation regarding differentially expressed genes analysis is the functional annotation of the DEGs. Furthermore, it is useful to find out if the DEGs are associated with  biological processes or molecular functions. 
 
 TODO do we need this any more regarding the removal of duplicated entrez-IDs in former step?
+
 ```{r}
 deg_entrez <- unique(genes)
 ```

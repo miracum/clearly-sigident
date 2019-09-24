@@ -11,7 +11,7 @@ geneMapSig_ <- function(mergeset, model){
   # TODO warum i+1?
   index <- model[["beta"]]@i+1
   # TODO map entrez_id on gene symbol here and include as second columen to ouput
-  return(as.data.frame(x = cbind("ID" = entrez[index])))
+  return(as.data.frame(x = cbind("ID" = id[index])))
 }
 
 
