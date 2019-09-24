@@ -339,12 +339,12 @@ sigidentPrognostic <- function(mergeset,
   outlist <- list()
   for (i in names(discoverystudies.w.timedata)){
     # extract data
-    rv$survTable[[i]] <- rv$survivalData[[i]]$survTable
-    rv$entrezIDs[[i]] <- rv$survivalData[[i]]$entrezIDs
+    rv$survTable[[i]] <- rv$survivalData[[i]]$survtable
+    rv$ids[[i]] <- rv$survivalData[[i]]$ids
 
     # compute univariat cox regression
     rv$surv_correlated[[i]] <- univCox_(survtable = rv$survTable[[i]],
-                                        entrezids = rv$entrezIDs[[i]])
+                                        ids = rv$ids[[i]])
     # export table with survival correlated genes
     data.table::fwrite(rv$surv_correlated[[i]], paste0(rv$csvdir, i, "_survival_correlated_genes.csv"))
 

@@ -61,7 +61,7 @@ getSurvivalTime_ <- function(studyMetadata,
 
     # filter only data of tumor samples
     if (! is.null(discoverystudies.w.timedata[[st]]$targetlevelname)){
-    esetTargets <- eset[which(eset$geo_accession %in% whichtumorsamples$sample),]
+      esetTargets <- eset[which(eset$geo_accession %in% whichtumorsamples$sample),]
     } else {
       # use the whole dataset
       esetTargets <- eset
@@ -69,7 +69,8 @@ getSurvivalTime_ <- function(studyMetadata,
 
     timestatus <- extractTimeStatus_(esetTargets = esetTargets,
                                      timecol = discoverystudies.w.timedata[[st]]$timecol,
-                                     statuscol = discoverystudies.w.timedata[[st]]$statuscol)
+                                     statuscol = discoverystudies.w.timedata[[st]]$status$statuscol,
+                                     statuslevels = discoverystudies.w.timedata[[st]]$status$levels)
     time <- timestatus$time
     status <- timestatus$status
 
@@ -90,7 +91,7 @@ getSurvivalTime_ <- function(studyMetadata,
 
     rownames(survTable) = colnames(expr)
 
-    outlist[[st]] <- list(survTable = survTable,
+    outlist[[st]] <- list(survtable = survTable,
                           ids = ids)
 
   }
@@ -320,7 +321,8 @@ prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datadir, ta
 
     timestatus <- extractTimeStatus_(esetTargets = esetTargets,
                                      timecol = validationstudiesinfo[[st]]$timecol,
-                                     statuscol = validationstudiesinfo[[st]]$statuscol)
+                                     statuscol = validationstudiesinfo[[st]]$status$statuscol,
+                                     statuslevels = validationstudiesinfo[[st]]$status$levels)
 
 
     time <- timestatus$time
@@ -386,16 +388,29 @@ classify_ <- function(Sigtable){
 }
 
 
-extractTimeStatus_ <- function(esetTargets, timecol, statuscol){
-  time <- esetTargets[, get("timecol")]
+extractTimeStatus_ <- function(esetTargets, timecol, statuscol, statuslevels){
+
+  # time <- esetTargets[, get("timecol")] -> does not work with expression sets
+  time <- eval(parse(text=paste0("esetTargets$", timecol)))
   time <- as.character(time)
   time[which(time=="")] <- "time: not available"
   time <- unlist(lapply(time, strsplit, ": ")) # string is split
   time <- time[c(FALSE,TRUE)] # first part of string ("overall survival") is discarded
   time <- as.numeric(time) # results in a vector of survival times (in sample order)
 
-  status <- esetTargets[, get("statuscol")] # coding if patient survived or not
-  levels(status) <- c(1,2,NA) # 1 = no event/alive; 2 = event/death
+  status <- eval(parse(text=paste0("esetTargets$", statuscol))) # coding if patient survived or not
+  # 1 = no event/alive; 2 = event/death
+  if (is.na(statuslevels$na)){
+    levelnames <- c(1, 2)
+    names(levelnames) <- c(statuslevels$alive,
+                           statuslevels$deceased)
+  } else {
+    levelnames <- c(1, 2, NA)
+    names(levelnames) <- c(statuslevels$alive,
+                           statuslevels$deceased,
+                           statuslevels$na)
+  }
+  status <- plyr::revalue(status, levelnames)
   status <- as.numeric(status)
   return(list(time=time, status=status))
 }
