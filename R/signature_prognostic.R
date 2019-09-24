@@ -134,7 +134,13 @@ univCox_ <- function(survtable, ids){
   colnames(survtable)[-c(1:2)] <- covariates
 
   univ_formulas <- sapply(covariates, function(x) stats::as.formula(paste('survival::Surv(time, status) ~', x))) # build separate formula for each variable
-  univ_models <- lapply(univ_formulas, function(f){survival::coxph(formula = f, data = survtable)}) # build cox model for each variable separatly
+  #univ_models <- lapply(univ_formulas, function(f){survival::coxph(formula = f, data = survtable)}) # build cox model for each variable separatly
+
+  # parallel test:
+  univ_models <- mcmapply(univ_formulas, FUN =  function(f) {
+    survival::coxph(formula = f, data = survtable)},
+    mc.cores = parallel::detectCores(), mc.preschedule = TRUE)
+
   # extract results
   univ_results <- lapply(univ_models, #
                          function(x){ #
