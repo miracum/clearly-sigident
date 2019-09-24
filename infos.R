@@ -8,7 +8,7 @@
 # createDEGheatmap_
 # exportDEGannotations_
 
-# providing sensitivity, specificity etc for diagnostic signatures?
+# taking exprs values for calculating prognostic signature from batch corrected mergeset (not eset3)
 
-# validating prognostic signature with second data set GSE50081?
+# removed ridge as parameter of signature_ but did not removed it in the code
 

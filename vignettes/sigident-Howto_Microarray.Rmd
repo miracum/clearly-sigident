@@ -575,8 +575,8 @@ training_list <- sigident::createTrainingTest_(diagnosis = diagnosis,
 
 ## Lasso regression
 
-The function `signature_` trains the prediction model performing `nfolds` cross-validation. The plot depicts the mean squared error as the criteron for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features above the plot.  
-At least a ROC curve is plotted.
+Regularization requires the selection of a tuning parameter (lambda) that determines the strength of regularization. The function `signature_` performs `nfolds` cross-validation selecting for best lambda and additionally builds the predictive model. `seed` is set for reproducibility. The plot depicts the mean squared error as the criteron for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features (genes) above the plot. The left dashed vertical line represents the log of the optimal value of lambda, which results in the lowest prediction error and giving the most accurate model. The right dashed vertical line indicates the log of the lambda value resulting in a model with the smallest number of included variables but also lies within one standard error of the optimal value of lambda.   
+At least a ROC curve is plotted to visualize the performance measurement of the model.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_lasso <- sigident::signature_(traininglist = training_list,
@@ -612,7 +612,7 @@ knitr::include_graphics(filename)
 
 ## Elastic net regression 
 
-TODO Description here.
+The elastic net is a mixture of lasso and ridge regularization shrinking coefficients (like in ridge regression) and set some coefficients to zero (as in lasso). Therefore, the mixing parameter alpha needs to be determined as value between 1 (for lasso) and 0 (for ridge). A grid search for calculating optimal alpha and lambda can be conducted (as it is done next) but might take much computing capacity, hence we propose setting alpha manually to 0.9. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_elasticnet <- sigident::signature_(traininglist = training_list,
@@ -649,7 +649,7 @@ knitr::include_graphics(filename)
 
 ## Gridsearch to find alpha and lambda
 
-TODO Description here.
+Setting `type = "grid"` conducts a grid search calculating a pair of alpha and lambda that minimizes the CV error. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_glmGrid <- sigident::signature_(traininglist = training_list,
@@ -689,8 +689,7 @@ knitr::include_graphics(filename)
 
 ## Comparing Model Performance  
 
-These models can be included into one big list and the results can then be printed using the function `compareDiagnosticModels()`.
-
+These builded models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`.
 
 ```{r}
 diagnosticModels <- list(
@@ -718,7 +717,9 @@ knitr::kable(
 )
 ```
 
-## Model Diagnostics 
+## Model performance measurement
+
+Additionally, the confusion matrix and the calculated perfomance metrices can be printed out for the different models, respectively. 
 
 ### Lasso (min)
 
@@ -753,6 +754,8 @@ diagnosticModels$elastic.grid$confmat
 
 ## Export selected Entrez-IDs
 
+The following function enables the extraction of the selected genes as csv file.
+
 ```{r}
 # map selected variables and export 
 signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnostic_lasso$lambda.min)
@@ -768,6 +771,8 @@ head(signature_genes)
 # Identification of Prognostic Signature
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
+
+For the calculation of a prognostic signature it is first required to transform the phenoData containing the relevant survival data. In our example only the study GSE19188 contains survival data. For this the levels of the required columns (`alive`, `deceased`, `na`) need to entitled equal to their entries. Same applies to `targetcolname`, `controllevelname`, `targetlevelname` indicating the groups to be seperated. 
 
 ```{r eval = TRUE}
 discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
@@ -799,12 +804,11 @@ discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics
 
 ### Extract survival data 
 
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-#---------------------------------------------------#
-##### 8. Identification of Prognostic Signature #####
-#---------------------------------------------------#
+Next the survival data needs to be extracted and to get into the right format. `getSurvivalTime` takes over this task resulting an a table `survivalData` containg samples (in our example of the class tumor) as rows, survival time and if a event (death) happened as columns. Additionally, the expression values for the selected DEGs are added as columns to the table. 
 
-### 8.A Identification of survival correlated genes
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+
+### Identification of survival correlated genes
 survivalData <- sigident::getSurvivalTime_(studyMetadata = studyMetadata,
                                            sampleMetadata = sampleMetadata,
                                            discoverystudies.w.timedata = discoverystudies.w.timedata,
@@ -825,7 +829,9 @@ head(survTable[,1:4])
 print(ids)
 ```
 
-### Compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions 
+### Compute univariate cox regression 
+
+Subsequently, univariate Cox regression is conducted to identify survival correlated genes. The results containing the hazard rate with 95% CI and p-value is exported as csv-file. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 surv_correlated <- sigident::univCox_(survtable = survTable,
@@ -844,9 +850,7 @@ head(surv_correlated)
 
 ## Prognostic classifier and Kaplan-Meier estimator
 
-classification of patients into high and low risk groups regarding to expression profile of signature genes
-
-due to selection bias, only GSE18842 and GSE19804 are used for calculating classifier
+To build an unbiased classifier that classfies patients into high and low risk groups expression data from the other studies are required. 
 
 ```{r}
 classifier_studies <- c("GSE18842", "GSE19804")
@@ -855,7 +859,7 @@ classifier_studies <- c("GSE18842", "GSE19804")
 
 ### Evaluate expression pattern (over-/underrepresentation)
 
-generate vectors 'control' and 'tumor' for function expressionPattern_
+The classifier is built taking into account the expression profiles of the identified survival correlated genes between tumor and non-tumor samples. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 exprPattern <- sigident::generateExpressionPattern_(classifier_studies = classifier_studies,
