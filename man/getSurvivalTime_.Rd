@@ -8,12 +8,22 @@ getSurvivalTime_(studyMetadata, sampleMetadata, genes, idtype,
   discoverystudies.w.timedata, targetname, controlname, targetcol, datadir)
 }
 \arguments{
+\item{studyMetadata}{A data frame. The data frame holding the study metadata.}
+
+\item{sampleMetadata}{A data frame. The data frame holding the sample metadata.}
+
 \item{genes}{A object. The output of the function `identifyDEGs_()`.}
 
 \item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
 
 \item{discoverystudies.w.timedata}{A list that contains specifications on the study/studies that contain(s) survival time information.}
+
+\item{targetname}{A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.}
+
+\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
+
+\item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
 
 \item{datadir}{A character string. Path to the data-folder inside the metadata folder.}
 }
