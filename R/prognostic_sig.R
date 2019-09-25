@@ -214,9 +214,13 @@ generateExpressionPattern_ <- function(classifier_studies,
     length(setdiff(classifier_studies, studyMetadata$study)) == 0
   )
 
-  diagnosis <- diagnosis_(vector = eset[[targetcol]],
-                          targetname = targetname,
-                          controlname = controlname)
+  dd <- createDiagnosisDesignBatch_(sampleMetadata = sampleMetadata[sampleMetadata$study %in% classifier_studies,],
+                                    studyMetadata = studyMetadata[studyMetadata$study %in% classifier_studies,],
+                                    controlname = controlname,
+                                    targetname = targetname,
+                                    targetcol = targetcol)
+  diagnosis <- dd$diagnosis
+
 
   # get sample names (= colnames of mergeset)
   classifier_colnames <- sampleMetadata[sampleMetadata$study %in% classifier_studies, get("sample")]
@@ -232,9 +236,9 @@ generateExpressionPattern_ <- function(classifier_studies,
 
   # train the prognostic classifier
   pattern <- c()
-  for(i in IDs){
+  for(id in IDs){
     pattern <- append(pattern, expressionPattern_(mergeset = classifier_data,
-                                                  ids = i,
+                                                  ids = id,
                                                   tumor = tumor,
                                                   control = control))
   }
@@ -269,16 +273,19 @@ tum.vec_ <- function(mergeset, diagnosis){
 
 
 expressionPattern_ <- function(mergeset, ids, tumor, control){
-  ctrl <- (mean(mergeset[ids, control])) # selecting control-samples and computing mean
-  tum <-(mean(mergeset[ids, tumor])) # selecting tumor-samples and computing mean
-  pattern=c() # creating empty vecotr
-  if(ctrl < tum){
-    pattern = "Over"
+
+  ctrl <- mean(mergeset[ids, control]) # selecting control-samples and computing mean
+  tum <- mean(mergeset[ids, tumor]) # selecting tumor-samples and computing mean
+
+  if (ctrl < tum){
+    pattern <- "Over"
+
+  } else if (ctrl > tum){ # Over-/Underexpression is checked by comparing group-means
+    pattern <- "Under" # vector is filled with respective symbols
+
+  } else {
+    pattern <- NA
   }
-  else if (ctrl > tum){ # Over-/Underexpression is checked by comparing group-means
-    pattern = "Under" # vector is filled with respective symbols
-  }
-  else{pattern=NA}
   return(pattern) # pattern vector is returned
 }
 
