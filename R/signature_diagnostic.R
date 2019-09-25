@@ -128,7 +128,8 @@ signature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
 
     # go parallel
     ncores <- parallel::detectCores()
-    cl <- parallel::makeCluster(4)
+    cores <- ifelse(ncores > 4, 4, ncores)
+    cl <- parallel::makeCluster(cores)
     doParallel::registerDoParallel(cl)
 
     set.seed(seed)
@@ -210,7 +211,8 @@ glmnetGridSearch_ <- function(traininglist, seed){
 
   # go parallel
   ncores <- parallel::detectCores()
-  cl <- parallel::makeCluster(4)
+  cores <- ifelse(ncores > 4, 4, ncores)
+  cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
   # perform cv forecasting
