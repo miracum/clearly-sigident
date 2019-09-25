@@ -10,15 +10,7 @@ goEnrichmentAnalysis_(entrez, OrgDB, organism, fitlm, pathwayid, species,
 \arguments{
 \item{entrez}{A character vector containing the Entrez-IDs.}
 
-\item{OrgDB}{A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".}
-
-\item{organism}{A character string indicating the organism. Currently supported: "hsa".}
-
 \item{fitlm}{An object, returned by `goDiffReg_()`.}
-
-\item{pathwayid}{A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".}
-
-\item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
 
 \item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
 }

@@ -1,12 +1,15 @@
-#' @title createDiagnosisDesign_
+#' @title createDiagnosisDesignBatch_
 #'
-#' @description Helper function to create diagnosis and design
+#' @description Helper function to create diagnosis, design and batch
+#'
+#' @param targetname A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.
 #'
 #' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #'
 #' @export
 # create design
-createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, targetname, targetcol){
+createDiagnosisDesignBatch_ <- function(sampleMetadata, studyMetadata, controlname, targetname, targetcol){
   stopifnot(
     is.data.frame(sampleMetadata),
     is.data.frame(studyMetadata),
@@ -19,12 +22,18 @@ createDiagnosisDesign_ <- function(sampleMetadata, studyMetadata, controlname, t
                           studyMetadata = studyMetadata)
   discoverydata <- sampleMetadata[which(sampleMetadata$study %in% discovery),][[targetcol]]
 
+  # create diagnosis
   diagnosis <- diagnosis_(vector = discoverydata,
                           controlname = controlname,
                           targetname = targetname)
-
+  # create design
   design <- stats::model.matrix(~diagnosis)
-  return(list(diagnosis = diagnosis, design = design))
+
+  # create batch
+  batch <- createBatch_(studyMetadata = studyMetadata,
+                        sampleMetadata = sampleMetadata)
+
+  return(list(diagnosis = diagnosis, design = design, batch = batch))
 }
 
 diagnosis_ <- function(vector, controlname, targetname){
@@ -81,8 +90,6 @@ batchDetection_ <- function(mergeset, batch){
 #' @description Helper function correcting for batch effects and mapping affy probes to Entrez IDs
 #'
 #' @param mergedset An ExpressionSet. The output of the function `merge_()`.
-#' @param idtype A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
-#'   affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!
 #'
 #' @details This function takes a Bioconductor's ExpressionSet class (the output of the function `merge()`) and outputs a batch corrected
 #'   matrix containing expression data. In order to correct for occurring batch effects and other unwanted variation in high-throughput
@@ -92,6 +99,7 @@ batchDetection_ <- function(mergeset, batch){
 #'
 #' @inheritParams batchDetection_
 #' @inheritParams goDiffReg_
+#' @inheritParams sigidentDiagnostic
 #'
 #' @references W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.
 #'   Jeffrey T. Leek, W. Evan Johnson, Hilary S. Parker, Elana J. Fertig, Andrew E. Jaffe, John D. Storey, Yuqing Zhang and Leonardo Collado Torres (2019). sva: Surrogate Variable Analysis. R package version 3.30.1.

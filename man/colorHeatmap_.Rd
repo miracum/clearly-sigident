@@ -6,15 +6,6 @@
 \usage{
 colorHeatmap_(sampleMetadata, studyMetadata, targetcol, controlname)
 }
-\arguments{
-\item{sampleMetadata}{A data frame. The data frame holding the sample metadata.}
-
-\item{studyMetadata}{A data frame. The data frame holding the study metadata.}
-
-\item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
-
-\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
-}
 \description{
 Helper function to color the heatmap
 }

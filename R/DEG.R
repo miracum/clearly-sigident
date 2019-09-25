@@ -9,10 +9,9 @@ DEG.limma_ <- function(mergeset, design){
 #'
 #' @description Helper function to identify DEGs based on the limma package
 #'
-#' @param design A object. The output of the function `createDiagnosisDesign_()`.
 #' @param qValue A numeric value for the q-value (false discovery rate) (default=0.01).
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #'
 #' @export
 identifyDEGs_ <- function(mergeset, design, qValue=0.01){

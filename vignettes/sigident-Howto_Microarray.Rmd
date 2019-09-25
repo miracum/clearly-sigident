@@ -474,6 +474,7 @@ knitr::kable(head(enr_topgo))
 ```{r}
 enr_topkegg <- sigident::extractKEGGterms_(entrez = deg_entrez,
                                            species = species)
+data.table::fwrite(enr_topkegg, paste0(csvdir, "Top_KEGG.csv"))
 ```
 ```{r}
 dim(enr_topkegg)

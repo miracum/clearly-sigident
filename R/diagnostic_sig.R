@@ -2,8 +2,6 @@
 #'
 #' @description Helper function to split data into training and test set
 #'
-#' @param diagnosis An object. The output of the function `createDiagnosisDesign_()`.
-#'
 #' @inheritParams sigidentDiagnostic
 #'
 #' @export
