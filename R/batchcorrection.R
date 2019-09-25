@@ -41,7 +41,8 @@ diagnosis_ <- function(vector, controlname, targetname){
   diagnosis <- gsub(controlname, "0", diag)
   diagnosis <- gsub(targetname, "1", diagnosis)
 
-  return(as.integer(diagnosis))
+  outdat <- as.integer(diagnosis)
+  return(outdat)
 }
 
 #' @title createBatch_
@@ -67,7 +68,8 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
   times <- sapply(names(studylist), function(n){
     studylist[[n]]
   }, USE.NAMES = F)
-  return(rep(x = x, times = times))
+  outdat <- rep(x = x, times = times)
+  return(outdat)
 }
 
 
@@ -81,7 +83,8 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
 #'
 #' @export
 batchDetection_ <- function(mergeset, batch){
-  return(gPCA::gPCA.batchdetect(x = t(mergeset), batch = batch, center = FALSE))
+  outdat <- gPCA::gPCA.batchdetect(x = t(mergeset), batch = batch, center = FALSE)
+  return(outdat)
 }
 
 #' @title batchCorrection_

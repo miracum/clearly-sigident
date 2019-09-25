@@ -39,6 +39,7 @@ extractKEGGterms_ <- function(gene, species){
 #'
 #' @inheritParams identifyDEGs_
 #' @inheritParams batchCorrection_
+#' @inheritParams sigidentDEG
 #'
 #' @export
 goDiffReg_ <- function(mergeset, design, idtype, entrezids = NULL){

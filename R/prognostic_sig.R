@@ -3,7 +3,7 @@
 #' @description Helper function to map relevant input variables of a diagnostic model to corresponding IDs.
 #'
 #' @inheritParams createGridModelPlot_
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #'
 #' @export
 geneMapSig_ <- function(mergeset, model){
@@ -23,9 +23,10 @@ geneMapSig_ <- function(mergeset, model){
 #' @param discoverystudies.w.timedata A list that contains specifications on the study/studies that contain(s) survival time information.
 #' @param datadir A character string. Path to the data-folder inside the metadata folder.
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #' @inheritParams createDEGheatmap_
 #' @inheritParams batchCorrection_
+#' @inheritParams createDiagnosisDesignBatch_
 #'
 #' @export
 getSurvivalTime_ <- function(studyMetadata,
@@ -196,7 +197,8 @@ exprsVector_ <- function(DEG){
 #' @param classifier_studies A character vector. Names of the studies used to train the classifier.
 #' @param sigCov A data.frame. Output of the function `univCox_()`.
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
+#' @inheritParams createDiagnosisDesignBatch_
 #'
 #' @export
 generateExpressionPattern_ <- function(classifier_studies,

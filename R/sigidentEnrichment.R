@@ -45,6 +45,7 @@ sigidentEnrichment <- function(mergedset,
 
   # store other arguments
   rv$idtype = idtype
+  rv$design = design
 
   # store dirs
   rv$plotdir <- cleanPathName_(plotdir)

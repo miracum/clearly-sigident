@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r, include = FALSE}
@@ -822,10 +822,6 @@ dim(survTable)
 head(survTable[,1:4])
 ```
 
-```{r}
-print(ids)
-```
-
 ### Compute univariate cox regression 
 
 Subsequently, univariate Cox regression is conducted to identify survival correlated genes. The results containing the hazard rate with 95% CI and p-value is exported as csv-file. 
@@ -849,16 +845,12 @@ head(surv_correlated)
 
 To build an unbiased classifier that classfies patients into high and low risk groups expression data from the other studies are required. 
 
-```{r}
-classifier_studies <- c("GSE18842", "GSE19804")
-```
-
-
 ### Evaluate expression pattern (over-/underrepresentation)
 
 The classifier is built taking into account the expression profiles of the identified survival correlated genes between tumor and non-tumor samples. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+classifier_studies <- c("GSE18842", "GSE19804")
 exprPattern <- sigident::generateExpressionPattern_(classifier_studies = classifier_studies,
                                                     sigCov = surv_correlated,
                                                     mergeset = mergeset,

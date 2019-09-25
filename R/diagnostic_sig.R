@@ -2,6 +2,7 @@
 #'
 #' @description Helper function to split data into training and test set
 #'
+#' @inheritParams sigidentDEG
 #' @inheritParams sigidentDiagnostic
 #'
 #' @export

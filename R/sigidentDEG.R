@@ -25,11 +25,11 @@ sigidentDEG <- function(mergeset,
                         mergedset,
                         studyMetadata,
                         sampleMetadata,
-                        targetcol,
                         controlname,
                         design,
                         idtype,
                         FDR,
+                        targetcol = "target",
                         plotdir = "./plots/",
                         csvdir = "./tables/"){
   stopifnot(
@@ -51,7 +51,6 @@ sigidentDEG <- function(mergeset,
 
   # store names
   rv$controlname <- controlname
-  rv$targetname <- targetname
   rv$targetcol <- targetcol
 
   # store other variables
