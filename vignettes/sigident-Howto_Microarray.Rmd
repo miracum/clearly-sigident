@@ -328,6 +328,8 @@ design <- dd$design
 
 
 # check batch assignment
+# (batch is also created during createDiagnosisDesignBatch_())
+batch <- dd$batch
 table(batch)
 length(batch)
 
