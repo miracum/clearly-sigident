@@ -4,13 +4,15 @@
 \alias{getSurvivalTime_}
 \title{getSurvivalTime_}
 \usage{
-getSurvivalTime_(studyMetadata, sampleMetadata,
+getSurvivalTime_(studyMetadata, sampleMetadata, genes,
   discoverystudies.w.timedata, targetname, controlname, targetcol, datadir)
 }
 \arguments{
 \item{studyMetadata}{A data frame. The data frame holding the study metadata.}
 
 \item{sampleMetadata}{A data frame. The data frame holding the sample metadata.}
+
+\item{genes}{A object. The output of the function `identifyDEGs_()`.}
 
 \item{discoverystudies.w.timedata}{A list that contains specifications on the study/studies that contain(s) survival time information.}
 
