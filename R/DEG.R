@@ -59,7 +59,6 @@ limmaTopTable_ <- function(mergeset, design, qValue){
   return(t)
 }
 
-
 #' #' @title qSelection_
 #' #'
 #' #' @description Helper function to select qValues
