@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -79,8 +79,10 @@ cels <- list.files(maindir, pattern = "[gz]")
 tryCatch({
   sapply(paste(maindir, cels, sep="/"), GEOquery::gunzip)
   # at this point, first the textfile "phenodata.txt must be generated
-  ## For downloading raw data use the function: getGEOSuppFiles(""). After downloading and uncompressing the raw file (*_RAW.tar) we need to capture
-  ## the experimental information. Therefore a text file is created in the terminal window or rather in the command line.
+  ## For downloading raw data use the function: getGEOSuppFiles("").
+  ## After downloading and uncompressing the raw file (*_RAW.tar) we need to capture
+  ## the experimental information. Therefore a text file is created in the terminal 
+  ## window or rather in the command line.
   system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
   ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.
   ## After this step the normalization can be started.
@@ -761,7 +763,7 @@ diagnosticModels$elastic.grid$confmat
 ```
 
 
-## Export selected Entrez-IDs
+## Export selected IDs
 
 The following function enables the extraction of the selected genes as csv file.
 
@@ -784,14 +786,15 @@ head(signature_genes)
 For the calculation of a prognostic signature it is first required to transform the phenoData containing the relevant survival data. In our example only the study GSE19188 contains survival data. For this the levels of the required columns (`alive`, `deceased`, `na`) need to entitled equal to their entries. Same applies to `targetcolname`, `controllevelname`, `targetlevelname` indicating the groups to be seperated. 
 
 ```{r eval = TRUE}
-discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
-                                                      status = list(statuscol = "characteristics_ch1.3",
-                                                                    levels = list(alive = "status: alive",
-                                                                                  deceased = "status: deceased",
-                                                                                  na = "status: Not available")),
-                                                      targetcolname = "characteristics_ch1",
-                                                      controllevelname = "tissue type: healthy",
-                                                      targetlevelname = "tissue type: tumor"))
+discoverystudies.w.timedata <- list(
+  "GSE19188" = list(timecol = "characteristics_ch1.2",
+                    status = list(statuscol = "characteristics_ch1.3",
+                                  levels = list(alive = "status: alive",
+                                                deceased = "status: deceased",
+                                                na = "status: Not available")),
+                    targetcolname = "characteristics_ch1",
+                    controllevelname = "tissue type: healthy",
+                    targetlevelname = "tissue type: tumor"))
 ```
 
 
@@ -871,23 +874,24 @@ head(exprPattern)
 #### Create a list that contains specifications of the study that contains the validation information
 
 ```{r eval = TRUE}
-validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
-                                                status = list(statuscol = "characteristics_ch1.8",
-                                                              levels = list(alive = "status: ALIVE",
-                                                                            deceased = "status: DEAD",
-                                                                            na = "status: NTL")),
-                                                targetcolname = "source_name_ch1",
-                                                controllevelname = "Non Tumoral Lung",
-                                                targetlevelname = "Lung Tumour"),
-
-                              "GSE50081" = list(timecol = "characteristics_ch1.8",
-                                                status = list(statuscol = "characteristics_ch1.9",
-                                                              levels = list(alive = "status: alive",
-                                                                            deceased = "status: dead",
-                                                                            na = NA)),
-                                                targetcolname = "characteristics_ch1.1",
-                                                targetlevelname = NULL,
-                                                controllevelname = NULL))
+validationstudiesinfo <- list(
+  "GSE30219" = list(timecol = "characteristics_ch1.9",
+                    status = list(statuscol = "characteristics_ch1.8",
+                                  levels = list(alive = "status: ALIVE",
+                                                deceased = "status: DEAD",
+                                                na = "status: NTL")),
+                    targetcolname = "source_name_ch1",
+                    controllevelname = "Non Tumoral Lung",
+                    targetlevelname = "Lung Tumour"),
+  
+  "GSE50081" = list(timecol = "characteristics_ch1.8",
+                    status = list(statuscol = "characteristics_ch1.9",
+                                  levels = list(alive = "status: alive",
+                                                deceased = "status: dead",
+                                                na = NA)),
+                    targetcolname = "characteristics_ch1.1",
+                    targetlevelname = NULL,
+                    controllevelname = NULL))
 # if targetlevelname == NULL, the expression set will not be filtered further
 # but instead, all samples will be used for calculations
 ```
@@ -1049,32 +1053,32 @@ mergeset <- sigident::batchCorrection_(mergedset = mergedset,
 ## Run `sigidentDEG`-function
 
 ```{r eval = FALSE}
-genes <- sigidentDEG(mergeset = mergeset,
-                     mergedset = mergedset,
-                     studyMetadata = studyMetadata,
-                     sampleMetadata = sampleMetadata,
-                     targetcol = targetcol,
-                     controlname = controlname,
-                     design = design,
-                     idtype = idtype,
-                     FDR = FDR,
-                     plotdir = plotdir,
-                     csvdir = csvdir)
+genes <- sigident::sigidentDEG(mergeset = mergeset,
+                               mergedset = mergedset,
+                               studyMetadata = studyMetadata,
+                               sampleMetadata = sampleMetadata,
+                               targetcol = targetcol,
+                               controlname = controlname,
+                               design = design,
+                               idtype = idtype,
+                               FDR = FDR,
+                               plotdir = plotdir,
+                               csvdir = csvdir)
 ```
 
 ## Run `sigidentEnrichment`-function
 
 ```{r eval = FALSE}
-sigidentEnrichment(mergeset = mergeset,
-                   mergedset = mergedset,
-                   idtype = idtype,
-                   design = design,
-                   species = species,
-                   OrgDB = OrgDb,
-                   organism = organism,
-                   pathwayid = pathwayid,
-                   plotdir = plotdir,
-                   csvdir = csvdir)
+sigident::sigidentEnrichment(mergeset = mergeset,
+                             mergedset = mergedset,
+                             idtype = idtype,
+                             design = design,
+                             species = species,
+                             OrgDB = OrgDb,
+                             organism = organism,
+                             pathwayid = pathwayid,
+                             plotdir = plotdir,
+                             csvdir = csvdir)
 ```
 ```{r eval = FALSE}
 filename <- paste0(plotdir, "/", organism, "04110.png")
@@ -1090,12 +1094,12 @@ knitr::include_graphics(filename)
 
 
 ```{r eval = FALSE}
-diagnosticModels <- sigidentDiagnostic(mergeset = mergeset,
-                                        diagnosis = diagnosis,
-                                        seed = seed,
-                                        nfolds = nfolds,
-                                        split = split,
-                                        plotdir = plotdir)
+diagnosticModels <- sigident::sigidentDiagnostic(mergeset = mergeset,
+                                                 diagnosis = diagnosis,
+                                                 seed = seed,
+                                                 nfolds = nfolds,
+                                                 split = split,
+                                                 plotdir = plotdir)
 ```
 
 ```{r eval = FALSE}
@@ -1109,34 +1113,34 @@ knitr::kable(
 ### First, define Meta information lists
 
 ```{r eval = FALSE}
-discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
-                                                      status = list(statuscol = "characteristics_ch1.3",
-                                                                    levels = list(alive = "status: alive",
-                                                                                  deceased = "status: deceased",
-                                                                                  na = "status: Not available")),
-                                                      targetcolname = "characteristics_ch1",
-                                                      controllevelname = "tissue type: healthy",
-                                                      targetlevelname = "tissue type: tumor"))
-```
+discoverystudies.w.timedata <- list(
+  "GSE19188" = list(timecol = "characteristics_ch1.2",
+                    status = list(statuscol = "characteristics_ch1.3",
+                                  levels = list(alive = "status: alive",
+                                                deceased = "status: deceased",
+                                                na = "status: Not available")),
+                    targetcolname = "characteristics_ch1",
+                    controllevelname = "tissue type: healthy",
+                    targetlevelname = "tissue type: tumor"))
 
-```{r eval = FALSE}
-validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
-                                                status = list(statuscol = "characteristics_ch1.8",
-                                                              levels = list(alive = "status: ALIVE",
-                                                                            deceased = "status: DEAD",
-                                                                            na = "status: NTL")),
-                                                targetcolname = "source_name_ch1",
-                                                controllevelname = "Non Tumoral Lung",
-                                                targetlevelname = "Lung Tumour"),
-
-                              "GSE50081" = list(timecol = "characteristics_ch1.8",
-                                                status = list(statuscol = "characteristics_ch1.9",
-                                                              levels = list(alive = "status: alive",
-                                                                            deceased = "status: dead",
-                                                                            na = NA)),
-                                                targetcolname = "characteristics_ch1.1",
-                                                targetlevelname = NULL,
-                                                controllevelname = NULL))
+validationstudiesinfo <- list(
+  "GSE30219" = list(timecol = "characteristics_ch1.9",
+                    status = list(statuscol = "characteristics_ch1.8",
+                                  levels = list(alive = "status: ALIVE",
+                                                deceased = "status: DEAD",
+                                                na = "status: NTL")),
+                    targetcolname = "source_name_ch1",
+                    controllevelname = "Non Tumoral Lung",
+                    targetlevelname = "Lung Tumour"),
+  
+  "GSE50081" = list(timecol = "characteristics_ch1.8",
+                    status = list(statuscol = "characteristics_ch1.9",
+                                  levels = list(alive = "status: alive",
+                                                deceased = "status: dead",
+                                                na = NA)),
+                    targetcolname = "characteristics_ch1.1",
+                    targetlevelname = NULL,
+                    controllevelname = NULL))
 # if targetlevelname == NULL, the expression set will not be filtered further
 # but instead, all samples will be used for calculations
 ```
