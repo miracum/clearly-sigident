@@ -236,9 +236,9 @@ generateExpressionPattern_ <- function(classifier_studies,
 
   # train the prognostic classifier
   pattern <- c()
-  for(i in 1:length(IDs)){
+  for(i in IDs){
     pattern <- append(pattern, expressionPattern_(mergeset = classifier_data,
-                                                  ids = IDs[i],
+                                                  ids = i,
                                                   tumor = tumor,
                                                   control = control))
   }
