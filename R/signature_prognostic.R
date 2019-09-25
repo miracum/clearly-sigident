@@ -142,7 +142,7 @@ univCox_ <- function(survtable, ids){
   # # parallel:
   # univ_models <- mcmapply(univ_formulas, FUN =  function(f) {
   #   survival::coxph(formula = f, data = survtable)},
-  #   mc.cores = parallel::detectCores(), mc.preschedule = TRUE)
+  #   mc.cores = parallel::detectCores()-1, mc.preschedule = TRUE)
 
   # extract results
   univ_results <- lapply(univ_models, #

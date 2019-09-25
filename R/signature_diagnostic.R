@@ -87,7 +87,7 @@ glmPrediction_ <- function(model, test.x, test.y, s = NULL){
 
 #' @title signature_
 #'
-#' @description Helper function to conduct lasso or elastic net regualization for fitting a GLM in order to identify a multi-gene classifier 
+#' @description Helper function to conduct lasso or elastic net regualization for fitting a GLM in order to identify a multi-gene classifier
 #'
 #' @param traininglist A list object containing the training data. The output of the function `createTrainingTest_()`.
 #' @param type A character string. The algorihm used to perform calculations. Currently implemented are \emph{"grid", "lasso", "elastic"}.
@@ -128,7 +128,7 @@ signature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
 
     # go parallel
     ncores <- parallel::detectCores()
-    cl <- parallel::makeCluster(ncores)
+    cl <- parallel::makeCluster(4)
     doParallel::registerDoParallel(cl)
 
     set.seed(seed)
@@ -210,7 +210,7 @@ glmnetGridSearch_ <- function(traininglist, seed){
 
   # go parallel
   ncores <- parallel::detectCores()
-  cl <- parallel::makeCluster(ncores)
+  cl <- parallel::makeCluster(4)
   doParallel::registerDoParallel(cl)
 
   # perform cv forecasting
