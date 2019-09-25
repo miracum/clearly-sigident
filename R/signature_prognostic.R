@@ -25,11 +25,13 @@ geneMapSig_ <- function(mergeset, model){
 #'
 #' @inheritParams sigidentDiagnostic
 #' @inheritParams createDEGheatmap_
+#' @inheritParams batchCorrection_
 #'
 #' @export
 getSurvivalTime_ <- function(studyMetadata,
                              sampleMetadata,
                              genes,
+                             idtype,
                              discoverystudies.w.timedata,
                              targetname,
                              controlname,
@@ -49,7 +51,7 @@ getSurvivalTime_ <- function(studyMetadata,
 
   for (st in names(discoverystudies.w.timedata)){
     samples <- sampleMetadata[sampleMetadata$study==st,]
-    tumorsamples <- samples[eval(parse(text=paste0("whichsamples$",targetcol)))==targetname,]
+    tumorsamples <- samples[eval(parse(text=paste0("samples$",targetcol)))==targetname,]
 
 
     eset <- loadEset_(name = st,
@@ -79,8 +81,7 @@ getSurvivalTime_ <- function(studyMetadata,
     survTable <- data.frame(time, status) # generating a table: columns: survivaltime, status; rows: individual samples
 
     expr <- createExpressionSet_(eset = esetTargets,
-                                 idtype = discoverystudies.w.timedata[[st]]$idtype,
-                                 idcol = discoverystudies.w.timedata[[st]]$idcol)
+                                 idtype = idtype)
 
     ids <- rownames(expr)
 
@@ -294,9 +295,10 @@ expressionPattern_ <- function(mergeset, ids, tumor, control){
 #'
 #' @inheritParams sigidentDiagnostic
 #' @inheritParams getSurvivalTime_
+#' @inheritParams batchCorrection_
 #'
 #' @export
-prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datadir, targetcol, targetname, controlname){
+prognosticClassifier_ <- function(PatternCom, idtype, validationstudiesinfo, datadir, targetcol, targetname, controlname){
 
   outlist <- list()
 
@@ -338,8 +340,7 @@ prognosticClassifier_ <- function(PatternCom, validationstudiesinfo, datadir, ta
     RiskTable <- data.frame(time, status)
 
     expr <- createExpressionSet_(eset = esetTargets,
-                                 idtype = validationstudiesinfo[[st]]$idtype,
-                                 idcol = validationstudiesinfo[[st]]$idcol)
+                                 idtype = idtype)
 
     # classification and Kaplan-Meier estimator
     Sig <- sigAnalysis_(expr = expr, PatternCom = PatternCom)
@@ -479,18 +480,24 @@ sigAnalysis_ <- function(expr, PatternCom){ # Input is an eset, consisting of tu
   return(Sigframe)
 }
 
-createExpressionSet_ <- function(eset, idtype, idcol){
+createExpressionSet_ <- function(eset, idtype){
+  expr <- Biobase::exprs(eset)
+  expr <- idType_(expr = expr, eset = eset, idtype = idtype)
+  return(expr)
+}
+
+
+idType_ <- function(expr, eset, idtype){
   stopifnot(
     idtype %in% c("entrez", "affy")
   )
-  expr <- Biobase::exprs(eset)
   if (idtype == "entrez"){
-    rownames(expr) <- as.character(eset@featureData@data[, idcol])
+    rownames(expr) <- as.character(eset@featureData@data$ENTREZ_GENE_ID)
     # remove empty characters and replicates in EntrezIDs
     expr <- expr[rownames(expr)!="",]
     expr <- expr[!duplicated(rownames(expr)),]
   } else if (idtype == "affy") {
-    rownames(expr) <- as.character(eset@featureData@data[, idcol])
+    rownames(expr) <- as.character(eset@featureData@data$ID)
   }
   return(expr)
 }

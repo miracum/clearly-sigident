@@ -7,12 +7,11 @@
 signature_(traininglist, type, alpha = NULL, nfolds = 10, seed)
 }
 \arguments{
-\item{traininglist}{A list object containint the training data. The output of the function `createTrainingTest_()`.}
+\item{traininglist}{A list object containing the training data. The output of the function `createTrainingTest_()`.}
 
-\item{type}{A character string. The algorihm used to perform calculations. Currently implemented are \emph{"grid", "lasso", "elastic"} and
-\emph{"ridge"}.}
+\item{type}{A character string. The algorihm used to perform calculations. Currently implemented are \emph{"grid", "lasso", "elastic"}.}
 
-\item{alpha}{A numeric between 0 and 1. The elasticnet mixing parameter passed to `glmnet::glmnet()`.}
+\item{alpha}{A numeric between 0 and 1. The elastic net mixing parameter passed to `glmnet::glmnet()`.}
 
 \item{nfolds}{A integer. The number of folds used for cross validation. Default: 10.}
 

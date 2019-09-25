@@ -53,7 +53,10 @@ merge_ <- function(esetlist){
 #' @inheritParams createDEGheatmap_
 #'
 #' @export
-exportDEGannotations_ <- function(mergedset, genes){
+exportDEGannotations_ <- function(mergedset, genes, idtype){
+  stopifnot(
+    idtype %in% c("entrez", "affy")
+  )
   ids <- mergedset@featureData@data[,"ID"]
   sym <- Biobase::fData(mergedset)["Gene Symbol"][ids,]
   tit <- Biobase::fData(mergedset)["Gene Title"][ids,]
@@ -65,5 +68,12 @@ exportDEGannotations_ <- function(mergedset, genes){
                                            gbACC,
                                            Entrez))
   colnames(DEGsInfo) <- c("probe_ID","gene_symbol","gene_title","genebank_accession","entrez_id")
-  return(DEGsInfo[get("entrez_id") %in% genes, ])
+
+  if (idtype == "entrez"){
+    ret <- DEGsInfo[get("entrez_id") %in% genes, ]
+  } else if (idtype == "affy"){
+    ret <- DEGsInfo[get("probe_ID") %in% genes, ]
+  }
+
+  return(ret)
 }

@@ -33,10 +33,21 @@ extractKEGGterms_ <- function(entrez, species){
 #'
 #' @description Helper function to fitting linear models
 #'
+#' @param entrezids A character vector, containing entrez IDs. To be used only if 'idtype'= "affy" (default = NULL).
+#'
 #' @inheritParams identifyDEGs_
+#' @inheritParams batchCorrection_
 #'
 #' @export
-goDiffReg_ <- function(mergeset, design){
+goDiffReg_ <- function(mergeset, design, idtype, entrezids = NULL){
+  stopifnot(
+    idtype %in% c("entrez", "affy")
+  )
+  if (idtype == "affy"){
+    stopifnot(!is.null(entrezids))
+    # map rownames to entrez-ids
+    rownames(mergeset) <- entrezids
+  }
   # run limma analysis
   return(fitLimma_(mergeset, design))
 }

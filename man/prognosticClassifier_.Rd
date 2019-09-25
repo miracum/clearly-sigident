@@ -4,11 +4,14 @@
 \alias{prognosticClassifier_}
 \title{prognosticClassifier_}
 \usage{
-prognosticClassifier_(PatternCom, validationstudiesinfo, datadir,
+prognosticClassifier_(PatternCom, idtype, validationstudiesinfo, datadir,
   targetcol, targetname, controlname)
 }
 \arguments{
 \item{PatternCom}{A data.frame. The output of the function `generateExpressionPattern_()`.}
+
+\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
 
 \item{validationstudiesinfo}{A list that contains specifications on the study that contains the validation information.}
 

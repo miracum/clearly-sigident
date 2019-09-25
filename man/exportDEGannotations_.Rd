@@ -4,12 +4,15 @@
 \alias{exportDEGannotations_}
 \title{exportDEGannotations_}
 \usage{
-exportDEGannotations_(mergedset, genes)
+exportDEGannotations_(mergedset, genes, idtype)
 }
 \arguments{
 \item{mergedset}{An ExpressionSet. The output of the function `merge_()`.}
 
 \item{genes}{A object. The output of the function `identifyDEGs_()`.}
+
+\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
 }
 \description{
 Helper function to export DEG annotations from mergedset.

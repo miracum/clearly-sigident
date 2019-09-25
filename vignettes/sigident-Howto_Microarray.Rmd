@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r, include = FALSE}
@@ -199,6 +199,7 @@ organism <- "hsa"
 pathwayid <- "hsa04110"
 seed <- 111
 split <- 0.8
+idtype = "affy"
 ```
 
 
@@ -326,7 +327,10 @@ length(batch)
 
 # removing batch effects computing linear models, take variance between the diagnosis into consideration
 
-mergeset <- sigident::batchCorrection_(mergedset = mergedset, batch = batch, design = design)
+mergeset <- sigident::batchCorrection_(mergedset = mergedset,
+                                       batch = batch,
+                                       design = design,
+                                       idtype = idtype)
 
 dim(mergeset)
 ```
@@ -412,7 +416,9 @@ Some investigations may have been finished at this point, receiving the DEGs. Ad
 TODO  combining table deg_info and deg_results
 
 ```{r}
-deg_info <- sigident::exportDEGannotations_(mergedset = mergedset, genes = genes)
+deg_info <- sigident::exportDEGannotations_(mergedset = mergedset,
+                                            genes = genes,
+                                            idtype = idtype)
 data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
@@ -440,7 +446,8 @@ A common investigation regarding differentially expressed genes analysis is the 
 TODO do we need this any more regarding the removal of duplicated entrez-IDs in former step?
 
 ```{r}
-deg_entrez <- unique(genes)
+deg_entrez <- unique(mergedset@featureData@data$ENTREZ_GENE_ID)
+deg_entrez <- deg_entrez[deg_entrez != ""]
 ```
 
 
@@ -485,7 +492,9 @@ The following test for over-representation is based on the same method, but also
 
 ```{r}
 enr_fitlm <- sigident::goDiffReg_(mergeset = mergeset,
-                                  design = design)
+                                  idtype = idtype,
+                                  design = design,
+                                  entrezids = mergedset@featureData@data$ENTREZ_GENE_ID)
 
 enr_fitlm_topgo <- sigident::extractGOterms_(entrez = enr_fitlm,
                                              species = species,
@@ -772,7 +781,6 @@ head(signature_genes)
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
 
-<<<<<<< HEAD
 For the calculation of a prognostic signature it is first required to transform the phenoData containing the relevant survival data. In our example only the study GSE19188 contains survival data. For this the levels of the required columns (`alive`, `deceased`, `na`) need to entitled equal to their entries. Same applies to `targetcolname`, `controllevelname`, `targetlevelname` indicating the groups to be seperated. 
 
 ```{r eval = TRUE}
@@ -783,37 +791,9 @@ discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics
                                                                                   na = "status: Not available")),
                                                       targetcolname = "characteristics_ch1",
                                                       controllevelname = "tissue type: healthy",
-                                                      targetlevelname = "tissue type: tumor",
-                                                      idtype = "affy",
-                                                      idcol = "ID"))
+                                                      targetlevelname = "tissue type: tumor"))
 ```
-=======
-<!-- ```{r eval = FALSE} -->
-<!-- discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2", -->
-<!--                                                       status = list(statuscol = "characteristics_ch1.3", -->
-<!--                                                                     levels = list(alive = "status: alive", -->
-<!--                                                                                   deceased = "status: deceased", -->
-<!--                                                                                   na = "status: Not available")), -->
-<!--                                                       targetcolname = "characteristics_ch1", -->
-<!--                                                       controllevelname = "tissue type: healthy", -->
-<!--                                                       targetlevelname = "tissue type: tumor", -->
-<!--                                                       idtype = "affy", -->
-<!--                                                       idcol = "ID")) -->
-<!-- ``` -->
->>>>>>> e9d370c3eac515eb659fba70c5a956b9053e2aee
 
-```{r eval = TRUE}
-discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
-                                                      status = list(statuscol = "characteristics_ch1.3",
-                                                                    levels = list(alive = "status: alive",
-                                                                                  deceased = "status: deceased",
-                                                                                  na = "status: Not available")),
-                                                      targetcolname = "characteristics_ch1",
-                                                      controllevelname = "tissue type: healthy",
-                                                      targetlevelname = "tissue type: tumor",
-                                                      idtype = "entrez",
-                                                      idcol = "ENTREZ_GENE_ID"))
-```
 
 ## Identification of survival correlated genes 
 
@@ -827,6 +807,7 @@ Next the survival data needs to be extracted and to get into the right format. `
 survivalData <- sigident::getSurvivalTime_(studyMetadata = studyMetadata,
                                            sampleMetadata = sampleMetadata,
                                            genes = genes,
+                                           idtype = idtype,
                                            discoverystudies.w.timedata = discoverystudies.w.timedata,
                                            targetname = targetname,
                                            controlname = controlname,
@@ -897,34 +878,7 @@ head(exprPattern)
 
 #### Create a list that contains specifications of the study that contains the validation information
 
-<!-- ```{r eval = FALSE} -->
-<!-- validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9", -->
-<!--                                                 status = list(statuscol = "characteristics_ch1.8", -->
-<!--                                                               levels = list(alive = "status: ALIVE", -->
-<!--                                                                             deceased = "status: DEAD", -->
-<!--                                                                             na = "status: NTL")), -->
-<!--                                                 targetcolname = "source_name_ch1", -->
-<!--                                                 controllevelname = "Non Tumoral Lung", -->
-<!--                                                 targetlevelname = "Lung Tumour", -->
-<!--                                                 idtype = "affy", -->
-<!--                                                 idcol = "ID"), -->
-
-<!--                               "GSE50081" = list(timecol = "characteristics_ch1.8", -->
-<!--                                                 status = list(statuscol = "characteristics_ch1.9", -->
-<!--                                                               levels = list(alive = "status: alive", -->
-<!--                                                                             deceased = "status: dead", -->
-<!--                                                                             na = NA)), -->
-<!--                                                 targetcolname = "characteristics_ch1.1", -->
-<!--                                                 targetlevelname = NULL,  -->
-<!--                                                 controllevelname = NULL, -->
-<!--                                                 idcol = "ID",  -->
-<!--                                                 idtype = "affy")) -->
-<!-- # if targetlevelname == NULL, the expression set will not be filtered further  -->
-<!-- # but instead, all samples will be used for calculations -->
-<!-- ``` -->
-
 ```{r eval = TRUE}
-# alternative approach, using entrez ids
 validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
                                                 status = list(statuscol = "characteristics_ch1.8",
                                                               levels = list(alive = "status: ALIVE",
@@ -932,27 +886,25 @@ validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9
                                                                             na = "status: NTL")),
                                                 targetcolname = "source_name_ch1",
                                                 controllevelname = "Non Tumoral Lung",
-                                                targetlevelname = "Lung Tumour",
-                                                idtype = "entrez",
-                                                idcol = "ENTREZ_GENE_ID"),
-                              
+                                                targetlevelname = "Lung Tumour"),
+
                               "GSE50081" = list(timecol = "characteristics_ch1.8",
                                                 status = list(statuscol = "characteristics_ch1.9",
                                                               levels = list(alive = "status: alive",
                                                                             deceased = "status: dead",
                                                                             na = NA)),
                                                 targetcolname = "characteristics_ch1.1",
-                                                targetlevelname = NULL, 
-                                                controllevelname = NULL,
-                                                idcol = "ENTREZ_GENE_ID", 
-                                                idtype = "entrez"))
+                                                targetlevelname = NULL,
+                                                controllevelname = NULL))
+# if targetlevelname == NULL, the expression set will not be filtered further
+# but instead, all samples will be used for calculations
 ```
-
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 pC <- sigident::prognosticClassifier_(PatternCom = exprPattern,
                                       validationstudiesinfo = validationstudiesinfo,
                                       datadir = datadir,
+                                      idtype = idtype,
                                       controlname = controlname,
                                       targetname = targetname,
                                       targetcol = targetcol)
