@@ -4,7 +4,6 @@
 #'
 #' @param targetname A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.
 #'
-#' @inheritParams sigidentDiagnostic
 #' @inheritParams sigidentDEG
 #'
 #' @export
@@ -49,7 +48,7 @@ diagnosis_ <- function(vector, controlname, targetname){
 #'
 #' @description Helper function to create batch
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #'
 #' @export
 # create batch
@@ -78,7 +77,7 @@ createBatch_ <- function(sampleMetadata, studyMetadata){
 #'
 #' @param batch Takes the results from \code{createBatch_()} as input.
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #'
 #' @export
 batchDetection_ <- function(mergeset, batch){
@@ -89,8 +88,6 @@ batchDetection_ <- function(mergeset, batch){
 #'
 #' @description Helper function correcting for batch effects and mapping affy probes to Entrez IDs
 #'
-#' @param mergedset An ExpressionSet. The output of the function `merge_()`.
-#'
 #' @details This function takes a Bioconductor's ExpressionSet class (the output of the function `merge()`) and outputs a batch corrected
 #'   matrix containing expression data. In order to correct for occurring batch effects and other unwanted variation in high-throughput
 #'   experiments the `ComBat` function from the sva package is conducted.
@@ -99,7 +96,7 @@ batchDetection_ <- function(mergeset, batch){
 #'
 #' @inheritParams batchDetection_
 #' @inheritParams goDiffReg_
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #'
 #' @references W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.
 #'   Jeffrey T. Leek, W. Evan Johnson, Hilary S. Parker, Elana J. Fertig, Andrew E. Jaffe, John D. Storey, Yuqing Zhang and Leonardo Collado Torres (2019). sva: Surrogate Variable Analysis. R package version 3.30.1.

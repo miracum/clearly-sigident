@@ -36,6 +36,9 @@ sigidentDiagnostic <- function(mergeset,
   # create output directories
   dir.create(rv$plotdir)
 
+  # set diagnosis
+  rv$diagnosis <- diagnosis
+
   # store seed, traintest.split
   rv$seed <- seed
   rv$nfolds <- nfolds

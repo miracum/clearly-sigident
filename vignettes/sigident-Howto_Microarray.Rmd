@@ -32,12 +32,14 @@ install.packages("devtools")
 devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 ```
 
-# Data Preparation 
+# Preprocessing 
+
+## Data Preparation 
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. 
 This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).
 
-## Download of GEO datasets and normalization
+### Download of GEO datasets and normalization
 
 To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The objects `targetcol` should also be entitled "target". To run this package analyzing DEGs and identifying diagnostic and prognostic gene signatures for the seperation of two groups (or subtypes, healthy vs cancer, etc) we here named `controlname` and `targetname` exemplary as "control" and "Lung Cancer". `targetcol` contains the outcome variable of interest for subsequent analysis.
 
@@ -114,7 +116,7 @@ Biobase::annotation(esetC) <- Biobase::annotation(eset3)
 eset3 <- esetC
 ```
 
-## Formatting the phenoData 
+### Formatting the phenoData 
 
 The phenoData of the expresssionSets need to be formatted that the phenoData columns overlap perfectly. This means that all expressionSets should contain identical columns in the same order. Not consistent columns need to get removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
 
@@ -183,7 +185,7 @@ cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)),
 ```
 
 
-# Preparations for utilizing the sigident package 
+## Preparations for utilizing the sigident package 
 
 These variables need to be defined for the package functions to work. One could use them also as arguments directly in the respective function. However, we think it is more clearly to define them here at the beginning and to refer at each function to the respective variable.  
 
@@ -203,7 +205,7 @@ idtype = "affy"
 ```
 
 
-## Extract Metadata 
+### Extract Metadata 
 
 The metadata are exrtracted directly from the expressionSets and are deposited for a easyier applicability in the data frame `sampleMetadata`. This data frame consists of the GEO accession numbers of the study (GPLxxx), the sample accession numbers (GSMxxx) and the `targetcol` containing the outcome of interest. 
 
@@ -240,7 +242,7 @@ sampleMetadata <- rbind(GSE18842_meta,
                         GSE19188_meta)
 ```
 
-### Define study metadata 
+#### Define study metadata 
 
 `sutdyMetadata` contains the GEO series accssion numbers of the studies and the assignment due to its usage as discovery or validation dataset. 
 
@@ -263,10 +265,12 @@ esets=c(eset1b,eset2b,eset3b)
 mergedset <- sigident::merge_(esets)
 ```
 
-### Discovering Batch Effects 
+# Discovering Batch Effects 
 
 Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studes can already be recognized apparently. 
 A more powerfull approach for batch effect detection is conducting a guided Principle Component Analysis (gPCA) implemented in the [gPCA](https://CRAN.R-project.org/package=gPCA) package.
+
+## Visualize batch effect
 
 ```{r}
 # visualize log2 transformed expression values of the merged data set as boxplot
@@ -309,11 +313,11 @@ In order to correct for occurring batch effects and other unwanted variation in 
 table(mergedset@phenoData@data[[targetcol]])
 
 # generate list dd with diagnosis and design
-dd <- sigident::createDiagnosisDesign_(sampleMetadata = sampleMetadata,
-                                       studyMetadata = studyMetadata,
-                                       controlname = controlname,
-                                       targetname = targetname,
-                                       targetcol = targetcol)
+dd <- sigident::createDiagnosisDesignBatch_(sampleMetadata = sampleMetadata,
+                                            studyMetadata = studyMetadata,
+                                            controlname = controlname,
+                                            targetname = targetname,
+                                            targetcol = targetcol)
 diagnosis <- dd$diagnosis
 length(diagnosis)
 table(diagnosis)
@@ -338,14 +342,9 @@ dim(mergeset)
 `mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet any more. During this process the affy probes are mapped to the appropriate Entrez ID and empty and replicated character strings get removed. Therefore, only 21879 Entrez IDs remain.  
 
 
-### Visualize batch effect removal
+## Visualize batch effect removal
 
 Creating a boxplot and a gPCA plot with `mergeset` points out that no batch effect is present no more. 
-
-```{r}
-# boxplot(mergeset, main = "Merged data after batch correction", 
-#         xlab = "Samples", ylab ="Expression value")
-```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "import_boxplot.png")
@@ -462,7 +461,7 @@ For the identification of enriched GO terms and KEGG pathways a over-representat
 * P.DE: p-value for over-representation of the GO term in the set
 
 ```{r}
-enr_topgo <- sigident::extractGOterms_(entrez = deg_entrez,
+enr_topgo <- sigident::extractGOterms_(gene = deg_entrez,
                                        species = species)
 ```
 ```{r}
@@ -472,7 +471,7 @@ knitr::kable(head(enr_topgo))
 
 
 ```{r}
-enr_topkegg <- sigident::extractKEGGterms_(entrez = deg_entrez,
+enr_topkegg <- sigident::extractKEGGterms_(gene = deg_entrez,
                                            species = species)
 data.table::fwrite(enr_topkegg, paste0(csvdir, "Top_KEGG.csv"))
 ```
@@ -497,7 +496,7 @@ enr_fitlm <- sigident::goDiffReg_(mergeset = mergeset,
                                   design = design,
                                   entrezids = mergedset@featureData@data$ENTREZ_GENE_ID)
 
-enr_fitlm_topgo <- sigident::extractGOterms_(entrez = enr_fitlm,
+enr_fitlm_topgo <- sigident::extractGOterms_(gene = enr_fitlm,
                                              species = species,
                                              FDR = 0.01)
 data.table::fwrite(enr_fitlm_topgo, paste0(csvdir, "Top_GO_fitlm.csv"))
@@ -508,7 +507,7 @@ knitr::kable(head(enr_fitlm_topgo))
 ```
 
 ```{r}
-enr_fitlm_topkegg <- sigident::extractKEGGterms_(entrez = enr_fitlm,
+enr_fitlm_topkegg <- sigident::extractKEGGterms_(gene = enr_fitlm,
                                                  species = species)
 data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 ```
@@ -522,7 +521,7 @@ knitr::kable(head(enr_fitlm_topkegg))
 TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-enr_analysis <- sigident::goEnrichmentAnalysis_(entrez = deg_entrez,
+enr_analysis <- sigident::goEnrichmentAnalysis_(gene = deg_entrez,
                                                 OrgDB = OrgDb,
                                                 organism = organism,
                                                 fitlm = enr_fitlm,
@@ -987,37 +986,124 @@ knitr::include_graphics(filename)
 
 # An alternative workflow: two generic functions for signature identification 
 
-In order to simplify the whole abovedescribed workflow, we wrapped all these functions into one big function.
+In order to simplify the whole abovedescribed workflow, we wrapped all these functions into a few big functions.
 
 ## Preprocessing: 
 
 The preprocessing needs to be conform with the above described approach.
 
-## Run `sigidentDiagnostic`-Function 
+### Define Variables
 
+```{r}
+# initialize filePath:
+filePath <- tempdir()
+maindir <- "./geodata/"
+datadir <- paste0(maindir, "data/")
+dir.create(maindir)
+dir.create(datadir)
 
-```{r eval = FALSE}
-results <- sigident::sigidentDiagnostic(mergeset = mergeset,
-                                        controlname = "Control",
-                                        targetname = "Lung Cancer",
-                                        studyMetadata = studyMetadata,
-                                        sampleMetadata = sampleMetadata,
-                                        species = "Hs",
-                                        OrgDB = "org.Hs.eg.db",
-                                        organism = "hsa",
-                                        pathwayid = "hsa04110",
-                                        FDR = 0.01,
-                                        seed = 111,
-                                        nfolds = 10,
-                                        split = 0.8,
-                                        plotdir = "./plots/",
-                                        csvdir = "./tables/",
-                                        targetcol = "target")
+# initialize more infos on the study
+targetcol <- "target" # should be named "target"
+controlname <- "Control"
+targetname <- "Lung Cancer"
+
+# define more variables
+plotdir <- "./plots/"
+dir.create(plotdir)
+csvdir <- "./csv/"
+dir.create(csvdir)
+
+# pathway
+species <- "Hs"
+OrgDb <- "org.Hs.eg.db"
+organism <- "hsa"
+pathwayid <- "hsa04110"
+
+# diagnostig signature
+seed <- 111
+split <- 0.8
+nfolds <- 10
+
+# other variables
+idtype = "affy"
+FDR <- 0.05
 ```
 
+
+## Create Diagnosis, Design and Batch
+
 ```{r eval = FALSE}
-diagnosticModels <- results$diagnosticModels
-sigUtils <- results$utils
+dd <- sigident::createDiagnosisDesignBatch_(sampleMetadata = sampleMetadata,
+                                            studyMetadata = studyMetadata,
+                                            controlname = controlname,
+                                            targetname = targetname,
+                                            targetcol = targetcol)
+diagnosis <- dd$diagnosis
+design <- dd$design
+batch <- dd$batch
+```
+
+## Create `mergeset`
+
+```{r eval = FALSE}
+mergeset <- sigident::batchCorrection_(mergedset = mergedset,
+                                       batch = batch,
+                                       design = design,
+                                       idtype = idtype)
+```
+
+
+
+## Run `sigidentDEG`-function
+
+```{r eval = FALSE}
+genes <- sigidentDEG(mergeset = mergeset,
+                     mergedset = mergedset,
+                     studyMetadata = studyMetadata,
+                     sampleMetadata = sampleMetadata,
+                     targetcol = targetcol,
+                     controlname = controlname,
+                     design = design,
+                     idtype = idtype,
+                     FDR = FDR,
+                     plotdir = plotdir,
+                     csvdir = csvdir)
+```
+
+## Run `sigidentEnrichment`-function
+
+```{r eval = FALSE}
+sigidentEnrichment(mergeset = mergeset,
+                   mergedset = mergedset,
+                   idtype = idtype,
+                   design = design,
+                   species = species,
+                   OrgDB = OrgDb,
+                   organism = organism,
+                   pathwayid = pathwayid,
+                   plotdir = plotdir,
+                   csvdir = csvdir)
+```
+```{r eval = FALSE}
+filename <- paste0(plotdir, "/", organism, "04110.png")
+knitr::include_graphics(filename)
+```
+```{r eval = FALSE}
+filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
+knitr::include_graphics(filename)
+```
+
+
+## Run `sigidentDiagnostic`-function 
+
+
+```{r eval = FALSE}
+diagnosticModels <- sigidentDiagnostic(mergeset = mergeset,
+                                        diagnosis = diagnosis,
+                                        seed = seed,
+                                        nfolds = nfolds,
+                                        split = split,
+                                        plotdir = plotdir)
 ```
 
 ```{r eval = FALSE}
@@ -1028,13 +1114,52 @@ knitr::kable(
 
 ## Run `sigidentPrognostic`-Function 
 
+### First, define Meta information lists
+
+```{r eval = FALSE}
+discoverystudies.w.timedata <- list("GSE19188" = list(timecol = "characteristics_ch1.2",
+                                                      status = list(statuscol = "characteristics_ch1.3",
+                                                                    levels = list(alive = "status: alive",
+                                                                                  deceased = "status: deceased",
+                                                                                  na = "status: Not available")),
+                                                      targetcolname = "characteristics_ch1",
+                                                      controllevelname = "tissue type: healthy",
+                                                      targetlevelname = "tissue type: tumor"))
+```
+
+```{r eval = FALSE}
+validationstudiesinfo <- list("GSE30219" = list(timecol = "characteristics_ch1.9",
+                                                status = list(statuscol = "characteristics_ch1.8",
+                                                              levels = list(alive = "status: ALIVE",
+                                                                            deceased = "status: DEAD",
+                                                                            na = "status: NTL")),
+                                                targetcolname = "source_name_ch1",
+                                                controllevelname = "Non Tumoral Lung",
+                                                targetlevelname = "Lung Tumour"),
+
+                              "GSE50081" = list(timecol = "characteristics_ch1.8",
+                                                status = list(statuscol = "characteristics_ch1.9",
+                                                              levels = list(alive = "status: alive",
+                                                                            deceased = "status: dead",
+                                                                            na = NA)),
+                                                targetcolname = "characteristics_ch1.1",
+                                                targetlevelname = NULL,
+                                                controllevelname = NULL))
+# if targetlevelname == NULL, the expression set will not be filtered further
+# but instead, all samples will be used for calculations
+```
+
+### Then run the analysis 
+
 ```{r eval = FALSE}
 progn_results <- sigident::sigidentPrognostic(mergeset = mergeset,
                                               studyMetadata = studyMetadata,
                                               sampleMetadata = sampleMetadata,
                                               discoverystudies.w.timedata = discoverystudies.w.timedata,
-                                              classifier_studies = classifier_studies,
+                                              classifier_studies = c("GSE18842", "GSE19804"),
                                               validationstudiesinfo = validationstudiesinfo,
+                                              idtype = idtype,
+                                              genes = genes,
                                               controlname = "Control",
                                               targetname = "Lung Cancer",
                                               datadir = datadir,

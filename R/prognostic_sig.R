@@ -212,11 +212,11 @@ generateExpressionPattern_ <- function(classifier_studies,
     length(setdiff(classifier_studies, studyMetadata$study)) == 0
   )
 
-  dd <- sigident::createDiagnosisDesign_(sampleMetadata = sampleMetadata[sampleMetadata$study %in% classifier_studies,],
-                                         studyMetadata = studyMetadata[studyMetadata$study %in% classifier_studies,],
-                                         controlname = controlname,
-                                         targetname = targetname,
-                                         targetcol = targetcol)
+  dd <- createDiagnosisDesignBatch_(sampleMetadata = sampleMetadata[sampleMetadata$study %in% classifier_studies,],
+                                    studyMetadata = studyMetadata[studyMetadata$study %in% classifier_studies,],
+                                    controlname = controlname,
+                                    targetname = targetname,
+                                    targetcol = targetcol)
   diagnosis <- dd$diagnosis
   design <- dd$design
 
@@ -293,9 +293,10 @@ expressionPattern_ <- function(mergeset, ids, tumor, control){
 #' @param validationstudiesinfo A list that contains specifications on the study that contains the validation information.
 #' @param PatternCom A data.frame. The output of the function `generateExpressionPattern_()`.
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #' @inheritParams getSurvivalTime_
 #' @inheritParams batchCorrection_
+#' @inheritParams createDiagnosisDesignBatch_
 #'
 #' @export
 prognosticClassifier_ <- function(PatternCom, idtype, validationstudiesinfo, datadir, targetcol, targetname, controlname){

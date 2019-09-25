@@ -20,13 +20,19 @@ identifyDEGs_ <- function(mergeset, design, qValue=0.01){
     is.numeric(qValue)
   )
   fit <- fitLimma_(mergeset, design)
-  t <- limma::topTable(fit, coef=2,number=Inf,p.value=qValue, lfc=2, adjust.method = "BH")
+  t <- limma::topTable(fit,
+                       coef=2,
+                       number=Inf,
+                       p.value=qValue,
+                       lfc=2,
+                       adjust.method = "BH")
   genes <- rownames(t)
   return(genes)
 }
 
 fitLimma_ <- function(mergeset, design){
-  return(limma::eBayes(limma::lmFit(mergeset, design)))
+  fit <- limma::eBayes(limma::lmFit(mergeset, design))
+  return(fit)
 }
 
 
@@ -34,7 +40,7 @@ fitLimma_ <- function(mergeset, design){
 #'
 #' @description Helper function to get DEG results
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #' @inheritParams identifyDEGs_
 #'
 #' @export
@@ -58,7 +64,7 @@ limmaTopTable_ <- function(mergeset, design, qValue){
 #' #'
 #' #' @description Helper function to select qValues
 #' #'
-#' #' @inheritParams sigidentDiagnostic
+#' #' @inheritParams sigidentDEG
 #' #'
 #' #' @export
 #' qSelection_ <- function(sampleMetadata, studyMetadata, deg.q.selection = NULL){

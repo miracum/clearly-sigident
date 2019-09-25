@@ -2,16 +2,17 @@
 #'
 #' @description Helper function to extract GO terms
 #'
-#' @param entrez A character vector containing the Entrez-IDs.
+#' @param gene A character vector containing the Entrez-IDs.
 #' @param FDR The false discovery rate passed to `limma::goana`.
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentEnrichment
 #'
 #' @export
-extractGOterms_ <- function(entrez, species, FDR = NULL){
-  return(limma::topGO(
-    limma::goana(de = entrez, species = species, FDR = FDR)
-  ))
+extractGOterms_ <- function(gene, species, FDR = NULL){
+  fit <- limma::topGO(
+    limma::goana(de = gene, species = species, FDR = FDR)
+  )
+  return(fit)
 }
 
 
@@ -22,10 +23,11 @@ extractGOterms_ <- function(entrez, species, FDR = NULL){
 #' @inheritParams extractGOterms_
 #'
 #' @export
-extractKEGGterms_ <- function(entrez, species){
-  return(limma::topKEGG(
-    limma::kegga(de = entrez, species = species)
-  ))
+extractKEGGterms_ <- function(gene, species){
+  fit <- limma::topKEGG(
+    limma::kegga(de = gene, species = species)
+  )
+  return(fit)
 }
 
 
@@ -49,7 +51,8 @@ goDiffReg_ <- function(mergeset, design, idtype, entrezids = NULL){
     rownames(mergeset) <- entrezids
   }
   # run limma analysis
-  return(fitLimma_(mergeset, design))
+  fit <- fitLimma_(mergeset, design)
+  return(fit)
 }
 
 
@@ -59,11 +62,11 @@ goDiffReg_ <- function(mergeset, design, idtype, entrezids = NULL){
 #'
 #' @param fitlm An object, returned by `goDiffReg_()`.
 #'
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentEnrichment
 #' @inheritParams extractGOterms_
 #'
 #' @export
-goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, species, plotdir = NULL){
+goEnrichmentAnalysis_ <- function(gene, OrgDB, organism, fitlm, pathwayid, species, plotdir = NULL){
 
   if (is.null(plotdir)){
     plotdir <- "./plots/"
@@ -75,7 +78,7 @@ goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, spe
   }
 
   # TODO is this always like this?
-  ego <- clusterProfiler::enrichGO(gene = entrez,
+  ego <- clusterProfiler::enrichGO(gene = gene,
                                    OrgDb = OrgDB,
                                    keyType = "ENTREZID",
                                    pAdjustMethod = "BH",
@@ -83,19 +86,20 @@ goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, spe
                                    qvalueCutoff = 0.05,
                                    readable = TRUE)
 
-  kk <- clusterProfiler::enrichKEGG(gene = entrez,
+  kk <- clusterProfiler::enrichKEGG(gene = gene,
                                     organism = organism,
                                     keyType = "kegg",
                                     pAdjustMethod = "BH",
                                     pvalueCutoff = 0.01)
 
   # create matrix with Entrez-IDs and logFC from limma
-  tt <- limma::topTable(fitlm,
-                        coef=2,
-                        number=Inf,
-                        p.value=0.05,
-                        lfc=2)
-  geneFC <- as.data.frame(cbind(ID = rownames(tt), logFC = as.numeric(tt[,"logFC"])))
+  tt <- limma::topTable(fit = fitlm,
+                        coef = 2,
+                        number = Inf,
+                        p.value = 0.05,
+                        lfc = 2)
+  #geneFC <- as.data.frame(cbind(ID = rownames(tt), logFC = as.numeric(tt[,"logFC"])))
+  geneFC <- tt[,1:2]
   geneFC <- geneFC[order(geneFC$ID),]
   # removing empty Entrez-IDs
   geneFC <- geneFC[which(geneFC$ID != ""),]
@@ -112,7 +116,7 @@ goEnrichmentAnalysis_ <- function(entrez, OrgDB, organism, fitlm, pathwayid, spe
   setwd(paste0(oldwd, "/", plotdir))
   p.out1 <- pathview::pathview(gene.data = geneFC,
                                pathway.id = pathwayid,
-                               species = species)
+                               species = organism)
   setwd(oldwd)
 
   return(list(go = ego, kegg = kk, geneFC = geneFC, pathview = p.out1))

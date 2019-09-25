@@ -6,6 +6,11 @@
 \usage{
 createBatch_(sampleMetadata, studyMetadata)
 }
+\arguments{
+\item{sampleMetadata}{A data frame. The data frame holding the sample metadata.}
+
+\item{studyMetadata}{A data frame. The data frame holding the study metadata.}
+}
 \description{
 Helper function to create batch
 }

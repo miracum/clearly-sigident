@@ -3,7 +3,7 @@
 #' @description One function to perform prognostic signature analysis.
 #'
 #' @inheritParams getSurvivalTime_
-#' @inheritParams sigidentDiagnostic
+#' @inheritParams sigidentDEG
 #' @inheritParams generateExpressionPattern_
 #' @inheritParams prognosticClassifier_
 #'
@@ -16,6 +16,7 @@ sigidentPrognostic <- function(mergeset,
                                studyMetadata,
                                sampleMetadata,
                                idtype,
+                               genes,
                                discoverystudies.w.timedata,
                                classifier_studies,
                                validationstudiesinfo,
@@ -52,6 +53,10 @@ sigidentPrognostic <- function(mergeset,
   rv$targetname <- targetname
   rv$targetcol <- targetcol
 
+  # store other variables
+  rv$idtype <- idtype
+  rv$genes <- genes
+
   # store dirs
   rv$plotdir <- cleanPathName_(plotdir)
   rv$csvdir <- cleanPathName_(csvdir)
@@ -76,6 +81,8 @@ sigidentPrognostic <- function(mergeset,
   rv$survivalData <- getSurvivalTime_(studyMetadata = studyMetadata,
                                       sampleMetadata = sampleMetadata,
                                       discoverystudies.w.timedata = discoverystudies.w.timedata,
+                                      idtype = rv$idtype,
+                                      genes = rv$genes,
                                       targetname = rv$targetname,
                                       controlname = rv$controlname,
                                       targetcol = rv$targetcol,
@@ -107,6 +114,7 @@ sigidentPrognostic <- function(mergeset,
     # apply prognostic classifier
     rv$pC[[i]] <- prognosticClassifier_(PatternCom = rv$exprPattern[[i]],
                                         validationstudiesinfo = validationstudiesinfo,
+                                        idtype = rv$idtype,
                                         datadir = rv$datadir,
                                         controlname = rv$controlname,
                                         targetname = rv$targetname,

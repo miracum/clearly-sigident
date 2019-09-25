@@ -96,5 +96,5 @@ sigidentDEG <- function(mergeset,
   data.table::fwrite(rv$deg_results, paste0(rv$csvdir, "DEG_results.csv"))
 
   # return genes
-  return(genes)
+  return(rv$genes)
 }

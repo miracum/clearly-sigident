@@ -4,10 +4,12 @@
 \alias{extractKEGGterms_}
 \title{extractKEGGterms_}
 \usage{
-extractKEGGterms_(entrez, species)
+extractKEGGterms_(gene, species)
 }
 \arguments{
-\item{entrez}{A character vector containing the Entrez-IDs.}
+\item{gene}{A character vector containing the Entrez-IDs.}
+
+\item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
 }
 \description{
 Helper function to extract KEGG terms

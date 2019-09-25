@@ -7,17 +7,16 @@
 #' @export
 createTrainingTest_ <- function(diagnosis, mergeset, split = 0.8, seed = 111){
 
-  data.for.calculation <- data.table::data.table(cbind(diagnosis, t(mergeset)))
-  colnames(data.for.calculation)[1] <- "diagnosis"
+  data.for.calculation <- as.data.frame(cbind(diagnosis, t(mergeset)))
 
   # randomly split the data into training set (80% for building a predictive model) and test set (20% for evaluating the model)
   set.seed(seed)
-  training.samples <- caret::createDataPartition(y = data.for.calculation[,get("diagnosis")], p = split, list = FALSE)
+  training.samples <- caret::createDataPartition(y = data.for.calculation$diagnosis, p = split, list = FALSE)
 
   train.x  <- as.matrix(data.for.calculation[training.samples, -1])
   test.x <- as.matrix(data.for.calculation[-training.samples, -1])
 
-  y <- data.for.calculation[,factor(get("diagnosis"))]
+  y <- factor(data.for.calculation$diagnosis)
   train.y <- y[training.samples]
   test.y <- y[-training.samples]
 

@@ -10,6 +10,9 @@ getSurvivalTime_(studyMetadata, sampleMetadata, genes, idtype,
 \arguments{
 \item{genes}{A object. The output of the function `identifyDEGs_()`.}
 
+\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
+
 \item{discoverystudies.w.timedata}{A list that contains specifications on the study/studies that contain(s) survival time information.}
 
 \item{datadir}{A character string. Path to the data-folder inside the metadata folder.}

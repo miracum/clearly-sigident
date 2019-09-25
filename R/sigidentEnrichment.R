@@ -64,12 +64,12 @@ sigidentEnrichment <- function(mergedset,
   rv$deg_entrez <- rv$deg_entrez[rv$deg_entrez != ""]
 
   # test for over-representation of gene ontology terms
-  rv$enr_topgo <- extractGOterms_(entrez = rv$deg_entrez,
+  rv$enr_topgo <- extractGOterms_(gene = rv$deg_entrez,
                                   species = rv$species)
   data.table::fwrite(rv$enr_topgo, paste0(rv$csvdir, "Top_GO.csv"))
 
   # test for over-representation of KEGG pathways
-  rv$enr_topkegg <- extractKEGGterms_(entrez = rv$deg_entrez,
+  rv$enr_topkegg <- extractKEGGterms_(gene = rv$deg_entrez,
                                       species = rv$species)
   data.table::fwrite(rv$enr_topkegg, paste0(rv$csvdir, "Top_KEGG.csv"))
 
@@ -80,24 +80,23 @@ sigidentEnrichment <- function(mergedset,
                              entrezids = rv$mergedset@featureData@data$ENTREZ_GENE_ID)
 
   # test for over-representation of gene ontology terms
-  rv$enr_fitlm_topgo <- extractGOterms_(entrez = rv$enr_fitlm,
+  rv$enr_fitlm_topgo <- extractGOterms_(gene = rv$enr_fitlm,
                                         species = rv$species,
                                         FDR = 0.01)
   data.table::fwrite(rv$enr_fitlm_topgo, paste0(rv$csvdir, "Top_GO_fitlm.csv"))
 
 
   # test for over-representation of KEGG pathways
-  rv$enr_fitlm_topkegg <- extractKEGGterms_(entrez = rv$enr_fitlm,
+  rv$enr_fitlm_topkegg <- extractKEGGterms_(gene = rv$enr_fitlm,
                                             species = rv$species)
   data.table::fwrite(rv$enr_fitlm_topkegg, paste0(rv$csvdir, "Top_KEGG_fitlm.csv"))
 
   # perform enrichment analysis
-  rv$enr_analysis <- goEnrichmentAnalysis_(entrez = rv$deg_entrez,
+  rv$enr_analysis <- goEnrichmentAnalysis_(gene = rv$deg_entrez,
                                            OrgDB = rv$orgdb,
                                            organism = rv$organism,
                                            fitlm = rv$enr_fitlm,
                                            pathwayid = rv$pathwayid,
-                                           species = rv$organism,
                                            plotdir = rv$plotdir)
 
   # plotting enrichmentanalysis

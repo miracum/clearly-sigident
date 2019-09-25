@@ -4,10 +4,12 @@
 \alias{extractGOterms_}
 \title{extractGOterms_}
 \usage{
-extractGOterms_(entrez, species, FDR = NULL)
+extractGOterms_(gene, species, FDR = NULL)
 }
 \arguments{
-\item{entrez}{A character vector containing the Entrez-IDs.}
+\item{gene}{A character vector containing the Entrez-IDs.}
+
+\item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
 
 \item{FDR}{The false discovery rate passed to `limma::goana`.}
 }
