@@ -214,13 +214,9 @@ generateExpressionPattern_ <- function(classifier_studies,
     length(setdiff(classifier_studies, studyMetadata$study)) == 0
   )
 
-  dd <- createDiagnosisDesignBatch_(sampleMetadata = sampleMetadata[sampleMetadata$study %in% classifier_studies,],
-                                    studyMetadata = studyMetadata[studyMetadata$study %in% classifier_studies,],
-                                    controlname = controlname,
-                                    targetname = targetname,
-                                    targetcol = targetcol)
-  diagnosis <- dd$diagnosis
-  design <- dd$design
+  diagnosis <- diagnosis_(vector = eset[[targetcol]],
+                          targetname = targetname,
+                          controlname = controlname)
 
   # get sample names (= colnames of mergeset)
   classifier_colnames <- sampleMetadata[sampleMetadata$study %in% classifier_studies, get("sample")]
@@ -354,7 +350,7 @@ prognosticClassifier_ <- function(PatternCom, idtype, validationstudiesinfo, dat
     RiskTable <- cbind(RiskTable, Groups)
     rownames(RiskTable) = colnames(expr)
 
-    kap <- fitKaplanEstimator_(RiskTable = RiskTable)
+    kap <- fitKaplanEstimator_(risktable = RiskTable)
 
     # prepare classification and required data for Kaplan-Meier estimator
     outlist[[st]] <- list(kaplan.estimator = kap,
@@ -364,11 +360,11 @@ prognosticClassifier_ <- function(PatternCom, idtype, validationstudiesinfo, dat
   return(outlist)
 }
 
-fitKaplanEstimator_ <- function(RiskTable){
+fitKaplanEstimator_ <- function(risktable){
 
   # fit proportional hazards regression model
-  res.cox <- survival::coxph(survival::Surv(time, status) ~ Groups, data = RiskTable)
-  new_df <- with(RiskTable,
+  res.cox <- survival::coxph(survival::Surv(time, status) ~ Groups, data = risktable)
+  new_df <- with(risktable,
                  data.frame(Groups = c(0, 1),
                             survival_time = rep(mean(time, na.rm = TRUE), 2),
                             ph.ecog = c(1, 1)
