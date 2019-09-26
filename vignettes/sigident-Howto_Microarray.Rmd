@@ -343,6 +343,14 @@ mergeset <- sigident::batchCorrection_(mergedset = mergedset,
 dim(mergeset)
 ```
 
+```{r results='hide'}
+# remove unneeded objects
+rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
+# also no further purpose, but takes a lot of memory and may slow down your computer
+rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804", "fData3")#, "esetC")
+gc()
+```
+
 `mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet any more. During this process the affy probes are mapped to the appropriate Entrez ID and empty and replicated character strings get removed. Therefore, only 21879 Entrez IDs remain.  
 
 
@@ -372,16 +380,6 @@ sigident::createBatchPlot_(correction_obj = gPCA_after,
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
-
-
-```{r results='hide'}
-# remove unneeded objects
-rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
-# also no further purpose, but takes a lot of memory and may slow down your computer
-rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804", "fData3", "esetC")
-gc()
-```
-
 
 # DEG Analysis 
 
@@ -818,8 +816,7 @@ survivalData <- sigident::getSurvivalTime_(studyMetadata = studyMetadata,
                                            controlname = controlname,
                                            targetcol = targetcol,
                                            datadir = datadir)
-survTable <- survivalData[["GSE19188"]]$survtable
-ids <- survivalData[["GSE19188"]]$ids
+survTable <- survivalData[["GSE19188"]]
 ```
 
 ```{r}
@@ -833,7 +830,7 @@ Subsequently, univariate Cox regression is conducted to identify survival correl
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 surv_correlated <- sigident::univCox_(survtable = survTable,
-                                      ids = ids)
+                                      genes = genes)
 # export table with survival correlated genes
 data.table::fwrite(surv_correlated, paste0(csvdir, "survival_correlated_genes.csv"))
 ```

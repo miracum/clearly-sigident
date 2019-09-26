@@ -95,8 +95,7 @@ getSurvivalTime_ <- function(studyMetadata,
 
     rownames(survTable) = colnames(expr)
 
-    outlist[[st]] <- list(survtable = survTable,
-                          ids = ids)
+    outlist[[st]] <- survTable
 
   }
   return(outlist)
@@ -125,10 +124,11 @@ loadEset_ <- function(name, datadir, targetcolname, targetcol, targetname, contr
 #' @description Helper function to compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions
 #'
 #' @param survtable A data.frame. Output of the function `getSurvivalTime_()`.
-#' @param ids A character string. Output of the function `getSurvivalTime_()`.
+#'
+#' @inheritParams createDEGheatmap_
 #'
 #' @export
-univCox_ <- function(survtable, ids){
+univCox_ <- function(survtable, genes){
 
   covariates <- colnames(survtable)[-c(1:2)]
   covariates <- gsub("[[:punct:]]","",covariates)
@@ -169,7 +169,7 @@ univCox_ <- function(survtable, ids){
   result$p.value <- as.character(result$p.value) # reforamtting of p.value-column
   result$p.value <- as.numeric(result$p.value) #
   indices <- which(result$p.value <= 0.05) # selecting indices with a significant p-value
-  IDs <- ids[indices] # IDs now contains Entrez-IDs of all genes with significant p-values
+  IDs <- genes[indices] # IDs now contains Entrez-IDs of all genes with significant p-values
 
   # TODO symbols?
 
