@@ -110,12 +110,12 @@ getSurvivalTime_ <- function(studyMetadata,
       gc()
 
       pData <- Biobase::pData(eset)
-      fData3 <- Biobase::fData(eset)
-      Biobase::pData(esetC) <- pData3
-      Biobase::fData(esetC) <- fData3
+      fData <- Biobase::fData(eset)
+      Biobase::pData(esetC) <- pData
+      Biobase::fData(esetC) <- fData
       colnames(Biobase::exprs(esetC)) <- colnames(Biobase::exprs(eset))
       Biobase::annotation(esetC) <- Biobase::annotation(eset)
-      eset3 <- esetC
+      eset <- esetC
     }
 
     # filter only data of tumor samples
