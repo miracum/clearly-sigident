@@ -51,6 +51,19 @@ getSurvivalTime_ <- function(studyMetadata,
   outlist <- list()
 
   for (st in names(discoverystudies.w.timedata)){
+
+    stopifnot(
+      is.character(discoverystudies.w.timedata[[st]]$timecol),
+      is.list(discoverystudies.w.timedata[[st]]$status),
+      is.character(discoverystudies.w.timedata[[st]]$status$statuscol),
+      is.list(discoverystudies.w.timedata[[st]]$status$levels),
+      is.character(discoverystudies.w.timedata[[st]]$status$alive),
+      is.character(discoverystudies.w.timedata[[st]]$status$deceased),
+      is.character(discoverystudies.w.timedata[[st]]$targetcolname),
+      is.logical(discoverystudies.w.timedata[[st]]$use_rawdata),
+      is.list(discoverystudies.w.timedata[[st]]$status)
+    )
+
     samples <- sampleMetadata[sampleMetadata$study==st,]
     tumorsamples <- samples[eval(parse(text=paste0("samples$",targetcol)))==targetname,]
 
