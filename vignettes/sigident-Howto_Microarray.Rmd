@@ -760,31 +760,31 @@ Additionally, the confusion matrix and the calculated perfomance metrices can be
 ### Lasso (min)
 
 ```{r}
-diagnosticModels$lasso.min$confmat
+diagnosticModels$lasso$min$confmat
 ```
 
 ### Lasso (1se)
 
 ```{r}
-diagnosticModels$lasso.1se$confmat
+diagnosticModels$lasso[["1se"]]$confmat
 ```
 
 ### Elastic (min)
 
 ```{r}
-diagnosticModels$elastic.min$confmat
+diagnosticModels$elasticnet$min$confmat
 ```
 
 ### Elastic (1se)
 
 ```{r}
-diagnosticModels$elastic.1se$confmat
+diagnosticModels$elasticnet[["1se"]]$confmat
 ```
 
 ### Elastic net (grid search)
 
 ```{r}
-diagnosticModels$elastic.grid$confmat
+diagnosticModels$grid$confmat
 ```
 
 
