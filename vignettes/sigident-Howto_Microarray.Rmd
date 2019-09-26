@@ -186,7 +186,7 @@ cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)),
       colnames(Biobase::pData(eset3b)))
 ```
 
-```{r out.width='80%'}
+```{r out.width='100%'}
 boxplot(Biobase::exprs(eset1b))
 boxplot(Biobase::exprs(eset2b))
 boxplot(Biobase::exprs(eset3b))
@@ -1131,7 +1131,7 @@ knitr::kable(
 )
 ```
 
-```{r}
+```{r eval = FALSE}
 knitr::kable(
   sigident::getDiagnosticLambdaValues(diagnosticModels)
 )
