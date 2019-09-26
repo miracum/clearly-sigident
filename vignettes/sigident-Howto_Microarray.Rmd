@@ -1005,9 +1005,9 @@ sigident::createSurvPlot_(fit = fit,
 knitr::include_graphics(filename)
 ```
 
-# An alternative workflow: two generic functions for signature identification 
+# An alternative workflow: four generic functions for signature identification 
 
-In order to simplify the whole abovedescribed workflow, we wrapped all these functions into a few big functions.
+In order to simplify the whole abovedescribed workflow, we wrapped all these functions into four big functions.
 
 ## Preprocessing: 
 
