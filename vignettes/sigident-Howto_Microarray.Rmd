@@ -352,7 +352,7 @@ dim(mergeset)
 # remove unneeded objects
 rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
 # also no further purpose, but takes a lot of memory and may slow down your computer
-rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804", "fData3")#, "esetC")
+rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804", "fData3", "esetC")
 gc()
 ```
 
