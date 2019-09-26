@@ -64,6 +64,48 @@ getSurvivalTime_ <- function(studyMetadata,
                       targetname = targetname,
                       controlname = controlname)
 
+    if (isTRUE(discoverystudies.w.timedata[[st]]$use_rawdata)){
+
+      rawdir <- paste0(datadir, "rawdata/")
+      dir.create(rawdir)
+      exdir <- paste0(rawdir, "celfiles/")
+      dir.create(exdir)
+
+      GEOquery::getGEOSuppFiles(st, baseDir = rawdir)
+
+      tar_file <- list.files(paste0(rawdir, st), pattern = ".tar$")
+
+      stopifnot(
+        length(tar_file) == 1
+      )
+
+      utils::untar(paste0(rawdir, st, "/", tar_file), exdir=exdir)
+
+      cels <- list.files(exdir, pattern = "[gz]")
+
+      tryCatch({
+        sapply(paste(exdir, cels, sep="/"), GEOquery::gunzip)
+        cmd <- paste0("bash -c 'ls ", exdir, "/*.CEL > ", exdir, "/phenodata.txt'")
+        system(cmd)
+      }, error = function(e){
+        print(e)
+      })
+
+      cels <- list.files(exdir, pattern = "CEL$")
+
+      celfiles <- paste0(exdir, cels)
+      esetC <- gcrma::justGCRMA(filenames = celfiles, fast = TRUE)
+      gc()
+
+      pData <- Biobase::pData(eset)
+      fData3 <- Biobase::fData(eset)
+      Biobase::pData(esetC) <- pData3
+      Biobase::fData(esetC) <- fData3
+      colnames(Biobase::exprs(esetC)) <- colnames(Biobase::exprs(eset))
+      Biobase::annotation(esetC) <- Biobase::annotation(eset)
+      eset3 <- esetC
+    }
+
     # filter only data of tumor samples
     if (!is.null(discoverystudies.w.timedata[[st]]$targetlevelname)){
       esetTargets <- eset[,which(eset$geo_accession %in% tumorsamples$sample)]

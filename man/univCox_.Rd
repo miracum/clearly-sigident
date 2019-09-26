@@ -4,12 +4,12 @@
 \alias{univCox_}
 \title{univCox_}
 \usage{
-univCox_(survtable, ids)
+univCox_(survtable, genes)
 }
 \arguments{
 \item{survtable}{A data.frame. Output of the function `getSurvivalTime_()`.}
 
-\item{ids}{A character string. Output of the function `getSurvivalTime_()`.}
+\item{genes}{A object. The output of the function `identifyDEGs_()`.}
 }
 \description{
 Helper function to compute univariate cox regression and determine significance of each gene through separate univariate Cox regressions

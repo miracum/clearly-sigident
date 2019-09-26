@@ -794,7 +794,8 @@ discoverystudies.w.timedata <- list(
                                                 na = "status: Not available")),
                     targetcolname = "characteristics_ch1",
                     controllevelname = "tissue type: healthy",
-                    targetlevelname = "tissue type: tumor"))
+                    targetlevelname = "tissue type: tumor",
+                    use_rawdata = TRUE))
 ```
 
 
@@ -1120,7 +1121,8 @@ discoverystudies.w.timedata <- list(
                                                 na = "status: Not available")),
                     targetcolname = "characteristics_ch1",
                     controllevelname = "tissue type: healthy",
-                    targetlevelname = "tissue type: tumor"))
+                    targetlevelname = "tissue type: tumor",
+                    use_rawdata = TRUE))
 
 validationstudiesinfo <- list(
   "GSE30219" = list(timecol = "characteristics_ch1.9",
