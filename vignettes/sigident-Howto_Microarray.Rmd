@@ -186,6 +186,11 @@ cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)),
       colnames(Biobase::pData(eset3b)))
 ```
 
+```{r out.width='80%'}
+boxplot(Biobase::exprs(eset1b))
+boxplot(Biobase::exprs(eset2b))
+boxplot(Biobase::exprs(eset3b))
+```
 
 ## Preparations for utilizing the sigident package 
 
@@ -700,26 +705,37 @@ knitr::include_graphics(filename)
 
 ## Comparing Model Performance  
 
-These builded models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`.
+These builded models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`. 
+This list includes all information of the respective models, which can be accessed by the following structure.
 
 ```{r}
 diagnosticModels <- list(
-  lasso.min = list(model = diagnostic_lasso$lambda.min,
-                   confmat = diagnostic_lasso$confmat.min,
-                   auc = as.numeric(diagnostic_lasso$roc.min$auc)),
-  lasso.1se = list(model = diagnostic_lasso$lambda.1se,
-                   confmat = diagnostic_lasso$confmat.1se,
-                   auc = as.numeric(diagnostic_lasso$roc.1se$auc)),
-  elastic.min = list(model = diagnostic_elasticnet$lambda.min,
-                     confmat = diagnostic_elasticnet$confmat.min,
-                     auc = as.numeric(diagnostic_elasticnet$roc.min$auc)),
-  elastic.1se = list(model = diagnostic_elasticnet$lambda.1se,
-                     confmat = diagnostic_elasticnet$confmat.1se,
-                     auc = as.numeric(diagnostic_elasticnet$roc.1se$auc)),
-  elastic.grid = list(model = diagnostic_glmGrid$elasticNet.auto,
-                      confmat = diagnostic_glmGrid$confmat.elasticNet,
-                      auc = as.numeric(diagnostic_glmGrid$roc.elasticNet$auc))
-  )
+  "lasso" = list("CV" = diagnostic_lasso$fitCV,
+                 "min" = list("model" = diagnostic_lasso$lambda.min,
+                              "confmat" = diagnostic_lasso$confmat.min,
+                              "prediction" = diagnostic_lasso$predicted.min,
+                              "auc" = as.numeric(diagnostic_lasso$roc.min$auc)),
+                 "1se" = list("model" = diagnostic_lasso$lambda.1se,
+                              "confmat" = diagnostic_lasso$confmat.1se,
+                              "prediction" = diagnostic_lasso$predicted.1se,
+                              "auc" = as.numeric(diagnostic_lasso$roc.1se$auc))
+  ),
+  "elasticnet" = list("CV" = diagnostic_elasticnet$fitCV,
+                      "min" = list("model" = diagnostic_elasticnet$lambda.min,
+                                   "confmat" = diagnostic_elasticnet$confmat.min,
+                                   "prediction" = diagnostic_elasticnet$predicted.min,
+                                   "auc" = as.numeric(diagnostic_elasticnet$roc.min$auc)),
+                      "1se" = list("model" = diagnostic_elasticnet$lambda.1se,
+                                   "confmat" = diagnostic_elasticnet$confmat.1se,
+                                   "prediction" = diagnostic_elasticnet$predicted.1se,
+                                   "auc" = as.numeric(diagnostic_elasticnet$roc.1se$auc))
+  ),
+  "grid" = list("CV" = diagnostic_glmGrid$caret.train,
+                "model" = diagnostic_glmGrid$elasticNet.auto,
+                "confmat" = diagnostic_glmGrid$confmat.elasticNet,
+                "prediction" = diagnostic_elasticnet$predicted.elasticNet,
+                "auc" = as.numeric(diagnostic_glmGrid$roc.elasticNet$auc))
+)
 ```
 
 ```{r}
@@ -728,7 +744,16 @@ knitr::kable(
 )
 ```
 
-## Model performance measurement
+## Extract lambda values 
+
+```{r}
+knitr::kable(
+  sigident::getDiagnosticLambdaValues(diagnosticModels)
+)
+```
+
+
+## Model performance measurements
 
 Additionally, the confusion matrix and the calculated perfomance metrices can be printed out for the different models, respectively. 
 
@@ -1089,9 +1114,7 @@ filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
 knitr::include_graphics(filename)
 ```
 
-
 ## Run `sigidentDiagnostic`-function 
-
 
 ```{r eval = FALSE}
 diagnosticModels <- sigident::sigidentDiagnostic(mergeset = mergeset,
@@ -1105,6 +1128,12 @@ diagnosticModels <- sigident::sigidentDiagnostic(mergeset = mergeset,
 ```{r eval = FALSE}
 knitr::kable(
   sigident::compareDiagnosticModels(diagnosticModels)
+)
+```
+
+```{r}
+knitr::kable(
+  sigident::getDiagnosticLambdaValues(diagnosticModels)
 )
 ```
 

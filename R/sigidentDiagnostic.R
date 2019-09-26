@@ -99,21 +99,31 @@ sigidentDiagnostic <- function(mergeset,
 
   # compare aucs
   diagnosticModels <- list(
-    lasso.min = list(model = rv$diagnostic_lasso$lambda.min,
-                     confmat = rv$diagnostic_lasso$confmat.min,
-                     auc = as.numeric(rv$diagnostic_lasso$roc.min$auc)),
-    lasso.1se = list(model = rv$diagnostic_lasso$lambda.1se,
-                     confmat = rv$diagnostic_lasso$confmat.1se,
-                     auc = as.numeric(rv$diagnostic_lasso$roc.1se$auc)),
-    elastic.min = list(model = rv$diagnostic_elasticnet$lambda.min,
-                       confmat = rv$diagnostic_elasticnet$confmat.min,
-                       auc = as.numeric(rv$diagnostic_elasticnet$roc.min$auc)),
-    elastic.1se = list(model = rv$diagnostic_elasticnet$lambda.1se,
-                       confmat = rv$diagnostic_elasticnet$confmat.1se,
-                       auc = as.numeric(rv$diagnostic_elasticnet$roc.1se$auc)),
-    elastic.grid = list(model = rv$diagnostic_glmGrid$elasticNet.auto,
-                        confmat = rv$diagnostic_glmGrid$confmat.elasticNet,
-                        auc = as.numeric(rv$diagnostic_glmGrid$roc.elasticNet$auc))
+    "lasso" = list("CV" = rv$diagnostic_lasso$fitCV,
+                   "min" = list("model" = rv$diagnostic_lasso$lambda.min,
+                                "confmat" = rv$diagnostic_lasso$confmat.min,
+                                "prediction" = rv$diagnostic_lasso$predicted.min,
+                                "auc" = as.numeric(rv$diagnostic_lasso$roc.min$auc)),
+                   "1se" = list("model" = rv$diagnostic_lasso$lambda.1se,
+                                "confmat" = rv$diagnostic_lasso$confmat.1se,
+                                "prediction" = rv$diagnostic_lasso$predicted.1se,
+                                "auc" = as.numeric(rv$diagnostic_lasso$roc.1se$auc))
+    ),
+    "elasticnet" = list("CV" = rv$diagnostic_elasticnet$fitCV,
+                        "min" = list("model" = rv$diagnostic_elasticnet$lambda.min,
+                                     "confmat" = rv$diagnostic_elasticnet$confmat.min,
+                                     "prediction" = rv$diagnostic_elasticnet$predicted.min,
+                                     "auc" = as.numeric(rv$diagnostic_elasticnet$roc.min$auc)),
+                        "1se" = list("model" = rv$diagnostic_elasticnet$lambda.1se,
+                                     "confmat" = rv$diagnostic_elasticnet$confmat.1se,
+                                     "prediction" = rv$diagnostic_elasticnet$predicted.1se,
+                                     "auc" = as.numeric(rv$diagnostic_elasticnet$roc.1se$auc))
+    ),
+    "grid" = list("CV" = rv$diagnostic_glmGrid$caret.train,
+                  "model" = rv$diagnostic_glmGrid$elasticNet.auto,
+                  "confmat" = rv$diagnostic_glmGrid$confmat.elasticNet,
+                  "prediction" = rv$diagnostic_elasticnet$predicted.elasticNet,
+                  "auc" = as.numeric(rv$diagnostic_glmGrid$roc.elasticNet$auc))
   )
   return(diagnosticModels = diagnosticModels)
 }

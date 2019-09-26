@@ -158,7 +158,7 @@ signature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
                                test.y = traininglist$test$y,
                                s = outlist$fitCV$lambda.min)
 
-    outlist$predicted.min <- pred.min$prediction
+    outlist$predicted.min <- pred.min$predicted
     outlist$confmat.min <- pred.min$confmat
     outlist$roc.min <- pred.min$roc
 
@@ -169,7 +169,7 @@ signature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
                                test.y = traininglist$test$y,
                                s = outlist$fitCV$lambda.1se)
 
-    outlist$predicted.1se <- pred.1se$prediction
+    outlist$predicted.1se <- pred.1se$predicted
     outlist$confmat.1se <- pred.1se$confmat
     outlist$roc.1se <- pred.1se$roc
   }
