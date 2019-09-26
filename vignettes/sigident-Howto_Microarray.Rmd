@@ -1181,25 +1181,31 @@ validationstudiesinfo <- list(
 progn_results <- sigident::sigidentPrognostic(mergeset = mergeset,
                                               studyMetadata = studyMetadata,
                                               sampleMetadata = sampleMetadata,
+                                              idtype = idtype,
+                                              genes = genes,
                                               discoverystudies.w.timedata = discoverystudies.w.timedata,
                                               classifier_studies = c("GSE18842", "GSE19804"),
                                               validationstudiesinfo = validationstudiesinfo,
-                                              idtype = idtype,
-                                              genes = genes,
-                                              controlname = "Control",
-                                              targetname = "Lung Cancer",
+                                              targetname = targetname,
+                                              controlname = controlname,
                                               datadir = datadir,
-                                              plotdir = "./plots/",
-                                              csvdir = "./tables/",
-                                              targetcol = "target")
+                                              plotdir = plotdir,
+                                              csvdir = csvdir,
+                                              targetcol = targetcol)
 ```
 
 ```{r eval = FALSE}
 # create roc plot
-filename <- paste0(plotdir, "Prognostic_Kaplan-Meier_Plot.png")
-sigident::createSurvPlot_(fit = progn_results$GSE19188$GSE30219$fit,
-                          RiskTable = progn_results$GSE19188$GSE30219$risktable,
-                          filename = filename)
+filename <- paste0(plotdir, "GSE30219_Prognostic_Kaplan-Meier_Plot.png")
+```
+
+```{r eval = FALSE}
+knitr::include_graphics(filename)
+```
+
+```{r eval = FALSE}
+# create roc plot
+filename <- paste0(plotdir, "GSE50081_Prognostic_Kaplan-Meier_Plot.png")
 ```
 
 ```{r eval = FALSE}
