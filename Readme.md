@@ -4,8 +4,9 @@ This is the repository of the R package 'sigident'. It provides core functionali
 
 Currently implemented features are:
 
+- merging of microarray datasets
 - DEG analysis
-- Gene enrichment
+- functional analysis (gene enrichment)
 - Identification of diagnostic signatures, using
   + Lasso regression
   + Elastic net regression
@@ -24,5 +25,5 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 ## Example
 
-Please view the package vignette to see a detailled description how to perform signature analyses of DNA microarray data.
+Please view the package's vignette to see a detailled description how to perform merging, signature and functional analyses of microarray data.
 

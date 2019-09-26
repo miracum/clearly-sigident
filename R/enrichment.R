@@ -61,7 +61,9 @@ goDiffReg_ <- function(mergeset, design, idtype, entrezids = NULL){
 #'
 #' @description Helper function to perform enrichment analysis
 #'
-#' @param fitlm An object, returned by `goDiffReg_()`.
+#' @param OrgDB OrgDB
+#' @param fitlm An MArrayLM object, returned by `goDiffReg_()`.
+#' @param pathwayid KEGG pathway ID (like hsa04110 for cell cycle)
 #'
 #' @inheritParams sigidentEnrichment
 #' @inheritParams extractGOterms_

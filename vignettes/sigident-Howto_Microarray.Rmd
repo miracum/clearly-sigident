@@ -22,7 +22,7 @@ library(sigident)
 library(knitr)
 ```
 
-# Prerequisites and Installation 
+# Prerequisites and installation 
 
 ## Install sigident package
 
@@ -34,7 +34,7 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 # Preprocessing 
 
-## Data Preparation 
+## Data preparation 
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. 
 This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).
@@ -57,7 +57,7 @@ controlname <- "Control"
 targetname <- "Lung Cancer"
 ```
 
-Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expressin data, pheno and feature data as well as the annotation of the probe sets and store it as .txt.gz files in the "data" folder. 
+Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expressin data, pheno and feature data as well as the annotation of the probe sets and store it as .txt.gz files in the defined `datadir` folder. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
@@ -68,7 +68,9 @@ eset1 <- GSE18842[[1]]
 eset2 <- GSE19804[[1]]
 ```
 
-Morover, the approach enables to download raw data as CEL files, uncompress it and conduct GCRMA normalization. For this, further commands are necessary to subsequently import the CEL files into the R environment. Accordingly `esetC` represents a normalized epressionSet though only containing expression data without pheno and feature data. These data can be added later. (Don't be confused by our example. We could have downloaded the study GSE19188 directly by applying `getGEO()` instead of downlaoding the raw data and adding pheno and feature data afterwards. We just wanted to demonstrating you how to use raw data in form of CEL files)
+Morover, the approach enables to download raw data in form of CEL files, uncompress them and conduct GCRMA normalization.  
+
+For this, further commands are necessary to subsequently import the CEL files into the R environment. Accordingly `esetC` represents a normalized epressionSet though only containing expression data without pheno and feature data. These data can be added later. (Don't be confused by our example. We could have downloaded the study GSE19188 directly by applying `getGEO()` instead of downlaoding the raw data and adding pheno and feature data afterwards. We just wanted to demonstrating you how to use raw data in form of CEL files)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # download raw data, uncompress them and execute GCRMA normalization
@@ -212,7 +214,7 @@ idtype = "affy"
 ```
 
 
-### Extract Metadata 
+### Extract metadata 
 
 The metadata are exrtracted directly from the expressionSets and are deposited for a easyier applicability in the data frame `sampleMetadata`. This data frame consists of the GEO accession numbers of the study (GPLxxx), the sample accession numbers (GSMxxx) and the `targetcol` containing the outcome of interest. 
 
@@ -263,7 +265,7 @@ studyMetadata <- data.frame(
 )
 ```
 
-## Merging and Batch Correction
+## Merging and batch correction
 
 In this framework for merging, only genes that are present in all datasets are preserved. In our example the entire probe set of 54675 transcripts remains. `mergedset` contains the samples of the studies grouped as discovery and represents an "ExpressionSet" object describing samples, annotations and informations about the features.
 
@@ -272,7 +274,7 @@ esets=c(eset1b,eset2b,eset3b)
 mergedset <- sigident::merge_(esets)
 ```
 
-# Discovering Batch Effects 
+# Discovering batch effects 
 
 Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studes can already be recognized apparently. 
 A more powerfull approach for batch effect detection is conducting a guided Principle Component Analysis (gPCA) implemented in the [gPCA](https://CRAN.R-project.org/package=gPCA) package.
@@ -280,7 +282,7 @@ A more powerfull approach for batch effect detection is conducting a guided Prin
 ## Visualize batch effect
 
 ```{r}
-# visualize log2 transformed expression values of the merged data set as boxplot
+# visualize log2 transformed expression values of the merged dataset as boxplot
 filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
 jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
 boxplot(mergedset@assayData$exprs, main = "Merged data before batch correction", 
@@ -386,7 +388,7 @@ sigident::createBatchPlot_(correction_obj = gPCA_after,
 knitr::include_graphics(filename)
 ```
 
-# DEG Analysis 
+# DEG analysis 
 
 A common task proceeding expression data is to perform statistical analysis to discover quantitative changes in expression levels between experimental groups. For this reason we here offer the identification of differentially expressed genes (DEGs) based on the limma package. In order to multiple testing correction we considered the p-value adjustment by conducting the "BH" method, which controls the expected false discovery rate (FDR).  
 A heatmap based on the selected DEGs is created and clear differences regarding the expression profiles between the groups (Control and Lung Cancer) can be recognized. 
@@ -417,9 +419,7 @@ sigident::createDEGheatmap_(mergeset = mergeset,
 knitr::include_graphics(filename)
 ```
 
-Some investigations may have been finished at this point, receiving the DEGs. Additionally, we provide a table containing annotations like gene symbols and the results from the limma analysis including log2 fold changes and the adjusted p-values. 
-
-TODO  combining table deg_info and deg_results
+Some investigations may have been finished at this point yielding the DEGs. We provide two tables containing annotations like gene symbols (DEG_info.csv) and the results from the limma analysis including log2 fold changes and the adjusted p-values (DEG_results.csv). 
 
 ```{r}
 deg_info <- sigident::exportDEGannotations_(mergedset = mergedset,
@@ -445,9 +445,11 @@ dim(deg_results)
 knitr::kable(head(deg_results))
 ```
 
-# Gene enrichment 
+# Functional analysis
 
-A common investigation regarding differentially expressed genes analysis is the functional annotation of the DEGs. Furthermore, it is useful to find out if the DEGs are associated with  biological processes or molecular functions. 
+## Gene enrichment
+
+A common investigation regarding differentially expressed genes analysis is the functional annotation of the DEGs. Furthermore, it is useful to find out if the DEGs are associated with biological processes or molecular functions. The functional analysis supports GO annotation from OrgDb object. 
 
 TODO do we need this any more regarding the removal of duplicated entrez-IDs in former step?
 
@@ -459,7 +461,7 @@ deg_entrez <- deg_entrez[deg_entrez != ""]
 
 ## Test for over-representation 
 
-For the identification of enriched GO terms and KEGG pathways a over-representation analysis is performed based on linear models. As input it needs the Entrez-IDs and the definition of the species. `extractGOterms_` and `extractKEGGterms` outputs a table conatining the most significant top GO and KEGG terms. In either case, rows are sorted by the minimum p-value with   
+For the identification of enriched GO terms and KEGG pathways a over-representation analysis is performed based on linear models. As input the Entrez-IDs and the definition of the species are needed. `extractGOterms_` and `extractKEGGterms` outputs a table containing the most significant top GO and KEGG terms. In either case, rows are sorted by the minimum p-value with   
 * Term: GO term  
 * (Pathway: KEGG pathway)
 * Ont: ontology that GO term belongs to  
@@ -523,11 +525,12 @@ dim(enr_fitlm_topkegg)
 knitr::kable(head(enr_fitlm_topkegg))
 ```
 
-## GO Analysis
+## GO enrichment analysis
 
-TODO Description here.
+GO enrichment analysis of a given set of genes `deg_entrez` with the defined organism based on the fitted linear models of the object `enr_fitlm` as output of the `goDiffReg_` function. `goEnrichmentAnalysis` provides the presentation of the desired KEGG pathway ID (in this case `hsa04110` - cell cycle) including under(red) and over expressed (green) genes inside the pathway as png images in the folder plots. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+pathwayid <- "hsa04010" 
 enr_analysis <- sigident::goEnrichmentAnalysis_(gene = deg_entrez,
                                                 OrgDB = OrgDb,
                                                 organism = organism,
@@ -537,19 +540,19 @@ enr_analysis <- sigident::goEnrichmentAnalysis_(gene = deg_entrez,
                                                 plotdir = plotdir)
 ```
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "/", organism, "04110.png")
+filename <- paste0(plotdir, "/", organism, paste0(pathwayid, ".png"))
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
+filename <- paste0(plotdir, "/", organism, paste0(pathwayid, "pathway.png"))
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
-TODO Description here.
+A bar plot is created depicting the enrichment scores (adj. p-value) as bar color and gene count as bar height. The parameter `type` controls whether to depict enriched GO terms or enriched KEGG terms. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_GO.png")
@@ -561,7 +564,6 @@ sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$go,
 knitr::include_graphics(filename)
 ```
 
-TODO Description here.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_KEGG.png")
@@ -580,7 +582,7 @@ A common task regarding gene expression data is to distuingishing between differ
 
 ## Split data into training and test dataset
 
-A statistical prediction model is usually trained on 70%-80% percent of the present data. `createTrainingTest` randomly splits the merged data set into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). 
+A statistical prediction model is usually trained on 70%-80% percent of the present data. `createTrainingTest` randomly splits the merged dataset into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). 
 
 ```{r}
 training_list <- sigident::createTrainingTest_(diagnosis = diagnosis,
@@ -701,9 +703,9 @@ sigident::createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet,
 knitr::include_graphics(filename)
 ```
 
-# Analysis of Diagnostic Models 
+# Analysis of diagnostic models 
 
-## Comparing Model Performance  
+## Comparing model performance  
 
 These builded models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`. 
 This list includes all information of the respective models, which can be accessed by the following structure.
@@ -804,7 +806,7 @@ head(signature_genes)
 ```
 
 
-# Identification of Prognostic Signature
+# Identification of prognostic signature
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
 
@@ -828,7 +830,7 @@ discoverystudies.w.timedata <- list(
 
 ### Extract survival data 
 
-Next the survival data needs to be extracted and to get into the right format. `getSurvivalTime` takes over this task resulting an a table `survivalData` containg samples (in our example of the class tumor) as rows, survival time and if a event (death) happened as columns. Additionally, the expression values for the selected DEGs are added as columns to the table. 
+Next the survival data needs to be extracted and to get into the right format. `getSurvivalTime` takes over this task resulting an a table `survivalData` containg samples (in our example of the class tumor) as rows, survival time and if an event (death) happened as columns. Additionally, the expression values for the selected DEGs are added as columns to the table. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 
@@ -894,7 +896,7 @@ dim(exprPattern)
 head(exprPattern)
 ```
 
-### Apply the prognostic classifier on validation data set
+### Apply the prognostic classifier on validation dataset
 
 #### Create a list that contains specifications of the study that contains the validation information
 
@@ -1007,7 +1009,7 @@ knitr::include_graphics(filename)
 
 # An alternative workflow: four generic functions for signature identification 
 
-In order to simplify the whole abovedescribed workflow, we wrapped all these functions into four big functions.
+In order to simplify the whole above described workflow, we wrapped all these functions into four big functions.
 
 ## Preprocessing: 
 
@@ -1139,7 +1141,7 @@ knitr::kable(
 
 ## Run `sigidentPrognostic`-Function 
 
-### First, define Meta information lists
+### First, define meta information lists
 
 ```{r eval = FALSE}
 discoverystudies.w.timedata <- list(
