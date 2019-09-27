@@ -1,21 +1,3 @@
-#' @title geneMapSig_
-#'
-#' @description Helper function to map relevant input variables of a diagnostic model to corresponding IDs.
-#'
-#' @inheritParams createGridModelPlot_
-#' @inheritParams sigidentDEG
-#'
-#' @export
-geneMapSig_ <- function(mergeset, model){
-  id <- rownames(mergeset)
-  # TODO warum i+1?
-  index <- model[["beta"]]@i+1
-  # TODO map entrez_id on gene symbol here and include as second columen to ouput
-  return(as.data.frame(x = cbind("ID" = id[index])))
-}
-
-
-
 #' @title getSurvivalTime_
 #'
 #' @description Helper function to get survival time.

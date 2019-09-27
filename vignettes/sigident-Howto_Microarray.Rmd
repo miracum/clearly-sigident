@@ -36,12 +36,13 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 ## Data preparation 
 
-In order to use this R package and its functions, you need to prepare a merged gene expression dataset. 
-This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).
+In order to use this R package and its functions, you need to prepare a merged gene expression dataset manually. The workflow to achieve this is presented in the following. 
 
 ### Download of GEO datasets and normalization
 
-To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The objects `targetcol` should also be entitled "target". To run this package analyzing DEGs and identifying diagnostic and prognostic gene signatures for the seperation of two groups (or subtypes, healthy vs cancer, etc) we here named `controlname` and `targetname` exemplary as "control" and "Lung Cancer". `targetcol` contains the outcome variable of interest for subsequent analysis.
+This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).  
+
+To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The object `targetcol` should also be entitled "target" (correspondingly to the column name of the object `sampleMetadata` below). `targetcol` contains the outcome variable of interest for subsequent analysis. The levels of `targetcol` are to be defined with `controlname` and `targetname`. To use this package in order to analyze DEGs and to identify diagnostic and prognostic gene signatures for the seperation of two groups (or subtypes, healthy vs cancer, etc) we here named `controlname` and `targetname` exemplary as "Control" and "Lung Cancer". 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # initialize filePath:
@@ -57,20 +58,20 @@ controlname <- "Control"
 targetname <- "Lung Cancer"
 ```
 
-Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expressin data, pheno and feature data as well as the annotation of the probe sets and store it as .txt.gz files in the defined `datadir` folder. 
+Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expression data, pheno data and feature data as well as the annotations of the probe sets and store it as '.txt.gz' files in the defined `datadir` folder. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
 GSE19804 <- GEOquery::getGEO("GSE19804", destdir = datadir)
 
-# extracting expressionSets
+# extracting ExpressionSets
 eset1 <- GSE18842[[1]]
 eset2 <- GSE19804[[1]]
 ```
 
-Morover, the approach enables to download raw data in form of CEL files, uncompress them and conduct GCRMA normalization.  
+Moreover, the approach enables to download also the raw data in CEL file format. These files need to be uncompressed. Subsequently a GCRMA normalization has to be conducted.  
 
-For this, further commands are necessary to subsequently import the CEL files into the R environment. Accordingly `esetC` represents a normalized epressionSet though only containing expression data without pheno and feature data. These data can be added later. (Don't be confused by our example. We could have downloaded the study GSE19188 directly by applying `getGEO()` instead of downlaoding the raw data and adding pheno and feature data afterwards. We just wanted to demonstrating you how to use raw data in form of CEL files)
+For this, further commands are necessary to subsequently import the CEL files into the R environment. `esetC` represents a normalized ExpressionSet though only containing expression data without pheno data or feature data. These data can be added later. (The study GSE19188 could also be downloaded directly by applying `getGEO()` instead of using the raw data and manually adding pheno data and feature data afterwards. We just wanted to demonstrate how to use raw data in form of CEL files and apply normalization to it.)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # download raw data, uncompress them and execute GCRMA normalization
@@ -105,7 +106,7 @@ gc()
 #celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")
 #esetC <- gcrma::gcrma(celfiles, fast = TRUE)
 
-# esetC = now is a normalized expressionSet, but without f- and pData
+# esetC = now is a normalized ExpressionSet, but without f- and pData
 # the f- and pData are transfered manually from dataset GSE19188
 
 GSE19188 <- GEOquery::getGEO("GSE19188", destdir = datadir)
@@ -122,10 +123,10 @@ eset3 <- esetC
 
 ### Formatting the phenoData 
 
-The phenoData of the expresssionSets need to be formatted that the phenoData columns overlap perfectly. This means that all expressionSets should contain identical columns in the same order. Not consistent columns need to get removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
+The phenoData of the expresssionSets need to be formatted so that the phenoData columns overlap perfectly. This means that all ExpressionSets should contain identical columns in the same order. Not consistent columns need to be removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
 
 ```{r}
-# create version b, that original expressionSets persist
+# create version b, that original ExpressionSets persist
 eset1b <- eset1
 eset2b <- eset2
 eset3b <- eset3
@@ -188,37 +189,74 @@ cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)),
       colnames(Biobase::pData(eset3b)))
 ```
 
-```{r out.width='100%'}
-boxplot(Biobase::exprs(eset1b))
-boxplot(Biobase::exprs(eset2b))
-boxplot(Biobase::exprs(eset3b))
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# visualize log2 transformed expression values of the merged dataset as boxplot
+filename <- paste0(plotdir, "boxplot_GSE18842.jpeg")
+jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
+boxplot(Biobase::exprs(eset1b), main = "GSE18842 before batch correction", 
+        xlab = "Samples", ylab ="Expression value")
+dev.off()
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# visualize log2 transformed expression values of the merged dataset as boxplot
+filename <- paste0(plotdir, "boxplot_GSE19804.jpeg")
+jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
+boxplot(Biobase::exprs(eset2b), main = "GSE19804 before batch correction", 
+        xlab = "Samples", ylab ="Expression value")
+dev.off()
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# visualize log2 transformed expression values of the merged dataset as boxplot
+filename <- paste0(plotdir, "boxplot_GSE19188.jpeg")
+jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
+boxplot(Biobase::exprs(eset3b), main = "GSE19188 before batch correction", 
+        xlab = "Samples", ylab ="Expression value")
+dev.off()
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
 ```
 
 ## Preparations for utilizing the sigident package 
 
-These variables need to be defined for the package functions to work. One could use them also as arguments directly in the respective function. However, we think it is more clearly to define them here at the beginning and to refer at each function to the respective variable.  
-
+Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clear we define them here at the beginning and refer at each function to the respective variable. `idtype` can be either "affy" or "entrez", indicating, if either Affy-IDs or Entrez-IDs are to be used as feature names for the subsequent analyses.  
+Selecting "entrez" usually results in a reduction of total features due to the removing of empty strings and duplicate IDs.  
+We here use `idtype` = "affy" for all subsequent analyses.  
 
 ```{r}
+# general
 plotdir <- "./plots/"
 dir.create(plotdir)
 csvdir <- "./csv/"
 dir.create(csvdir)
+idtype = "affy"
+
+# enrichment analysis
 species <- "Hs"
 OrgDb <- "org.Hs.eg.db"
 organism <- "hsa"
-pathwayid <- "hsa04110"
+#pathwayid <- "hsa04110" # Cell Cycle
+pathwayid <- "hsa04151" # PI3K-Akt
+
+# diagnostic signature
 seed <- 111
 split <- 0.8
-idtype = "affy"
+nfolds <- 10
 ```
-
 
 ### Extract metadata 
 
-The metadata are exrtracted directly from the expressionSets and are deposited for a easyier applicability in the data frame `sampleMetadata`. This data frame consists of the GEO accession numbers of the study (GPLxxx), the sample accession numbers (GSMxxx) and the `targetcol` containing the outcome of interest. 
+The metadata are extracted directly from the ExpressionSets and are deposited for a easier applicability in the data frame `sampleMetadata`. This data frame consists of the GEO accession numbers of the study (GPLxxx), the sample accession numbers (GSMxxx) and the `targetcol` (named "target") containing the outcome of interest (currently, only a binary coded target variable is supported for the subsequent analyses, e.g. "Cancer - No Cancer"). 
 
-### Extract sample metadata 
+#### Extract sample metadata 
 
 ```{r}
 # workaround
@@ -253,13 +291,13 @@ sampleMetadata <- rbind(GSE18842_meta,
 
 #### Define study metadata 
 
-`sutdyMetadata` contains the GEO series accssion numbers of the studies and the assignment due to its usage as discovery or validation dataset. 
+`sutdyMetadata` contains the GEO series accssion numbers of the studies and the assignment due to its usage as discovery dataset or validation dataset. 
 
 ```{r}
 studyMetadata <- data.frame(
-  cbind(study = c("GSE18842", "GSE19804", "GSE19188", "GSE30219"),
-        discovery = as.logical(c(1, 1, 1, 0)),
-        validation = as.logical(c(0, 0, 0, 1))
+  cbind(study = c("GSE18842", "GSE19804", "GSE19188", "GSE30219", "GSE50081"),
+        discovery = as.logical(c(1, 1, 1, 0, 0)),
+        validation = as.logical(c(0, 0, 0, 1, 1))
   ),
   stringsAsFactors = FALSE
 )
@@ -267,7 +305,7 @@ studyMetadata <- data.frame(
 
 ## Merging and batch correction
 
-In this framework for merging, only genes that are present in all datasets are preserved. In our example the entire probe set of 54675 transcripts remains. `mergedset` contains the samples of the studies grouped as discovery and represents an "ExpressionSet" object describing samples, annotations and informations about the features.
+In this framework for merging, only genes that are present in all datasets are preserved. In our example the entire probe set of 54675 transcripts remains. `mergedset` contains the samples of the studies grouped as discovery and represents an "ExpressionSet" object describing samples, annotations and further information about the features.  
 
 ```{r}
 esets=c(eset1b,eset2b,eset3b)
@@ -276,12 +314,11 @@ mergedset <- sigident::merge_(esets)
 
 # Discovering batch effects 
 
-Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studes can already be recognized apparently. 
-A more powerfull approach for batch effect detection is conducting a guided Principle Component Analysis (gPCA) implemented in the [gPCA](https://CRAN.R-project.org/package=gPCA) package.
+Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studes can already be recognized apparently.  
 
 ## Visualize batch effect
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # visualize log2 transformed expression values of the merged dataset as boxplot
 filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
 jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
@@ -294,6 +331,7 @@ dev.off()
 knitr::include_graphics(filename)
 ```
 
+A more powerfull approach for batch effect detection is conducting a guided Principle Component Analysis (gPCA) implemented in the [gPCA](https://CRAN.R-project.org/package=gPCA) package.  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # conducting gPCA for batch effect detection
@@ -315,8 +353,7 @@ sigident::createBatchPlot_(correction_obj = gPCA_before,
 knitr::include_graphics(filename)
 ```
 
-
-In order to correct for occurring batch effects and other unwanted variation in high-throughput experiments the `ComBat` function from the [sva](10.1093/bioinformatics/bts034) package is conducted. The `ComBat` function adjusts for known batches using an empirical Bayesian framework[1].  
+In order to correct for occurring batch effects and other unwanted variation in high-throughput experiments, the `ComBat` function from the [sva](10.1093/bioinformatics/bts034) package is applied inside the function `batchCorrection_()`. The `ComBat` function adjusts for known batches using an empirical Bayesian framework [1].  
 
 ```{r message=FALSE, warning=FALSE, error=FALSE}
 table(mergedset@phenoData@data[[targetcol]])
@@ -358,8 +395,7 @@ rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842",
 gc()
 ```
 
-`mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet any more. During this process the affy probes are mapped to the appropriate Entrez ID and empty and replicated character strings get removed. Therefore, only 21879 Entrez IDs remain.  
-
+`mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet any more. 
 
 ## Visualize batch effect removal
 
@@ -373,7 +409,6 @@ sigident::createImportBoxplot_(mergeset, filename)
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
-
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 gPCA_after <- sigident::batchDetection_(mergeset = mergeset,
@@ -390,9 +425,8 @@ knitr::include_graphics(filename)
 
 # DEG analysis 
 
-A common task proceeding expression data is to perform statistical analysis to discover quantitative changes in expression levels between experimental groups. For this reason we here offer the identification of differentially expressed genes (DEGs) based on the limma package. In order to multiple testing correction we considered the p-value adjustment by conducting the "BH" method, which controls the expected false discovery rate (FDR).  
-A heatmap based on the selected DEGs is created and clear differences regarding the expression profiles between the groups (Control and Lung Cancer) can be recognized. 
-
+A common task preceeding expression data analysis is to perform statistical analysis to discover quantitative changes in expression levels between experimental groups. For this reason we here offer the identification of differentially expressed genes (DEGs) based on the [limma](https://bioconductor.org/packages/release/bioc/html/limma.html) package. In order correct for multiple testing we considered the p-value adjustment by conducting the "BH" method, which controls the expected false discovery rate (FDR).  
+A heatmap based on the selected DEGs is created and clear differences regarding the expression profiles between the groups ("Controls" [blue] and "Lung Cancer" [red]) can be recognized. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # define the false discovery rate here
@@ -451,33 +485,30 @@ knitr::kable(head(deg_results))
 
 A common investigation regarding differentially expressed genes analysis is the functional annotation of the DEGs. Furthermore, it is useful to find out if the DEGs are associated with biological processes or molecular functions. The functional analysis supports GO annotation from OrgDb object. 
 
-TODO do we need this any more regarding the removal of duplicated entrez-IDs in former step?
-
 ```{r}
 deg_entrez <- unique(mergedset@featureData@data$ENTREZ_GENE_ID)
 deg_entrez <- deg_entrez[deg_entrez != ""]
 ```
 
-
 ## Test for over-representation 
 
-For the identification of enriched GO terms and KEGG pathways a over-representation analysis is performed based on linear models. As input the Entrez-IDs and the definition of the species are needed. `extractGOterms_` and `extractKEGGterms` outputs a table containing the most significant top GO and KEGG terms. In either case, rows are sorted by the minimum p-value with   
-* Term: GO term  
-* (Pathway: KEGG pathway)
-* Ont: ontology that GO term belongs to  
-* N: number of genes in the GO term  
-* DE: number of genes in the input Entrez Gene IDs (deg_entrez)  
-* P.DE: p-value for over-representation of the GO term in the set
+For the identification of enriched GO terms and KEGG pathways an over-representation analysis is performed based on linear models. As input the Entrez-IDs and the definition of the species are needed. `extractGOterms_` and `extractKEGGterms_` output tables containing the most significant top GO terms and KEGG terms respectively. In either case, rows are sorted by the minimum p-value with   
+- Term: GO term   
+- (Pathway: KEGG pathway)  
+- Ont: ontology that GO term belongs to    
+- N: number of genes in the GO term    
+- DE: number of genes in the input Entrez Gene IDs (deg_entrez)    
+- P.DE: p-value for over-representation of the GO term in the set   
 
 ```{r}
 enr_topgo <- sigident::extractGOterms_(gene = deg_entrez,
                                        species = species)
+data.table::fwrite(enr_topgo, paste0(csvdir, "Top_GO.csv"))
 ```
 ```{r}
 dim(enr_topgo)
 knitr::kable(head(enr_topgo))
 ```
-
 
 ```{r}
 enr_topkegg <- sigident::extractKEGGterms_(gene = deg_entrez,
@@ -489,15 +520,14 @@ dim(enr_topkegg)
 knitr::kable(head(enr_topkegg))
 ```
 
-
-The following test for over-representation is based on the same method, but also taking into account for over and under expression in enriched terms with
-* Term: GO term  
-* Ont: ontology that GO term belongs to  
-* N: number of genes in the GO term  
-* Up: number of up-regulated DEGs  
-* Down: number of down-regulated DEGs
-* P.Up: p-value for over-representation of GO term in up-regulated genes  
-* P.Down: p-value for over-representation of GO term in down-regulated genes
+The following test for over-representation is based on the same method, but also taking into account for over expression and under expression in enriched terms with  
+- Term: GO term  
+- Ont: ontology that GO term belongs to  
+- N: number of genes in the GO term  
+- Up: number of up-regulated DEGs  
+- Down: number of down-regulated DEGs  
+- P.Up: p-value for over-representation of GO term in up-regulated genes  
+- P.Down: p-value for over-representation of GO term in down-regulated genes  
 
 ```{r}
 enr_fitlm <- sigident::goDiffReg_(mergeset = mergeset,
@@ -527,10 +557,10 @@ knitr::kable(head(enr_fitlm_topkegg))
 
 ## GO enrichment analysis
 
-GO enrichment analysis of a given set of genes `deg_entrez` with the defined organism based on the fitted linear models of the object `enr_fitlm` as output of the `goDiffReg_` function. `goEnrichmentAnalysis` provides the presentation of the desired KEGG pathway ID (in this case `hsa04110` - cell cycle) including under(red) and over expressed (green) genes inside the pathway as png images in the folder plots. 
+GO enrichment analysis of a given set of genes (`deg_entrez`) with the defined organism is based on the fitted linear models of the object `enr_fitlm` as output of the `goDiffReg_` function.  
+`goEnrichmentAnalysis` provides the presentation of the desired KEGG pathway ID (in this case `hsa04151` - PI3K-Akt-Pathway) including under expressed (red) and over expressed (green) genes inside the pathway as png images in the folder named 'plots' (object 'plotdir'). 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-pathwayid <- "hsa04010" 
 enr_analysis <- sigident::goEnrichmentAnalysis_(gene = deg_entrez,
                                                 OrgDB = OrgDb,
                                                 organism = organism,
@@ -552,7 +582,7 @@ filename <- paste0(plotdir, "/", organism, paste0(pathwayid, "pathway.png"))
 knitr::include_graphics(filename)
 ```
 
-A bar plot is created depicting the enrichment scores (adj. p-value) as bar color and gene count as bar height. The parameter `type` controls whether to depict enriched GO terms or enriched KEGG terms. 
+Using `createEnrichtedBarplot_`, a bar plot is created depicting the enrichment scores (adj. p-value) as bar color and gene count as bar height. The parameter `type` controls whether to depict enriched GO terms or enriched KEGG terms. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_GO.png")
@@ -575,14 +605,14 @@ sigident::createEnrichtedBarplot_(enrichmentobj = enr_analysis$kegg,
 knitr::include_graphics(filename)
 ```
 
-
 # Identification of diagnostic signatures 
 
-A common task regarding gene expression data is to distuingishing between different groups or subtypes. For this a multi-gene classifier trained using a large amount of expression data is required. Due to the superiority of features over observations an appropriate method is needed. The lasso and elastic net regularization to fit generalied linear models are powerfull and versatile methods for feature selection and is well suited to genomic data with p>>n. Therefore, we implemented the elastic net regularization method for the identification of a diagnostic multi-gene signature.  
+A common task regarding gene expression data is to distingish between different groups or subtypes. In order to train a multi-gene classifier, a large amount of expression data is required. Due to the imbalance of features (p) versus observations (n), the application of an appropriate method is needed. The lasso regression and elastic net regularization to fit generalied linear models are powerfull and versatile methods for feature selection and are well suited in order to analyse genomic data with p >> n.  
+Therefore, we implemented the elastic net regularization method for the identification of a diagnostic multi-gene signature.  
 
 ## Split data into training and test dataset
 
-A statistical prediction model is usually trained on 70%-80% percent of the present data. `createTrainingTest` randomly splits the merged dataset into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). 
+A statistical prediction model is usually trained on 70%-80% percent of the present data. `createTrainingTest_` randomly splits the merged dataset into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). For reproducibility, a seed must be set.  
 
 ```{r}
 training_list <- sigident::createTrainingTest_(diagnosis = diagnosis,
@@ -593,13 +623,13 @@ training_list <- sigident::createTrainingTest_(diagnosis = diagnosis,
 
 ## Lasso regression
 
-Regularization requires the selection of a tuning parameter (lambda) that determines the strength of regularization. The function `signature_` performs `nfolds` cross-validation selecting for best lambda and additionally builds the predictive model. `seed` is set for reproducibility. The plot depicts the mean squared error as the criteron for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features (genes) above the plot. The left dashed vertical line represents the log of the optimal value of lambda, which results in the lowest prediction error and giving the most accurate model. The right dashed vertical line indicates the log of the lambda value resulting in a model with the smallest number of included variables but also lies within one standard error of the optimal value of lambda.   
-At least a ROC curve is plotted to visualize the performance measurement of the model.
+Regularization requires the selection of a tuning parameter (lambda) that determines the strength of regularization. The function `signature_` performs an `nfolds` cross-validation to select the best lambda and additionally builds the predictive model. `seed` is again set for reproducibility. The plot depicts the mean squared error as the criteron for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features (genes) above the plot. The left dashed vertical line represents the log of the optimal value of lambda ('lambda min'), which results in the lowest prediction error and giving the most accurate model. The right dashed vertical line indicates the log of the lambda value resulting in a model with the smallest number of included variables but also lies within one standard error of the optimal value of lambda ('lambda 1se').   
+Furthermore, a ROC curve is plotted to visualize the performance measurement of the model.  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_lasso <- sigident::signature_(traininglist = training_list,
                                          type = "lasso",
-                                         nfolds = 10,
+                                         nfolds = nfolds,
                                          seed = seed)
 filename <- paste0(plotdir, "CV_lasso.png")
 sigident::createCVPlot_(cv_obj = diagnostic_lasso$fitCV,
@@ -627,16 +657,15 @@ sigident::createROCplot_(roc = diagnostic_lasso$roc.1se,
 knitr::include_graphics(filename)
 ```
 
-
 ## Elastic net regression 
 
-The elastic net is a mixture of lasso and ridge regularization shrinking coefficients (like in ridge regression) and set some coefficients to zero (as in lasso). Therefore, the mixing parameter alpha needs to be determined as value between 1 (for lasso) and 0 (for ridge). A grid search for calculating optimal alpha and lambda can be conducted (as it is done next) but might take much computing capacity, hence we propose setting alpha manually to 0.9. 
+The elastic net is a mixture of lasso and ridge regularization to shrink coefficients (like in ridge regression) and to set some coefficients to zero (as in lasso). Therefore, the mixing parameter alpha needs to be determined as value between 1 (for lasso) and 0 (for ridge). A grid search for calculating optimal alpha and lambda can be conducted (as it is done next) but might take much computing capacity, hence we propose setting alpha manually to 0.9. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_elasticnet <- sigident::signature_(traininglist = training_list,
                                               type = "elastic",
                                               alpha = 0.9,
-                                              nfolds = 10,
+                                              nfolds = nfolds,
                                               seed = seed)
 filename <- paste0(plotdir, "CV_elasticNet.png")
 sigident::createCVPlot_(cv_obj = diagnostic_elasticnet$fitCV,
@@ -664,15 +693,14 @@ sigident::createROCplot_(roc = diagnostic_elasticnet$roc.1se,
 knitr::include_graphics(filename)
 ```
 
-
 ## Gridsearch to find alpha and lambda
 
-Setting `type = "grid"` conducts a grid search calculating a pair of alpha and lambda that minimizes the CV error. 
+Setting `type = "grid"` of the function `signature_` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_glmGrid <- sigident::signature_(traininglist = training_list,
                                            type = "grid",
-                                           nfolds = 10,
+                                           nfolds = nfolds,
                                            seed = seed)
 # plot model of gridsearch
 filename <- paste0(plotdir, "Gridsearch_model.png")
@@ -707,8 +735,7 @@ knitr::include_graphics(filename)
 
 ## Comparing model performance  
 
-These builded models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`. 
-This list includes all information of the respective models, which can be accessed by the following structure.
+These builded models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`. This list includes all information of the respective models, which can be accessed by the following structure.  
 
 ```{r}
 diagnosticModels <- list(
@@ -748,16 +775,17 @@ knitr::kable(
 
 ## Extract lambda values 
 
+A function `getDiagnosticLambdaValues` was designed, to extract the results of the cross validation.
+
 ```{r}
 knitr::kable(
   sigident::getDiagnosticLambdaValues(diagnosticModels)
 )
 ```
 
-
 ## Model performance measurements
 
-Additionally, the confusion matrix and the calculated perfomance metrices can be printed out for the different models, respectively. 
+Additionally, the confusion matrix and the calculated perfomance metrices can be printed out for each model. 
 
 ### Lasso (min)
 
@@ -789,28 +817,45 @@ diagnosticModels$elasticnet[["1se"]]$confmat
 diagnosticModels$grid$confmat
 ```
 
+## Export selected IDs for each model 
 
-## Export selected IDs
-
-The following function enables the extraction of the selected genes as csv file.
+The following function enables the extraction of the selected genes (Affy-IDs) for each model as csv file.
 
 ```{r}
-# map selected variables and export 
-signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnostic_lasso$lambda.min)
-data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_model1.csv"))
+signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnosticModels$lasso$min$model)
+data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_lasso_min.csv"))
 ```
 
 ```{r}
-dim(signature_genes)
-head(signature_genes)
+signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnosticModels$lasso[["1se"]]$model)
+data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_lasso_1se.csv"))
 ```
 
+```{r}
+signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnosticModels$elasticnet$min$model)
+data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_elasticnet_min.csv"))
+```
+
+```{r}
+signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnosticModels$elasticnet[["1se"]]$model)
+data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_elasticnet_1se.csv"))
+```
 
 # Identification of prognostic signature
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
 
-For the calculation of a prognostic signature it is first required to transform the phenoData containing the relevant survival data. In our example only the study GSE19188 contains survival data. For this the levels of the required columns (`alive`, `deceased`, `na`) need to entitled equal to their entries. Same applies to `targetcolname`, `controllevelname`, `targetlevelname` indicating the groups to be seperated. 
+For the calculation of a prognostic signature it is first required to transform the phenoData containing the relevant survival data. In our example, only the study GSE19188 contains information on a subjects survival.  
+In order to make the subsequent analyses possible, the list `discoverystudies.w.timedata`, containing metainformation about the validation study needs to be created. This nested list needs to contain the following elements:
+- the studyname, which is the key for a list containing
+  + `timecol`: the phenoData columm name of the survival time
+  + `status`: a list, containing the elements `statuscol` (name of phenoData column containing the survival status), `levels` (a list containing the originally used level-names of `statuscol`, namely `alive`, `deceased`, `na`)
+  + `targetcolname`: the name of the phenoData column containing the target-variable
+  + `controllevelname`: the level name of the controls of the column, specified in `targetcolname`
+  + `targetlevelname`: the level name of the subjects of interest in `targetcolname`
+  + `use_rawdata`: a logical value (TRUE or FALSE) that indicates, if the study is imported from the raw data
+  
+Since we already used the raw data above to load the study 'GSE19188' for the analyses of the DEGs, the enrichment analysis and the computation of the diagnostic signature, we here again import the study from the raw CEL files.  
 
 ```{r eval = TRUE}
 discoverystudies.w.timedata <- list(
@@ -830,7 +875,7 @@ discoverystudies.w.timedata <- list(
 
 ### Extract survival data 
 
-Next the survival data needs to be extracted and to get into the right format. `getSurvivalTime` takes over this task resulting an a table `survivalData` containg samples (in our example of the class tumor) as rows, survival time and if an event (death) happened as columns. Additionally, the expression values for the selected DEGs are added as columns to the table. 
+Next, the survival data needs to be extracted. `getSurvivalTime_` results in a table named `survivalData`, which contains samples (in our example of the class tumor) as rows, survival time and if an event (death) happened as columns. Additionally, the expression values of the selected DEGs (provided as parameter 'genes') are added as columns to the table. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 
@@ -854,7 +899,7 @@ head(survTable[,1:4])
 
 ### Compute univariate cox regression 
 
-Subsequently, univariate Cox regression is conducted to identify survival correlated genes. The results containing the hazard rate with 95% CI and p-value is exported as csv-file. 
+Subsequently, an univariate Cox regression is conducted to identify survival correlated genes. The results containing the hazard rate within a 95% CI and corresponding p-values are exported as csv-file. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 surv_correlated <- sigident::univCox_(survtable = survTable,
@@ -863,21 +908,18 @@ surv_correlated <- sigident::univCox_(survtable = survTable,
 data.table::fwrite(surv_correlated, paste0(csvdir, "survival_correlated_genes.csv"))
 ```
 
-TODO here we have a difference compared with compiled vignette 
-
 ```{r}
 dim(surv_correlated)
 head(surv_correlated)
 ```
 
-
 ## Prognostic classifier and Kaplan-Meier estimator
 
-To build an unbiased classifier that classfies patients into high and low risk groups expression data from the other studies are required. 
+In order to build an unbiased classifier that speparates subjects into high risk and low risk groups, expression data from the remaining discovery studies are required. 
 
 ### Evaluate expression pattern (over-/underrepresentation)
 
-The classifier is built taking into account the expression profiles of the identified survival correlated genes between tumor and non-tumor samples. 
+The classifier takes the expression profiles of the identified survival correlated genes between tumor and non-tumor samples into account. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 classifier_studies <- c("GSE18842", "GSE19804")
@@ -896,7 +938,10 @@ dim(exprPattern)
 head(exprPattern)
 ```
 
-### Apply the prognostic classifier on validation dataset
+### Apply the prognostic classifier on validation dataset 
+
+In order to apply the prognostic classifier on validation datasets, another list containing metainformation about these validation studies is required. This list (`validationstudiesinfo`) has the same structure as the above described list `discoverystudies.w.timedata`.  
+However, the element `use_rawdata` is not allowed here. Furthermore, is allowed to to set `targetlevelname` to 'NULL', which indicates, that all included samples are of the class of interest and are taken into account to perform the analyses.  
 
 #### Create a list that contains specifications of the study that contains the validation information
 
@@ -933,7 +978,9 @@ pC <- sigident::prognosticClassifier_(PatternCom = exprPattern,
                                       targetcol = targetcol)
 ```
 
-### Validation study: GSE30219
+### Validation study: GSE30219  
+
+Here we extract information on the study GSE30219.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 fit <- pC[["GSE30219"]]$kaplan.estimator$fit
@@ -1013,7 +1060,7 @@ In order to simplify the whole above described workflow, we wrapped all these fu
 
 ## Preprocessing: 
 
-The preprocessing needs to be conform with the above described approach.
+The preprocessing of the data needs to be conform with the above described approach. 
 
 ### Define Variables
 

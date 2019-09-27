@@ -98,7 +98,7 @@ glmPrediction_ <- function(model, test.x, test.y, s = NULL){
 signature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
 
   stopifnot(
-    type %in% c("grid", "lasso", "elastic", "ridge"),
+    type %in% c("grid", "lasso", "elastic"),
     is.numeric(nfolds),
     is.numeric(seed),
     is.list(traininglist)
@@ -111,8 +111,6 @@ signature_ <- function(traininglist, type, alpha = NULL, nfolds = 10, seed){
     # use provided alpha only in elastic
     if (type == "lasso"){
       alpha <- 1
-    } else if (type == "ridge"){
-      alpha <- 0
     } else if (type == "elastic"){
       stopifnot(
         !is.null(alpha),
@@ -243,4 +241,20 @@ glmnetGridSearch_ <- function(traininglist, seed){
   outlist$roc.elasticNet <- pred.elasticNet$roc
 
   return(outlist)
+}
+
+#' @title geneMapSig_
+#'
+#' @description Helper function to map relevant input variables of a diagnostic model to corresponding IDs.
+#'
+#' @inheritParams createGridModelPlot_
+#' @inheritParams sigidentDEG
+#'
+#' @export
+geneMapSig_ <- function(mergeset, model){
+  id <- rownames(mergeset)
+  # TODO warum i+1?
+  index <- model[["beta"]]@i+1
+  # TODO map entrez_id on gene symbol here and include as second columen to ouput
+  return(as.data.frame(x = cbind("ID" = id[index])))
 }

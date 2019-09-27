@@ -59,20 +59,20 @@ limmaTopTable_ <- function(mergeset, design, qValue){
   return(t)
 }
 
-#' #' @title qSelection_
-#' #'
-#' #' @description Helper function to select qValues
-#' #'
-#' #' @inheritParams sigidentDEG
-#' #'
-#' #' @export
-#' qSelection_ <- function(sampleMetadata, studyMetadata, deg.q.selection = NULL){
-#'   if (is.null(deg.q.selection)){
-#'     discovery <- discovery_(sampleMetadata = sampleMetadata,
-#'                             studyMetadata = studyMetadata)
-#'     deg_q <- 1/length(sampleMetadata[sampleMetadata$study %in% discovery, "sample"])
-#'   } else {
-#'     deg_q <- as.numeric(deg.q.selection)
-#'   }
-#'   return(deg_q)
-#' }
+# #' @title qSelection_
+# #'
+# #' @description Helper function to select qValues
+# #'
+# #' @inheritParams sigidentDEG
+# #'
+# #' @export
+# qSelection_ <- function(sampleMetadata, studyMetadata, deg.q.selection = NULL){
+#   if (is.null(deg.q.selection)){
+#     discovery <- discovery_(sampleMetadata = sampleMetadata,
+#                             studyMetadata = studyMetadata)
+#     deg_q <- 1/length(sampleMetadata[sampleMetadata$study %in% discovery, "sample"])
+#   } else {
+#     deg_q <- as.numeric(deg.q.selection)
+#   }
+#   return(deg_q)
+# }
