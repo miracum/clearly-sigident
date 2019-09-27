@@ -42,7 +42,8 @@ getSurvivalTime_ <- function(studyMetadata,
       is.character(discoverystudies.w.timedata[[st]]$status$levels$alive),
       is.character(discoverystudies.w.timedata[[st]]$status$levels$deceased),
       is.character(discoverystudies.w.timedata[[st]]$targetcolname),
-      is.logical(discoverystudies.w.timedata[[st]]$use_rawdata)
+      is.logical(discoverystudies.w.timedata[[st]]$use_rawdata),
+      is.numeric(discoverystudies.w.timedata[[st]]$setid)
     )
 
     samples <- sampleMetadata[sampleMetadata$study==st,]
@@ -56,7 +57,8 @@ getSurvivalTime_ <- function(studyMetadata,
                       controllevelname = discoverystudies.w.timedata[[st]]$controllevelname,
                       targetcol = targetcol,
                       targetname = targetname,
-                      controlname = controlname)
+                      controlname = controlname,
+                      setid = discoverystudies.w.timedata[[st]]$setid)
 
     if (isTRUE(discoverystudies.w.timedata[[st]]$use_rawdata)){
 
@@ -135,23 +137,6 @@ getSurvivalTime_ <- function(studyMetadata,
 
   }
   return(outlist)
-}
-
-
-loadEset_ <- function(name, datadir, targetcolname, targetcol, targetname, controlname, targetlevelname, controllevelname){
-  # original GEO data
-  eset <- GEOquery::getGEO(name, destdir = datadir)[[1]]
-  # rename targetcol
-  colnames(Biobase::pData(eset))[which(colnames(Biobase::pData(eset)) == targetcolname)] <- targetcol
-
-  # rename levels of targetcol
-  if (!is.null(targetlevelname)){
-    levelnames <- c(targetname, controlname)
-    names(levelnames) <- c(targetlevelname,
-                           controllevelname)
-    eset[[targetcol]] <- plyr::revalue(eset[[targetcol]], levelnames)
-  }
-  return(eset)
 }
 
 
@@ -352,7 +337,8 @@ prognosticClassifier_ <- function(PatternCom, idtype, validationstudiesinfo, dat
                       controllevelname = validationstudiesinfo[[st]]$controllevelname,
                       targetcol = targetcol,
                       targetname = targetname,
-                      controlname = controlname)
+                      controlname = controlname,
+                      setid = validationstudiesinfo[[st]]$setid)
 
     diagnosis <- diagnosis_(vector = eset[[targetcol]],
                             targetname = targetname,
@@ -520,26 +506,4 @@ sigAnalysis_ <- function(expr, PatternCom){ # Input is an eset, consisting of tu
   }
   Sigframe <- Sigframe[-1]
   return(Sigframe)
-}
-
-createExpressionSet_ <- function(eset, idtype){
-  expr <- Biobase::exprs(eset)
-  expr <- idType_(expr = expr, eset = eset, idtype = idtype)
-  return(expr)
-}
-
-
-idType_ <- function(expr, eset, idtype){
-  stopifnot(
-    idtype %in% c("entrez", "affy")
-  )
-  if (idtype == "entrez"){
-    rownames(expr) <- as.character(eset@featureData@data$ENTREZ_GENE_ID)
-    # remove empty characters and replicates in EntrezIDs
-    expr <- expr[rownames(expr)!="",]
-    expr <- expr[!duplicated(rownames(expr)),]
-  } else if (idtype == "affy") {
-    rownames(expr) <- as.character(eset@featureData@data$ID)
-  }
-  return(expr)
 }

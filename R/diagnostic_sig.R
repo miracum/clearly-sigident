@@ -232,9 +232,9 @@ glmnetGridSearch_ <- function(traininglist, seed){
 
   # prediction
   pred.elasticNet <- glmPrediction_(model = outlist$elasticNet.auto,
-                             test.x = traininglist$test$x,
-                             test.y = traininglist$test$y,
-                             s = NULL)
+                                    test.x = traininglist$test$x,
+                                    test.y = traininglist$test$y,
+                                    s = NULL)
 
   outlist$predicted.elasticNet <- pred.elasticNet$prediction
   outlist$confmat.elasticNet <- pred.elasticNet$confmat
@@ -257,4 +257,90 @@ geneMapSig_ <- function(mergeset, model){
   index <- model[["beta"]]@i+1
   # TODO map entrez_id on gene symbol here and include as second columen to ouput
   return(as.data.frame(x = cbind("ID" = id[index])))
+}
+
+#' @title validateDiagnosticSignature_
+#'
+#' @description Helper function to validate diagnostic signatures
+#'
+#' @param validationstudylist A list, containing metainformation on the study used for validation of the diagnostic signature.
+#' @param models A prediction model to be used for validation.
+#' @param datadir A character string. Path to the data-folder inside the metadata folder.
+#'
+#' @inheritParams sigidentDEG
+#' @inheritParams createDEGheatmap_
+#' @inheritParams batchCorrection_
+#' @inheritParams createDiagnosisDesignBatch_
+#'
+#' @export
+validateDiagnosticSignature_ <- function(validationstudylist,
+                                         models,
+                                         genes,
+                                         idtype,
+                                         targetname,
+                                         controlname,
+                                         targetcol,
+                                         datadir){
+  stopifnot(
+    is.character(targetcol),
+    is.character(targetname),
+    is.character(controlname),
+    is.list(validationstudylist),
+    is.character(validationstudylist$studyname),
+    is.character(validationstudylist$targetcolname),
+    is.character(validationstudylist$targetlevelname),
+    is.character(validationstudylist$controllevelname),
+    is.numeric(validationstudylist$setid)
+  )
+
+  outlist <- list()
+
+  eset <- loadEset_(name = validationstudylist$studyname,
+                    datadir = datadir,
+                    targetcolname = validationstudylist$targetcolname,
+                    targetlevelname = validationstudylist$targetlevelname,
+                    controllevelname = validationstudylist$controllevelname,
+                    targetcol = targetcol,
+                    targetname = targetname,
+                    controlname = controlname,
+                    setid = validationstudylist$setid)
+
+
+
+  diagnosis <- diagnosis_(vector = eset[[targetcol]],
+                          targetname = targetname,
+                          controlname = controlname)
+
+
+  expr <- createExpressionSet_(eset = eset,
+                               idtype = idtype)
+
+  # TODO why is this code in the original script?
+  # # creating data frame, selecting only DEGs
+  # v.data.DEG <- base::subset(t(expr), select = genes)
+
+  # creating data frame including all genes
+  v.data.all <- t(expr)
+
+  for (i in names(models)){
+
+    if (i %in% c("lasso", "elasticnet")){
+
+      for (j in c("min", "1se")){
+
+        predicted <- predict(model[[i]][[j]]$model, v.data.all, type = "response")
+
+        confmat <- caret::confusionMatrix(data = factor(ifelse(as.numeric(as.character(predicted)) < 0.5, 0, 1)),
+                                          reference = factor(diagnosis),
+                                          positive = "1") # determine the true case with the 'positive' argument
+
+        # Calculate Roc
+        roc <- calcROC_(test.y = diagnosis,
+                        prediction = predicted)
+
+        outlist[[i]][[j]] <- list(predicted = predicted, confmat = confmat, roc = roc)
+      }
+    }
+  }
+  return(outlist)
 }

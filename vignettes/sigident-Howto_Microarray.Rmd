@@ -732,9 +732,9 @@ sigident::createROCplot_(roc = diagnostic_glmGrid$roc.elasticNet,
 knitr::include_graphics(filename)
 ```
 
-# Analysis of diagnostic models 
+## Analysis of diagnostic models 
 
-## Comparing model performance  
+### Comparing model performance  
 
 These models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`. This list includes all information of the respective models, which can be accessed by the following structure.  
 
@@ -774,7 +774,7 @@ knitr::kable(
 )
 ```
 
-## Extract lambda values 
+### Extract lambda values 
 
 A function `getDiagnosticLambdaValues` was designed, to extract the results of the cross validation.
 
@@ -784,41 +784,41 @@ knitr::kable(
 )
 ```
 
-## Model performance measurements
+### Model performance measurements
 
 Additionally, the confusion matrix and the calculated performance metrices can be printed out for each model. 
 
-### Lasso (min)
+#### Lasso (min)
 
 ```{r}
 diagnosticModels$lasso$min$confmat
 ```
 
-### Lasso (1se)
+#### Lasso (1se)
 
 ```{r}
 diagnosticModels$lasso[["1se"]]$confmat
 ```
 
-### Elastic (min)
+#### Elastic (min)
 
 ```{r}
 diagnosticModels$elasticnet$min$confmat
 ```
 
-### Elastic (1se)
+#### Elastic (1se)
 
 ```{r}
 diagnosticModels$elasticnet[["1se"]]$confmat
 ```
 
-### Elastic net (grid search)
+##### Elastic net (grid search)
 
 ```{r}
 diagnosticModels$grid$confmat
 ```
 
-## Export selected IDs for each model 
+### Export selected IDs for each model 
 
 The following function enables the extraction of the selected genes (Affy-IDs) for each model as csv file.
 
@@ -842,6 +842,281 @@ signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnostic
 data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_elasticnet_1se.csv"))
 ```
 
+
+## Validation of diagnostic signatures 
+
+The validation of diagnostic signatures is conducted using expression data of the studies "GSE30219", "GSE33356" and "GSE102287". We therefore need to create a list, holding meta information about the respective studies. 
+
+All models can be provided via the argument 'model' to the function `validateDiagnosticSignature_` using the previously created list `diagnosticModels`.
+
+You have to create a list for each validation data that contains specifications of the validation study. The object must be named The list structure is as follows:  
+- `studyname`: the GEO id of the validation study  
+- `setid`: the index of the provided GEO set to be used    
+- `targetcolname`: the name of the phenoData column containing the target-variable
+- `controllevelname`: the level name of the controls of the column, specified in `targetcolname`
+- `targetlevelname`: the level name of the subjects of interest in `targetcolname`
+
+### GSE302019 
+
+```{r}
+validationstudylist <- list(studyname = "GSE30219",
+                            setid = 1, 
+                            targetcolname = "source_name_ch1",
+                            controllevelname = "Non Tumoral Lung",
+                            targetlevelname = "Lung Tumour")
+```
+
+```{r}
+GSE30219_validation <- sigident::validateDiagnosticSignature_(
+  validationstudylist = validationstudylist,
+  models = diagnosticModels,
+  genes = genes,
+  idtype = idtype,
+  targetname = targetname,
+  controlname = controlname,
+  targetcol = targetcol,
+  datadir = datadir
+)
+```
+
+#### Lasso (min) 
+
+```{r}
+GSE30219_validation$lasso$min$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_lasso_min.png")
+sigident::createROCplot_(roc = GSE30219_validation$lasso$min$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Lasso (1se) 
+
+```{r}
+GSE30219_validation$lasso[["1se"]]$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_lasso_1se.png")
+sigident::createROCplot_(roc = GSE30219_validation$lasso[["1se"]]$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Elastic (min) 
+
+```{r}
+GSE30219_validation$elasticnet$min$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_min.png")
+sigident::createROCplot_(roc = GSE30219_validation$elasticnet$min$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Elastic (1se) 
+
+```{r}
+GSE30219_validation$elasticnet[["1se"]]$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_1se.png")
+sigident::createROCplot_(roc = GSE30219_validation$elasticnet[["1se"]]$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+### GSE33356 
+
+```{r}
+validationstudylist <- list(studyname = "GSE33356",
+                            setid = 1, 
+                            targetcolname = "tissue:ch1",
+                            controllevelname = "paired normal adjacent",
+                            targetlevelname = "lung cancer")
+```
+
+```{r}
+GSE33356_validation <- sigident::validateDiagnosticSignature_(
+  validationstudylist = validationstudylist,
+  models = diagnosticModels,
+  genes = genes,
+  idtype = idtype,
+  targetname = targetname,
+  controlname = controlname,
+  targetcol = targetcol,
+  datadir = datadir
+)
+```
+
+#### Lasso (min) 
+
+```{r}
+GSE33356_validation$lasso$min$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_lasso_min.png")
+sigident::createROCplot_(roc = GSE33356_validation$lasso$min$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Lasso (1se) 
+
+```{r}
+GSE33356_validation$lasso[["1se"]]$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_lasso_1se.png")
+sigident::createROCplot_(roc = GSE33356_validation$lasso[["1se"]]$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Elastic (min) 
+
+```{r}
+GSE33356_validation$elasticnet$min$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_min.png")
+sigident::createROCplot_(roc = GSE33356_validation$elasticnet$min$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Elastic (1se) 
+
+```{r}
+GSE33356_validation$elasticnet[["1se"]]$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_1se.png")
+sigident::createROCplot_(roc = GSE33356_validation$elasticnet[["1se"]]$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+### GSE102287 
+
+```{r}
+validationstudylist <- list(studyname = "GSE102287",
+                            setid = 2, 
+                            targetcolname = "tumor_normal status:ch1",
+                            controllevelname = "N",
+                            targetlevelname = "T")
+```
+
+```{r}
+GSE102287_validation <- sigident::validateDiagnosticSignature_(
+  validationstudylist = validationstudylist,
+  models = diagnosticModels,
+  genes = genes,
+  idtype = idtype,
+  targetname = targetname,
+  controlname = controlname,
+  targetcol = targetcol,
+  datadir = datadir
+)
+```
+
+#### Lasso (min) 
+
+```{r}
+GSE102287_validation$lasso$min$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_lasso_min.png")
+sigident::createROCplot_(roc = GSE102287_validation$lasso$min$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Lasso (1se) 
+
+```{r}
+GSE102287_validation$lasso[["1se"]]$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_lasso_1se.png")
+sigident::createROCplot_(roc = GSE102287_validation$lasso[["1se"]]$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Elastic (min) 
+
+```{r}
+GSE102287_validation$elasticnet$min$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_min.png")
+sigident::createROCplot_(roc = GSE102287_validation$elasticnet$min$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### Elastic (1se) 
+
+```{r}
+GSE102287_validation$elasticnet[["1se"]]$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_1se.png")
+sigident::createROCplot_(roc = GSE102287_validation$elasticnet[["1se"]]$roc,
+                         filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
 # Identification of prognostic signatures 
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
@@ -849,6 +1124,7 @@ data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_elasticnet_1
 For the calculation of a prognostic signature it is first required to transform the phenoData containing the relevant survival data. In our example, only the study GSE19188 contains information on a subjects survival.  
 In order to make the subsequent analyses possible, the list `discoverystudies.w.timedata`, containing metainformation about the validation study needs to be created. This nested list needs to contain the following elements:
 - the studyname, which is the key for a list containing
+  + `setid`: the index of the provided GEO set to be used   
   + `timecol`: the phenoData columm name of the survival time
   + `status`: a list, containing the elements `statuscol` (name of phenoData column containing the survival status), `levels` (a list containing the originally used level-names of `statuscol`, namely `alive`, `deceased`, `na`)
   + `targetcolname`: the name of the phenoData column containing the target-variable
@@ -860,7 +1136,8 @@ Since we already used the raw data above to load the study 'GSE19188' for the an
 
 ```{r eval = TRUE}
 discoverystudies.w.timedata <- list(
-  "GSE19188" = list(timecol = "characteristics_ch1.2",
+  "GSE19188" = list(setid = 1,
+                    timecol = "characteristics_ch1.2",
                     status = list(statuscol = "characteristics_ch1.3",
                                   levels = list(alive = "status: alive",
                                                 deceased = "status: deceased",
@@ -948,7 +1225,8 @@ However, the element `use_rawdata` is not allowed here. Furthermore, is allowed 
 
 ```{r eval = TRUE}
 validationstudiesinfo <- list(
-  "GSE30219" = list(timecol = "characteristics_ch1.9",
+  "GSE30219" = list(setid = 1,
+                    timecol = "characteristics_ch1.9",
                     status = list(statuscol = "characteristics_ch1.8",
                                   levels = list(alive = "status: ALIVE",
                                                 deceased = "status: DEAD",
@@ -957,7 +1235,8 @@ validationstudiesinfo <- list(
                     controllevelname = "Non Tumoral Lung",
                     targetlevelname = "Lung Tumour"),
   
-  "GSE50081" = list(timecol = "characteristics_ch1.8",
+  "GSE50081" = list(setid = 1, 
+                    timecol = "characteristics_ch1.8",
                     status = list(statuscol = "characteristics_ch1.9",
                                   levels = list(alive = "status: alive",
                                                 deceased = "status: dead",
@@ -1193,7 +1472,8 @@ knitr::kable(
 
 ```{r eval = FALSE}
 discoverystudies.w.timedata <- list(
-  "GSE19188" = list(timecol = "characteristics_ch1.2",
+  "GSE19188" = list(setid = 1,
+                    timecol = "characteristics_ch1.2",
                     status = list(statuscol = "characteristics_ch1.3",
                                   levels = list(alive = "status: alive",
                                                 deceased = "status: deceased",
@@ -1204,7 +1484,8 @@ discoverystudies.w.timedata <- list(
                     use_rawdata = TRUE))
 
 validationstudiesinfo <- list(
-  "GSE30219" = list(timecol = "characteristics_ch1.9",
+  "GSE30219" = list(setid = 1,
+                    timecol = "characteristics_ch1.9",
                     status = list(statuscol = "characteristics_ch1.8",
                                   levels = list(alive = "status: ALIVE",
                                                 deceased = "status: DEAD",
@@ -1213,7 +1494,8 @@ validationstudiesinfo <- list(
                     controllevelname = "Non Tumoral Lung",
                     targetlevelname = "Lung Tumour"),
   
-  "GSE50081" = list(timecol = "characteristics_ch1.8",
+  "GSE50081" = list(setid = 1,
+                    timecol = "characteristics_ch1.8",
                     status = list(statuscol = "characteristics_ch1.9",
                                   levels = list(alive = "status: alive",
                                                 deceased = "status: dead",
