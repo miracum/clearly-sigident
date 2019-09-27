@@ -23,7 +23,7 @@ createImportBoxplot_ <- function(mergeset, filename = NULL){
   },
   filename = filename,
   height = 1000,
-  width = 1500)
+  width = 2000)
 }
 
 
@@ -54,7 +54,7 @@ createBatchPlot_ <- function(correction_obj, filename = NULL, time){
     ))
   },
   filename = filename,
-  height = 1000,
+  height = 1500,
   width = 1500)
 }
 
@@ -93,8 +93,8 @@ createDEGheatmap_ <- function(mergeset, genes, patientcolors, filename = NULL){
     ))
   },
   filename = filename,
-  height = 1000,
-  width = 1500)
+  height = 2000,
+  width = 3000)
 }
 
 
@@ -129,7 +129,7 @@ createEnrichtedBarplot_ <- function(enrichmentobj, type, filename = NULL, showCa
   },
   filename = filename,
   height = 1000,
-  width = 1500)
+  width = 2000)
 }
 
 
@@ -193,8 +193,8 @@ createCVPlot_ <- function(cv_obj, filename){
     ))
   },
   filename = filename,
-  height = 400,
-  width = 450)
+  height = 1000,
+  width = 1500)
 }
 
 
