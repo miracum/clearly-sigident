@@ -1367,7 +1367,7 @@ dir.create(csvdir)
 species <- "Hs"
 OrgDb <- "org.Hs.eg.db"
 organism <- "hsa"
-pathwayid <- "hsa04110"
+pathwayid <- "hsa04151"
 
 # diagnostig signature
 seed <- 111
@@ -1435,11 +1435,11 @@ sigident::sigidentEnrichment(mergeset = mergeset,
                              csvdir = csvdir)
 ```
 ```{r eval = FALSE}
-filename <- paste0(plotdir, "/", organism, "04110.png")
+filename <- paste0(plotdir, "/", pathwayid, ".png")
 knitr::include_graphics(filename)
 ```
 ```{r eval = FALSE}
-filename <- paste0(plotdir, "/", organism, "04110.pathview.png")
+filename <- paste0(plotdir, "/", pathwayid, ".pathview.png")
 knitr::include_graphics(filename)
 ```
 
@@ -1463,6 +1463,31 @@ knitr::kable(
 ```{r eval = FALSE}
 knitr::kable(
   sigident::getDiagnosticLambdaValues(diagnosticModels)
+)
+```
+
+### Validation of the diagnostic signatures 
+
+Some users may validate the resulting models using new data sets. This can be conducted running the function `validateDiagnosticSignature_`. First, a list containing meta information on the validation study must be created.
+
+```{r eval = FALSE}
+validationstudylist <- list(studyname = "GSE30219",
+                            setid = 1, 
+                            targetcolname = "source_name_ch1",
+                            controllevelname = "Non Tumoral Lung",
+                            targetlevelname = "Lung Tumour")
+```
+
+```{r eval = FALSE}
+GSE30219_validation <- sigident::validateDiagnosticSignature_(
+  validationstudylist = validationstudylist,
+  models = diagnosticModels,
+  genes = genes,
+  idtype = idtype,
+  targetname = targetname,
+  controlname = controlname,
+  targetcol = targetcol,
+  datadir = datadir
 )
 ```
 

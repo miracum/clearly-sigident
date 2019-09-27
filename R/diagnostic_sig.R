@@ -328,7 +328,9 @@ validateDiagnosticSignature_ <- function(validationstudylist,
 
       for (j in c("min", "1se")){
 
-        predicted <- predict(models[[i]][[j]]$model, v.data.all, type = "response")
+        predicted <- predictGLM_(model = models[[i]][[j]]$model,
+                                 test.x = v.data.all,
+                                 type = "response")
 
         confmat <- caret::confusionMatrix(data = factor(ifelse(as.numeric(as.character(predicted)) < 0.5, 0, 1)),
                                           reference = factor(diagnosis),
