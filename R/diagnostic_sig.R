@@ -264,7 +264,7 @@ geneMapSig_ <- function(mergeset, model){
 #' @description Helper function to validate diagnostic signatures
 #'
 #' @param validationstudylist A list, containing metainformation on the study used for validation of the diagnostic signature.
-#' @param models A prediction model to be used for validation.
+#' @param models A list of prediction models. Usually the output of the function `sigidentDiagnostic`.
 #' @param datadir A character string. Path to the data-folder inside the metadata folder.
 #'
 #' @inheritParams sigidentDEG
@@ -328,7 +328,7 @@ validateDiagnosticSignature_ <- function(validationstudylist,
 
       for (j in c("min", "1se")){
 
-        predicted <- predict(model[[i]][[j]]$model, v.data.all, type = "response")
+        predicted <- predict(models[[i]][[j]]$model, v.data.all, type = "response")
 
         confmat <- caret::confusionMatrix(data = factor(ifelse(as.numeric(as.character(predicted)) < 0.5, 0, 1)),
                                           reference = factor(diagnosis),

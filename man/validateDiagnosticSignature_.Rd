@@ -10,7 +10,7 @@ validateDiagnosticSignature_(validationstudylist, models, genes, idtype,
 \arguments{
 \item{validationstudylist}{A list, containing metainformation on the study used for validation of the diagnostic signature.}
 
-\item{models}{A prediction model to be used for validation.}
+\item{models}{A list of prediction models. Usually the output of the function `sigidentDiagnostic`.}
 
 \item{genes}{A object. The output of the function `identifyDEGs_()`.}
 
