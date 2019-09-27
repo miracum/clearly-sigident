@@ -576,7 +576,7 @@ filename <- paste0(plotdir, "/", pathwayid, ".png")
 knitr::include_graphics(filename)
 ```
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "/", pathwayid, ".pathway.png")
+filename <- paste0(plotdir, "/", pathwayid, ".pathview.png")
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
