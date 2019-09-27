@@ -42,7 +42,7 @@ In order to use this R package and its functions, you need to prepare a merged g
 
 This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).  
 
-To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The object `targetcol` should also be entitled "target" (correspondingly to the column name of the object `sampleMetadata` below). `targetcol` contains the outcome variable of interest for subsequent analysis. The levels of `targetcol` are to be defined with `controlname` and `targetname`. To use this package in order to analyze DEGs and to identify diagnostic and prognostic gene signatures for the seperation of two groups (or subtypes, healthy vs cancer, etc) we here named `controlname` and `targetname` exemplary as "Control" and "Lung Cancer". 
+To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The object `targetcol` should also be titled "target" (correspondingly to the column name of the object `sampleMetadata` below). `targetcol` contains the outcome variable of interest for subsequent analysis. The levels of `targetcol` are to be defined with `controlname` and `targetname`. For this example we used the package to analyze DEGs and identify diagnostic and prognostic gene signatures for the separation of two groups (or subtypes, healthy vs cancer, etc) we named `controlname` and `targetname` as "Control" and "Lung Cancer". 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # initialize filePath:
@@ -58,7 +58,7 @@ controlname <- "Control"
 targetname <- "Lung Cancer"
 ```
 
-Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expression data, pheno data and feature data as well as the annotations of the probe sets and store it as '.txt.gz' files in the defined `datadir` folder. 
+Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expression, pheno and feature data as well as the annotations of the probe sets and store it as '.txt.gz' files in the defined `datadir` folder. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
@@ -69,9 +69,9 @@ eset1 <- GSE18842[[1]]
 eset2 <- GSE19804[[1]]
 ```
 
-Moreover, the approach enables to download also the raw data in CEL file format. These files need to be uncompressed. Subsequently a GCRMA normalization has to be conducted.  
+Moreover, this approach enables us to download also the raw data in CEL file format. These files need to be uncompressed. Subsequently a GCRMA normalization has to be conducted.  
 
-For this, further commands are necessary to subsequently import the CEL files into the R environment. `esetC` represents a normalized ExpressionSet though only containing expression data without pheno data or feature data. These data can be added later. (The study GSE19188 could also be downloaded directly by applying `getGEO()` instead of using the raw data and manually adding pheno data and feature data afterwards. We just wanted to demonstrate how to use raw data in form of CEL files and apply normalization to it.)
+For this, further commands are necessary to subsequently import the CEL files into the R environment. `esetC` represents a normalized ExpressionSet, though only containing expression data without pheno data or feature data. These data can be added later. (The study GSE19188 could also be downloaded directly by applying `getGEO()` instead of using the raw data and manually adding pheno and feature data afterwards. We just wanted to demonstrate how to use raw data in form of CEL files and apply normalization to it.)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # download raw data, uncompress them and execute GCRMA normalization
@@ -123,7 +123,7 @@ eset3 <- esetC
 
 ### Formatting the phenoData 
 
-The phenoData of the expresssionSets need to be formatted so that the phenoData columns overlap perfectly. This means that all ExpressionSets should contain identical columns in the same order. Not consistent columns need to be removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
+The phenoData of the expresssionSets need to be formatted so that the phenoData columns overlap perfectly. This means that all ExpressionSets should contain identical columns in the same order. Non consistent columns need to be removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
 
 ```{r}
 # create version b, that original ExpressionSets persist
@@ -191,7 +191,7 @@ cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)),
 
 ## Preparations for utilizing the sigident package 
 
-Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clear we define them here at the beginning and refer at each function to the respective variable. `idtype` can be either "affy" or "entrez", indicating, if either Affy-IDs or Entrez-IDs are to be used as feature names for the subsequent analyses.  
+Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. `idtype` can be either "affy" or "entrez", indicating, if either Affy-IDs or Entrez-IDs are to be used as feature names for the subsequent analyses.  
 Selecting "entrez" usually results in a reduction of total features due to the removing of empty strings and duplicate IDs.  
 We here use `idtype` = "affy" for all subsequent analyses.  
 
@@ -255,7 +255,7 @@ sampleMetadata <- rbind(GSE18842_meta,
 
 #### Define study metadata 
 
-`sutdyMetadata` contains the GEO series accssion numbers of the studies and the assignment due to its usage as discovery dataset or validation dataset. 
+`sutdyMetadata` contains the GEO series accession numbers of the studies and the assignment due to its usage as discovery dataset or validation dataset. 
 
 ```{r}
 studyMetadata <- data.frame(
@@ -278,7 +278,7 @@ mergedset <- sigident::merge_(esets)
 
 # Discovering batch effects 
 
-Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studes can already be recognized apparently.  
+Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studies can already be recognized.    
 
 ## Visualize batch effect
 
@@ -395,11 +395,11 @@ rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842",
 gc()
 ```
 
-`mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet any more. 
+`mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet anymore. 
 
 ## Visualize batch effect removal
 
-Creating a boxplot and a gPCA plot with `mergeset` points out that no batch effect is present no more. 
+Creating a boxplot and a gPCA plot with `mergeset` shows that no batch effect is present anymore. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "import_boxplot.png")
@@ -453,7 +453,7 @@ sigident::createDEGheatmap_(mergeset = mergeset,
 knitr::include_graphics(filename)
 ```
 
-Some investigations may have been finished at this point yielding the DEGs. We provide two tables containing annotations like gene symbols (DEG_info.csv) and the results from the limma analysis including log2 fold changes and the adjusted p-values (DEG_results.csv). 
+Some investigations may have been finished at this point yielding the DEGs. We provide two tables containing annotations, like gene symbols (DEG_info.csv) and the results from the limma analysis including log2 fold changes and the adjusted p-values (DEG_results.csv). 
 
 ```{r}
 deg_info <- sigident::exportDEGannotations_(mergedset = mergedset,
@@ -607,7 +607,8 @@ knitr::include_graphics(filename)
 
 # Identification of diagnostic signatures 
 
-A common task regarding gene expression data is to distingish between different groups or subtypes. In order to train a multi-gene classifier, a large amount of expression data is required. Due to the imbalance of features (p) versus observations (n), the application of an appropriate method is needed. The lasso regression and elastic net regularization to fit generalied linear models are powerfull and versatile methods for feature selection and are well suited in order to analyse genomic data with p >> n.  
+A common task regarding gene expression data is to distinguish between different groups or subtypes. In order to train a multi-gene classifier, a large amount of expression data is required. Due to the imbalance of features (p) versus observations (n), the application of an appropriate method is needed.  
+The lasso regression and elastic net regularization are generalized linear models which are powerful and versatile methods for feature selection and are well suited in order to analyse genomic data with p >> n.  
 Therefore, we implemented the elastic net regularization method for the identification of a diagnostic multi-gene signature.  
 
 ## Split data into training and test dataset
@@ -735,7 +736,7 @@ knitr::include_graphics(filename)
 
 ## Comparing model performance  
 
-These builded models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`. This list includes all information of the respective models, which can be accessed by the following structure.  
+These models can be included into a list and the performance metrices for classification can then be printed using the function `compareDiagnosticModels()`. This list includes all information of the respective models, which can be accessed by the following structure.  
 
 ```{r}
 diagnosticModels <- list(
@@ -785,7 +786,7 @@ knitr::kable(
 
 ## Model performance measurements
 
-Additionally, the confusion matrix and the calculated perfomance metrices can be printed out for each model. 
+Additionally, the confusion matrix and the calculated performance metrices can be printed out for each model. 
 
 ### Lasso (min)
 
@@ -841,7 +842,7 @@ signature_genes <- sigident::geneMapSig_(mergeset = mergeset, model = diagnostic
 data.table::fwrite(signature_genes, paste0(csvdir, "signature_genes_elasticnet_1se.csv"))
 ```
 
-# Identification of prognostic signature
+# Identification of prognostic signatures 
 
 ## Create a list that contains specifications of the study/studies that contain(s) survival time information 
 
@@ -875,7 +876,7 @@ discoverystudies.w.timedata <- list(
 
 ### Extract survival data 
 
-Next, the survival data needs to be extracted. `getSurvivalTime_` results in a table named `survivalData`, which contains samples (in our example of the class tumor) as rows, survival time and if an event (death) happened as columns. Additionally, the expression values of the selected DEGs (provided as parameter 'genes') are added as columns to the table. 
+Next, the survival data needs to be extracted. `getSurvivalTime_` results in a table named `survivalData`, containing samples (in our example of the class tumor) as rows, survival time and if an event (death) happened as columns. Additionally, the expression values of the selected DEGs (provided as parameter 'genes') are added as columns to the table. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 
@@ -1056,11 +1057,11 @@ knitr::include_graphics(filename)
 
 # An alternative workflow: four generic functions for signature identification 
 
-In order to simplify the whole above described workflow, we wrapped all these functions into four big functions.
+In order to simplify the workflow described above, we wrapped all these functions into four big functions.
 
 ## Preprocessing: 
 
-The preprocessing of the data needs to be conform with the above described approach. 
+The preprocessing of the data needs to conform with the above described approach. 
 
 ### Define Variables
 
