@@ -4,13 +4,13 @@
 \alias{validateDiagnosticSignature_}
 \title{validateDiagnosticSignature_}
 \usage{
-validateDiagnosticSignature_(setid, model, genes, idtype, targetname,
-  controlname, targetcol, datadir)
+validateDiagnosticSignature_(validationstudylist, models, genes, idtype,
+  targetname, controlname, targetcol, datadir)
 }
 \arguments{
-\item{setid}{A named list, containing metainformation on the study/studies used for validation of the diagnostic signature.}
+\item{validationstudylist}{A list, containing metainformation on the study used for validation of the diagnostic signature.}
 
-\item{model}{A prediction model to be used for validation.}
+\item{models}{A prediction model to be used for validation.}
 
 \item{genes}{A object. The output of the function `identifyDEGs_()`.}
 
