@@ -189,42 +189,6 @@ cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)),
       colnames(Biobase::pData(eset3b)))
 ```
 
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE18842.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset1b), main = "GSE18842 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE19804.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset2b), main = "GSE19804 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE19188.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset3b), main = "GSE19188 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
 ## Preparations for utilizing the sigident package 
 
 Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clear we define them here at the beginning and refer at each function to the respective variable. `idtype` can be either "affy" or "entrez", indicating, if either Affy-IDs or Entrez-IDs are to be used as feature names for the subsequent analyses.  
@@ -318,6 +282,43 @@ Batch effects are systematic non-biological variation between studies due to exp
 
 ## Visualize batch effect
 
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# visualize log2 transformed expression values of the merged dataset as boxplot
+filename <- paste0(plotdir, "boxplot_GSE18842.jpeg")
+jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
+boxplot(Biobase::exprs(eset1b), main = "GSE18842 before batch correction", 
+        xlab = "Samples", ylab ="Expression value")
+dev.off()
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# visualize log2 transformed expression values of the merged dataset as boxplot
+filename <- paste0(plotdir, "boxplot_GSE19804.jpeg")
+jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
+boxplot(Biobase::exprs(eset2b), main = "GSE19804 before batch correction", 
+        xlab = "Samples", ylab ="Expression value")
+dev.off()
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# visualize log2 transformed expression values of the merged dataset as boxplot
+filename <- paste0(plotdir, "boxplot_GSE19188.jpeg")
+jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
+boxplot(Biobase::exprs(eset3b), main = "GSE19188 before batch correction", 
+        xlab = "Samples", ylab ="Expression value")
+dev.off()
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # visualize log2 transformed expression values of the merged dataset as boxplot
 filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
@@ -326,7 +327,6 @@ boxplot(mergedset@assayData$exprs, main = "Merged data before batch correction",
         xlab = "Samples", ylab ="Expression value")
 dev.off()
 ```
-
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
