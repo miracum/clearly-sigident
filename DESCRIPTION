@@ -67,3 +67,4 @@ Suggests:
     devtools,
     rmarkdown,
     qpdf
+RoxygenNote: 6.1.1
