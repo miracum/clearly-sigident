@@ -27,3 +27,30 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 Please view the package's vignette to see a detailled description how to perform merging, signature and functional analyses of microarray data.
 
+## Citation  
+
+To cite the 'sigident' package in publications, please use: 
+
+```
+@Article{,
+    title = {A Toolbox for Functional Analysis and the Systematic Identification of Diagnostic and Prognostic Gene Expression Signatures Combining Meta-Analysis and Machine Learning},
+    volume = {11},
+    doi = {10.3390/cancers11101606},
+    pages = {14},
+    number = {1606},
+    journal = {Cancers},
+    author = {Johannes Vey and Lorenz A. Kapsner and Maximilian Fuchs and Philipp Unberath and Giulia Veronesi and Meik Kunz},
+    year = {2019},
+}
+```
+and
+
+```
+@Manual{,
+    title = {sigident: Signature Analyses in Genomic Expression Sets},
+    author = {Lorenz A. Kapsner and Johannes Vey and Meik Kunz and Andreas Pittroff},
+    year = {2019},
+    note = {R package version 0.0.1.9000},
+    url = {https://gitlab.miracum.org/clearly/sigident},
+}
+```
