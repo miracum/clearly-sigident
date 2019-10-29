@@ -4,8 +4,8 @@
 \alias{sigidentDEG}
 \title{Perform DEG Analysis in Gene Expression Datasets Derived from MicroArrays}
 \usage{
-sigidentDEG(mergeset, mergedset, studyMetadata, sampleMetadata,
-  controlname, design, idtype, FDR, targetcol = "target",
+sigidentDEG(mergeset, mergedset, study_metadata, sample_metadata,
+  controlname, design, idtype, fdr, targetcol = "target",
   plotdir = "./plots/", csvdir = "./tables/")
 }
 \arguments{
@@ -13,20 +13,20 @@ sigidentDEG(mergeset, mergedset, studyMetadata, sampleMetadata,
 
 \item{mergedset}{A large Expression Set. The output of the function `merge_()`.}
 
-\item{studyMetadata}{A data frame. The data frame holding the study metadata.}
+\item{study_metadata}{A data frame. The data frame holding the study metadata.}
 
-\item{sampleMetadata}{A data frame. The data frame holding the sample metadata.}
+\item{sample_metadata}{A data frame. The data frame holding the sample metadata.}
 
-\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
+\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sample_metadata`.}
 
-\item{design}{A object. The output of the function `createDiagnosisDesignBatch_()`.}
+\item{design}{A object. The output of the function `create_diagnosisdesignbatch()`.}
 
 \item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
 
-\item{FDR}{A positive numeric value between (max. 0.05) indicating the desired q-Value during DEG analysis (Default: 0.01).}
+\item{fdr}{A positive numeric value between (max. 0.05) indicating the desired q-Value during DEG analysis (Default: 0.01).}
 
-\item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
+\item{targetcol}{A character string. Columname of `sample_metadata` holding the targets. Default: "target". Caution: this should not be changed.}
 
 \item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
 

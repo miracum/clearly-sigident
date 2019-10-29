@@ -4,14 +4,14 @@
 #'
 #' @param mergeset A matrix of merged expression sets (rows = genes, columns = samples).
 #' @param mergedset A large Expression Set. The output of the function `merge_()`.
-#' @param studyMetadata A data frame. The data frame holding the study metadata.
-#' @param sampleMetadata A data frame. The data frame holding the sample metadata.
-#' @param targetcol A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.
-#' @param controlname A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.
-#' @param design A object. The output of the function `createDiagnosisDesignBatch_()`.
+#' @param study_metadata A data frame. The data frame holding the study metadata.
+#' @param sample_metadata A data frame. The data frame holding the sample metadata.
+#' @param targetcol A character string. Columname of `sample_metadata` holding the targets. Default: "target". Caution: this should not be changed.
+#' @param controlname A character string. Name of the the controls, specified in the 'target' column of `sample_metadata`.
+#' @param design A object. The output of the function `create_diagnosisdesignbatch()`.
 #' @param idtype A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 #'   affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!
-#' @param FDR A positive numeric value between (max. 0.05) indicating the desired q-Value during DEG analysis (Default: 0.01).
+#' @param fdr A positive numeric value between (max. 0.05) indicating the desired q-Value during DEG analysis (Default: 0.01).
 #' @param csvdir A character string. Path to the folder to store output tables. Default: "./tables/".
 #' @param plotdir A character string. Path to the folder to store resulting plots. Default: "./plots/".
 #'
@@ -23,25 +23,25 @@
 
 sigidentDEG <- function(mergeset,
                         mergedset,
-                        studyMetadata,
-                        sampleMetadata,
+                        study_metadata,
+                        sample_metadata,
                         controlname,
                         design,
                         idtype,
-                        FDR,
+                        fdr,
                         targetcol = "target",
                         plotdir = "./plots/",
                         csvdir = "./tables/"){
   stopifnot(
     class(mergeset) == "matrix",
-    is.data.frame(sampleMetadata),
-    is.data.frame(studyMetadata),
+    is.data.frame(sample_metadata),
+    is.data.frame(study_metadata),
     is.character(targetcol),
     is.character(controlname),
     is.character(idtype),
     idtype %in% c("entrez", "affy"),
-    is.numeric(FDR),
-    FDR > 0 | FDR <= 0.05,
+    is.numeric(fdr),
+    fdr > 0 | fdr <= 0.05,
     is.character(plotdir),
     is.character(csvdir)
   )
@@ -54,44 +54,44 @@ sigidentDEG <- function(mergeset,
   rv$targetcol <- targetcol
 
   # store other variables
-  rv$deg_q <- FDR
+  rv$deg_q <- fdr
   rv$design <- design
   rv$idtype <- idtype
 
   # store dirs
-  rv$plotdir <- cleanPathName_(plotdir)
-  rv$csvdir <- cleanPathName_(csvdir)
+  rv$plotdir <- clean_path_name(plotdir)
+  rv$csvdir <- clean_path_name(csvdir)
 
   # add mergeset to list
   rv$mergeset <- mergeset
   rv$mergedset <- mergedset
 
   ### DEG Analysis ###
-  rv$genes <- identifyDEGs_(mergeset = rv$mergeset,
+  rv$genes <- identify_degs(mergeset = rv$mergeset,
                             design = rv$design,
-                            qValue = rv$deg_q)
+                            q_value = rv$deg_q)
 
   # heatmap creation
   # create colors for map
-  ht_colors <- colorHeatmap_(sampleMetadata = sampleMetadata,
-                             studyMetadata = studyMetadata,
+  ht_colors <- color_heatmap(sample_metadata = sample_metadata,
+                             study_metadata = study_metadata,
                              targetcol = rv$targetcol,
                              controlname = rv$controlname) # cancer = red
-  createDEGheatmap_(mergeset = rv$mergeset,
+  plot_deg_heatmap(mergeset = rv$mergeset,
                     genes = rv$genes,
                     patientcolors = ht_colors,
                     filename = paste0(rv$plotdir, "DEG_heatmap.png"))
 
   # Export a table with DEGs and annotations
-  rv$deg_info <- sigident::exportDEGannotations_(mergedset = rv$mergedset,
+  rv$deg_info <- sigident::export_deg_annotations(mergedset = rv$mergedset,
                                               genes = rv$genes,
                                               idtype = rv$idtype)
   data.table::fwrite(rv$deg_info, paste0(rv$csvdir, "DEG_info.csv"))
 
   # export table with differential expression parameters and annotations
-  rv$deg_results <- limmaTopTable_(mergeset = rv$mergeset,
+  rv$deg_results <- limma_top_table(mergeset = rv$mergeset,
                                 design = rv$design,
-                                qValue = rv$deg_q)
+                                q_value = rv$deg_q)
   data.table::fwrite(rv$deg_results, paste0(rv$csvdir, "DEG_results.csv"))
 
   # return genes

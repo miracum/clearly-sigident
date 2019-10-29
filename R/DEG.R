@@ -1,78 +1,113 @@
-DEG.limma_ <- function(mergeset, design){
-  fit <- fitLimma_(mergeset, design)
-  t <- limma::topTable(fit, coef=2,number=Inf,p.value=0.05,lfc=2)
+deg_limma <- function(mergeset,
+                       design) {
+
+  fit <- limma_fitting(mergeset, design)
+
+  t <- limma::topTable(
+    fit,
+    coef = 2,
+    number = Inf,
+    p.value = 0.05,
+    lfc = 2
+  )
   genes <- rownames(t)
   return(genes)
 }
 
-#' @title identifyDEGs_
+#' @title identify_degs
 #'
 #' @description Helper function to identify DEGs based on the limma package
 #'
-#' @param qValue A numeric value for the q-value (false discovery rate) (default=0.01).
+#' @param q_value A numeric value for the q-value (false discovery rate)
+#'   (default=0.01).
 #'
 #' @inheritParams sigidentDEG
 #'
 #' @export
-identifyDEGs_ <- function(mergeset, design, qValue=0.01){
+identify_degs <- function(mergeset,
+                          design,
+                          q_value = 0.01) {
+
   stopifnot(
-    qValue > 0 | qValue <= 0.05,
-    is.numeric(qValue)
+    q_value > 0 | q_value <= 0.05,
+    is.numeric(q_value)
   )
-  fit <- fitLimma_(mergeset, design)
-  t <- limma::topTable(fit,
-                       coef=2,
-                       number=Inf,
-                       p.value=qValue,
-                       lfc=2,
-                       adjust.method = "BH")
+
+  fit <- limma_fitting(mergeset, design)
+
+  t <- limma::topTable(
+    fit,
+    coef = 2,
+    number = Inf,
+    p.value = q_value,
+    lfc = 2,
+    adjust.method = "BH"
+  )
   genes <- rownames(t)
   return(genes)
 }
 
-fitLimma_ <- function(mergeset, design){
+limma_fitting <- function(mergeset,
+                      design) {
+
   fit <- limma::eBayes(limma::lmFit(mergeset, design))
+
   return(fit)
 }
 
 
-#' @title limmaTopTable_
+#' @title limma_top_table
 #'
 #' @description Helper function to get DEG results
 #'
 #' @inheritParams sigidentDEG
-#' @inheritParams identifyDEGs_
+#' @inheritParams identify_degs
 #'
 #' @export
-limmaTopTable_ <- function(mergeset, design, qValue){
-  fit <- fitLimma_(mergeset, design)
-  t <- limma::topTable(fit,
-                       coef = 2,
-                       number = Inf,
-                       p.value = qValue,
-                       lfc = 2,
-                       adjust.method = "BH")
-  t[,2:4] <- NULL
-  t[,3] <- NULL
-  t <- cbind(rownames(t),t)
-  colnames(t) <- c("Probe ID", "logFC", "adj.qValue")
+limma_top_table <- function(mergeset,
+                           design,
+                           q_value) {
+
+  fit <- limma_fitting(mergeset, design)
+
+  t <- limma::topTable(
+    fit,
+    coef = 2,
+    number = Inf,
+    p.value = q_value,
+    lfc = 2,
+    adjust.method = "BH"
+  )
+
+  t[, 2:4] <- NULL
+  t[, 3] <- NULL
+  t <- cbind(rownames(t), t)
+  colnames(t) <- c("Probe ID", "logFC", "adj.q_value")
+
   return(t)
 }
 
 # #' @title qSelection_
 # #'
-# #' @description Helper function to select qValues
+# #' @description Helper function to select q_values
 # #'
 # #' @inheritParams sigidentDEG
 # #'
 # #' @export
-# qSelection_ <- function(sampleMetadata, studyMetadata, deg.q.selection = NULL){
-#   if (is.null(deg.q.selection)){
-#     discovery <- discovery_(sampleMetadata = sampleMetadata,
-#                             studyMetadata = studyMetadata)
-#     deg_q <- 1/length(sampleMetadata[sampleMetadata$study %in% discovery, "sample"])
-#   } else {
-#     deg_q <- as.numeric(deg.q.selection)
-#   }
-#   return(deg_q)
-# }
+#% qSelection_ <- function(sample_metadata,
+#%                         study_metadata,
+#%                         deg.q.selection = NULL) {
+#%
+#%   if (is.null(deg.q.selection)) {
+#%     discovery <- discovery_func(
+#%       sample_metadata = sample_metadata,
+#%       study_metadata = study_metadata
+#%     )
+#%     deg_q <- 1/length(
+#%       sample_metadata[sample_metadata$study %in% discovery, "sample"]
+#%     )
+#%   } else {
+#%     deg_q <- as.numeric(deg.q.selection)
+#%   }
+#%   return(deg_q)
+#% }

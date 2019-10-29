@@ -1,15 +1,17 @@
-#' @title cleanPathName_ helper function
+#' @title clean_path_name helper function
 #'
-#' @description Internal function to clean paths to have a tailing slash
+#' @description Internal function to clean paths to have a
+#'   tailing slash
 #'
-#' @param pathname A character string. A pathname to be cleaned (to have a tailing slash).
+#' @param pathname A character string. A pathname to be
+#'   cleaned (to have a tailing slash).
 #'
 #' @export
 #'
-cleanPathName_ <- function(pathname){
+clean_path_name <- function(pathname){
   return(gsub("([[:alnum:]])$", "\\1/", pathname))
 }
 
-discovery_ <- function(sampleMetadata, studyMetadata){
-  return(studyMetadata[which(studyMetadata$discovery == TRUE), "study"])
+discovery_func <- function(sample_metadata, study_metadata){
+  return(study_metadata[which(study_metadata$discovery == TRUE), "study"])
 }

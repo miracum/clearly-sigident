@@ -4,7 +4,7 @@
 \alias{sigidentEnrichment}
 \title{Perform Enrichtment Analysis in Gene Expression Datasets Derived from MicroArrays}
 \usage{
-sigidentEnrichment(mergedset, mergeset, idtype, design, species, OrgDB,
+sigidentEnrichment(mergedset, mergeset, idtype, design, species, org_db,
   organism, pathwayid, plotdir = "./plots/", csvdir = "./tables/")
 }
 \arguments{
@@ -15,11 +15,11 @@ sigidentEnrichment(mergedset, mergeset, idtype, design, species, OrgDB,
 \item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
 
-\item{design}{A object. The output of the function `createDiagnosisDesignBatch_()`.}
+\item{design}{A object. The output of the function `create_diagnosisdesignbatch()`.}
 
 \item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
 
-\item{OrgDB}{A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".}
+\item{org_db}{A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".}
 
 \item{organism}{A character string indicating the organism. Currently supported: "hsa".}
 

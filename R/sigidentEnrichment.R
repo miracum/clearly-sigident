@@ -4,7 +4,7 @@
 #'
 #' @param mergedset A large merged Expression Data set. The output of the funtion `merge_()`.
 #' @param species A character string indicating the sample's species. Currently supported: "Hs".
-#' @param OrgDB A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".
+#' @param org_db A character string indicating the OrgDb. Currently supported: "org.Hs.eg.db".
 #' @param organism A character string indicating the organism. Currently supported: "hsa".
 #' @param pathwayid A character string indicating the pathway to show in the enrichment analysis. Currently supported: "hsa04110".'
 #'
@@ -17,7 +17,7 @@ sigidentEnrichment <- function(mergedset,
                                idtype,
                                design,
                                species,
-                               OrgDB,
+                               org_db,
                                organism,
                                pathwayid,
                                plotdir = "./plots/",
@@ -29,7 +29,7 @@ sigidentEnrichment <- function(mergedset,
     is.character(csvdir),
     is.character(species),
     is.character(organism),
-    is.character(OrgDB),
+    is.character(org_db),
     is.character(pathwayid),
     idtype %in% c("entrez", "affy")
   )
@@ -39,7 +39,7 @@ sigidentEnrichment <- function(mergedset,
 
   # store species, orgdb and orgamism
   rv$species <- species
-  rv$orgdb <- OrgDB
+  rv$orgdb <- org_db
   rv$organism <- organism
   rv$pathwayid <- pathwayid
 
@@ -48,8 +48,8 @@ sigidentEnrichment <- function(mergedset,
   rv$design = design
 
   # store dirs
-  rv$plotdir <- cleanPathName_(plotdir)
-  rv$csvdir <- cleanPathName_(csvdir)
+  rv$plotdir <- clean_path_name(plotdir)
+  rv$csvdir <- clean_path_name(csvdir)
 
   # create output directories
   dir.create(rv$plotdir)
@@ -65,47 +65,47 @@ sigidentEnrichment <- function(mergedset,
   rv$deg_entrez <- rv$deg_entrez[rv$deg_entrez != ""]
 
   # test for over-representation of gene ontology terms
-  rv$enr_topgo <- extractGOterms_(gene = rv$deg_entrez,
+  rv$enr_topgo <- extract_go_terms(gene = rv$deg_entrez,
                                   species = rv$species)
   data.table::fwrite(rv$enr_topgo, paste0(rv$csvdir, "Top_GO.csv"))
 
   # test for over-representation of KEGG pathways
-  rv$enr_topkegg <- extractKEGGterms_(gene = rv$deg_entrez,
+  rv$enr_topkegg <- extract_kegg_terms(gene = rv$deg_entrez,
                                       species = rv$species)
   data.table::fwrite(rv$enr_topkegg, paste0(rv$csvdir, "Top_KEGG.csv"))
 
   # take differential regulation between two groups (design) into account
-  rv$enr_fitlm <- goDiffReg_(mergeset = rv$mergeset,
+  rv$enr_fitlm <- go_diff_reg(mergeset = rv$mergeset,
                              idtype = rv$idtype,
                              design = rv$design,
                              entrezids = rv$mergedset@featureData@data$ENTREZ_GENE_ID)
 
   # test for over-representation of gene ontology terms
-  rv$enr_fitlm_topgo <- extractGOterms_(gene = rv$enr_fitlm,
+  rv$enr_fitlm_topgo <- extract_go_terms(gene = rv$enr_fitlm,
                                         species = rv$species,
-                                        FDR = 0.01)
+                                        fdr = 0.01)
   data.table::fwrite(rv$enr_fitlm_topgo, paste0(rv$csvdir, "Top_GO_fitlm.csv"))
 
 
   # test for over-representation of KEGG pathways
-  rv$enr_fitlm_topkegg <- extractKEGGterms_(gene = rv$enr_fitlm,
+  rv$enr_fitlm_topkegg <- extract_kegg_terms(gene = rv$enr_fitlm,
                                             species = rv$species)
   data.table::fwrite(rv$enr_fitlm_topkegg, paste0(rv$csvdir, "Top_KEGG_fitlm.csv"))
 
   # perform enrichment analysis
-  rv$enr_analysis <- goEnrichmentAnalysis_(gene = rv$deg_entrez,
-                                           OrgDB = rv$orgdb,
+  rv$enr_analysis <- go_enrichment_analysis(gene = rv$deg_entrez,
+                                           org_db = rv$orgdb,
                                            organism = rv$organism,
                                            fitlm = rv$enr_fitlm,
                                            pathwayid = rv$pathwayid,
                                            plotdir = rv$plotdir)
 
   # plotting enrichmentanalysis
-  createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$go,
+  plot_enrichted_barplot(enrichmentobj = rv$enr_analysis$go,
                           type = "GO",
                           filename = paste0(rv$plotdir, "Enriched_GO.png"))
 
-  createEnrichtedBarplot_(enrichmentobj = rv$enr_analysis$kegg,
+  plot_enrichted_barplot(enrichmentobj = rv$enr_analysis$kegg,
                           type = "KEGG",
                           filename = paste0(rv$plotdir, "Enriched_KEGG.png"))
 }

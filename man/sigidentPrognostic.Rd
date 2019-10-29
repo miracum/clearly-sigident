@@ -4,40 +4,45 @@
 \alias{sigidentPrognostic}
 \title{Perform Prognostic Signature Analyses in Gene Expression Datasets Derived from MicroArrays}
 \usage{
-sigidentPrognostic(mergeset, studyMetadata, sampleMetadata, idtype, genes,
-  discoverystudies.w.timedata, classifier_studies, validationstudiesinfo,
-  targetname, controlname, datadir, plotdir = "./plots/",
-  csvdir = "./tables/", targetcol = "target")
+sigidentPrognostic(mergeset, study_metadata, sample_metadata, idtype,
+  genes, discoverystudies_w_timedata, classifier_studies,
+  validationstudiesinfo, targetname, controlname, datadir,
+  plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
 
-\item{studyMetadata}{A data frame. The data frame holding the study metadata.}
+\item{study_metadata}{A data frame. The data frame holding the study metadata.}
 
-\item{sampleMetadata}{A data frame. The data frame holding the sample metadata.}
+\item{sample_metadata}{A data frame. The data frame holding the sample metadata.}
 
 \item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
 
-\item{genes}{A object. The output of the function `identifyDEGs_()`.}
+\item{genes}{A object. The output of the function `identify_degs()`.}
 
-\item{discoverystudies.w.timedata}{A list that contains specifications on the study/studies that contain(s) survival time information.}
+\item{discoverystudies_w_timedata}{A list that contains specifications
+on the study/studies that contain(s) survival time information.}
 
-\item{classifier_studies}{A character vector. Names of the studies used to train the classifier.}
+\item{classifier_studies}{A character vector. Names of the studies
+used to train the classifier.}
 
-\item{validationstudiesinfo}{A list that contains specifications on the study that contains the validation information.}
+\item{validationstudiesinfo}{A list that contains specifications on
+the study that contains the validation information.}
 
-\item{targetname}{A character string. Name of the the targets, specified in the 'target' column of `sampleMetadata`.}
+\item{targetname}{A character string. Name of the the targets, specified
+in the 'target' column of `sample_metadata`.}
 
-\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sampleMetadata`.}
+\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sample_metadata`.}
 
-\item{datadir}{A character string. Path to the data-folder inside the metadata folder.}
+\item{datadir}{A character string. Path to the data-folder inside the
+metadata folder.}
 
 \item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
 
 \item{csvdir}{A character string. Path to the folder to store output tables. Default: "./tables/".}
 
-\item{targetcol}{A character string. Columname of `sampleMetadata` holding the targets. Default: "target". Caution: this should not be changed.}
+\item{targetcol}{A character string. Columname of `sample_metadata` holding the targets. Default: "target". Caution: this should not be changed.}
 }
 \description{
 One function to perform prognostic signature analysis.

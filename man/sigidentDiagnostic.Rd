@@ -10,7 +10,7 @@ sigidentDiagnostic(mergeset, diagnosis, seed = 111, nfolds = 10,
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
 
-\item{diagnosis}{An object. The output of the function `createDiagnosisDesignBatch_()`.}
+\item{diagnosis}{An object. The output of the function `create_diagnosisdesignbatch()`.}
 
 \item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
 
