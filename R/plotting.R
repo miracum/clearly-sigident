@@ -247,7 +247,7 @@ createGridVarImpPlot_ <- function(model, filename){
 createSurvPlot_ <- function(fit, RiskTable, filename){
   shiny::plotPNG({
     return(print({
-      survminer::ggsurvplot(fit, RiskTable, conf.int = TRUE, legend.labs=c("Low-Risk", "High-Risk"), ggtheme = ggplot2::theme_minimal())
+      survminer::ggsurvplot(fit, RiskTable, conf.int = TRUE, legend.labs=c("Low-Risk", "High-Risk"))
     }))
   },
   filename = filename,
