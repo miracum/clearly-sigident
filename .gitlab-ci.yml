@@ -14,8 +14,7 @@ variables:
   _R_CHECK_FORCE_SUGGESTS_: "true"
   DOCKER_REGISTRY: "docker.miracum.org"
   IMAGE_PATH: "r_package_ci"
-  IMAGE_NAME: "${CI_PROJECT_NAME}_base_image"
-  CI_IMAGE_NAME: "${DOCKER_REGISTRY}/${IMAGE_PATH}/${IMAGE_NAME}"
+  CI_IMAGE_NAME: "${DOCKER_REGISTRY}/${IMAGE_PATH}/${CI_PROJECT_NAME}_base_image"
   IMAGE_TAG: "0.0.1"
 
 # set DOCKER_AUTH_CONFIG in settings CI/CD
