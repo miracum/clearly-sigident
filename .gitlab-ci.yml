@@ -54,11 +54,11 @@ check_package:
   image: ${CI_IMAGE_NAME}:latest
   stage: check
   script:
-    - R -e "devtools::check(pkg = '.', args = c('--no-clean'), build_args = c('--no-build-vignettes'), check_dir = '.')"
+    - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '.')"
   artifacts:
     paths:
       - "*.Rcheck"
-    when: always # always upload check artifacts, even if job fails!
+    when: on_failure # upload check artifacts when job fails!
     expire_in: 1 month
 
 #check_errors:

@@ -27,3 +27,4 @@
 ^Readme\.md$
 ^infos\.R$
 ^\.gitlab-ci\.yml$
+^ci$
