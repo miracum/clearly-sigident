@@ -3,6 +3,7 @@ image: bioconductor/bioconductor_full:release
 stages:
   - build
   - vignette
+  - check
 #  - document
 #  - check
 #  - test
@@ -12,20 +13,25 @@ variables:
   _R_CHECK_CRAN_INCOMING_: "false"
   _R_CHECK_FORCE_SUGGESTS_: "true"
 
-#before_script:
-#  - apt-get update
+before_script:
+  - R -e "install.packages(c('devtools'))"
 
-buildbinary:
+build_binary:
   stage: build
   script:
     - R -e 'devtools::build(binary = TRUE, vignette = FALSE)'
 
-buildsource:
+build_source:
   stage: build
   script:
     - R -e 'devtools::build(binary = FALSE, vignette = FALSE)'
 
-compilevignette:
+compile_vignette:
   stage: vignette
   script:
     - R -e 'devtools::build_vignettes()'
+
+check_package:
+  stage: check
+  script:
+    - R -e 'devtools::check(".", args = "--no-vignettes")'
