@@ -32,7 +32,7 @@ build_base_image:
   image: docker:stable
   extends: .docker_registry
   script:
-    - cd .. && docker build -t $IMAGE_NAME:latest -f ci/Dockerfile .
+    - cd .. && docker build -t $IMAGE_NAME:latest -f ${PKG_NAME}/ci/Dockerfile .
     - docker push $CI_IMAGE_NAME
 
 check_package:
