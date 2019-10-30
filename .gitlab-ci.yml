@@ -24,9 +24,8 @@ check_package:
     - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes', '--no-clean'), check_dir = '.')"
   artifacts:
     paths:
-      - "*.Rcheck"
-    name: logs
-    when: always
+      - "sigident.Rcheck"
+    expire_in: 1 month
 
 #check_errors:
 #  stage: check
@@ -49,9 +48,10 @@ compile_vignette:
     - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
   artifacts:
     paths:
-      - "vignettes/"
-    name: vignettes
-    when: always
+      - "vignettes/sigident-Howto_Microarray.HTML"
+      - "vignettes/csv"
+      - "vignettes/plot"
+    expire_in: 1 month
 
 codecoverage:
   stage: codecov
@@ -66,9 +66,9 @@ build_source:
 build_binary:
   stage: build
   script:
-    - R -e "devtools::build(pkg = '.',binary = TRUE, vignettes = FALSE)"
+    - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
 
 install:
   stage: deploy
   script:
-    - r -e 'devtools::install()'
+    - R -e "devtools::install(pkg = '.')"

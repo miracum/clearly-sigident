@@ -12,7 +12,7 @@ test_that(
         "batchcorrection.R" = NULL,
         "compare_diagnostic_models.R" = NULL,
         "data_handling.R" = NULL,
-        "deg.R" = NULL,
+        "DEG.R" = NULL,
         "diagnostic_sig.R" = NULL,
         "enrichment.R" = NULL,
         "otherfunctions.R" = NULL,
