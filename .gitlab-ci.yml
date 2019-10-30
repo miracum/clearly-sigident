@@ -1,9 +1,9 @@
 image: bioconductor/bioconductor_full:release
 
 stages:
-  - build
-  - vignette
   - check
+  - vignette
+  - build
 #  - document
 #  - check
 #  - test
@@ -16,22 +16,23 @@ variables:
 before_script:
   - R -e "install.packages(c('devtools'))"
 
-build_binary:
-  stage: build
-  script:
-    - R -e 'devtools::build(binary = TRUE, vignette = FALSE)'
+#build_binary:
+#  stage: build
+#  script:
+#    - R -e 'devtools::build(binary = TRUE, vignette = FALSE)'
 
-build_source:
-  stage: build
+
+check_package:
+  stage: check
   script:
-    - R -e 'devtools::build(binary = FALSE, vignette = FALSE)'
+    - R -e 'devtools::check(".", args = "--no-vignettes")'
 
 compile_vignette:
   stage: vignette
   script:
     - R -e 'devtools::build_vignettes()'
 
-check_package:
-  stage: check
+build_source:
+  stage: build
   script:
-    - R -e 'devtools::check(".", args = "--no-vignettes")'
+    - R -e 'devtools::build(binary = FALSE, vignette = FALSE)'
