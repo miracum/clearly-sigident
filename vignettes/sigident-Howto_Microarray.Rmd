@@ -359,7 +359,7 @@ In order to correct for occurring batch effects and other unwanted variation in 
 table(mergedset@phenoData@data[[targetcol]])
 
 # generate list dd with diagnosis and design
-dd <- sigident::create_diagnosisdesignbatch_(
+dd <- sigident::create_diagnosisdesignbatch(
   sample_metadata = sample_metadata,
   study_metadata = study_metadata,
   controlname = controlname,
