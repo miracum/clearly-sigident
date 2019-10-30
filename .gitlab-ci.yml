@@ -1,5 +1,5 @@
 #image: bioconductor/bioconductor_full:release
-image: rocker/tidyverse:3.6.1
+#image: rocker/tidyverse:3.6.1
 
 stages:
   - .pre
@@ -12,19 +12,23 @@ stages:
 variables:
   _R_CHECK_CRAN_INCOMING_: "false"
   _R_CHECK_FORCE_SUGGESTS_: "true"
+  CI_IMAGE_NAME: $CI_REGISTRY_IMAGE/ci_base_image
 
 
+# https://gitlab.com/gitlab-org/gitlab/issues/22801
 build_base_image:
   stage: .pre
-  image: rocker/tidyverse:3.6.1
+  image: docker:stable
   script:
-    - docker build -t ci_base_image:latest -f ci/Dockerfile .
+    - docker -D login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker -D build -t $CI_IMAGE_NAME:latest -f ci/Dockerfile .
+    - docker -D push $CI_IMAGE_NAME
   only:
     changes:
       - "ci/Dockerfile"
 
 check_package:
-  image: ci_base_image:latest
+  image: $CI_IMAGE_NAME:latest
   stage: check
   script:
     - R -e "devtools::check(pkg = '.', args = c('--no-clean'), build_args = c('--no-build-vignettes'), check_dir = '.')"
@@ -50,7 +54,7 @@ check_package:
 #    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['notes']], character(0))) stop('Check with Notes')"
 
 compile_vignette:
-  image: ci_base_image:latest
+  image: $CI_IMAGE_NAME:latest
   stage: vignette
   script:
     - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
@@ -62,25 +66,25 @@ compile_vignette:
     expire_in: 1 month
 
 codecoverage:
-  image: ci_base_image:latest
+  image: $CI_IMAGE_NAME:latest
   stage: codecov
   script:
     - R -e 'covr::codecov()'
 
 build_source:
-  image: ci_base_image:latest
+  image: $CI_IMAGE_NAME:latest
   stage: build
   script:
     - R -e "devtools::build(pkg = '.', binary = FALSE, vignettes = FALSE)"
 
 build_binary:
-  image: ci_base_image:latest
+  image: $CI_IMAGE_NAME:latest
   stage: build
   script:
     - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
 
 install:
-  image: ci_base_image:latest
+  image: $CI_IMAGE_NAME:latest
   stage: deploy
   script:
     - R -e "devtools::install(pkg = '.')"
