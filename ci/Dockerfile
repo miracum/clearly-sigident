@@ -16,5 +16,3 @@ RUN R -e "devtools::install_dev_deps(pkg = '${PKG_NAME}', upgrade = 'always')"
 
 # clean up
 RUN rm -rf ${PKG_NAME}
-
-CMD ["R"]
