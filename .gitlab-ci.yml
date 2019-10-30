@@ -14,7 +14,7 @@ variables:
   _R_CHECK_FORCE_SUGGESTS_: "true"
   DOCKER_REGISTRY: "docker.miracum.org"
   IMAGE_PATH: "r_package_ci"
-  IMAGE_NAME: "sigident_base_image"
+  IMAGE_NAME: "${CI_IMAGE_NAME}_base_image"
   CI_IMAGE_NAME: "${DOCKER_REGISTRY}/${IMAGE_PATH}/${IMAGE_NAME}"
   IMAGE_TAG: "0.0.1"
 
