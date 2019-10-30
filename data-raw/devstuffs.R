@@ -98,7 +98,7 @@ usethis::use_package("GO.db", type="Imports")
 usethis::use_package("org.Hs.eg.db", type="Imports")
 usethis::use_package("clusterProfiler", type="Imports")
 usethis::use_package("pathfindR", type="Imports")
-usethis::use_package("pathview", type="Imports")
+usethis::use_package("pathview", type = "Imports")
 
 
 # Suggests

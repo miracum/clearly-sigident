@@ -47,6 +47,7 @@ build_base_image:
     - cd .. && docker build -t ${CI_IMAGE_NAME}:latest -f ${PKG_NAME}/ci/Dockerfile .
     - docker push ${CI_IMAGE_NAME}
   only:
+    # build only when there are changes in dependencies
     changes:
       - "data-raw/devstuffs.R"
 
