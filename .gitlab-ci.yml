@@ -12,7 +12,7 @@ stages:
 variables:
   _R_CHECK_CRAN_INCOMING_: "false"
   _R_CHECK_FORCE_SUGGESTS_: "true"
-  DOCKER_REGISTRY: docker.miracum.org
+  DOCKER_REGISTRY: https://docker.miracum.org
   IMAGE_PATH: $DOCKER_REGISTRY/r_package_ci
   IMAGE_NAME: ci_sigident_base_image
   CI_IMAGE_NAME: $IMAGE_PATH/$IMAGE_NAME
