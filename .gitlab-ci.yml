@@ -52,8 +52,8 @@ build_base_image:
       - "data-raw/devstuffs.R"
 
 check_package:
-  image: ${CI_IMAGE_NAME}:latest
   stage: check
+  image: ${CI_IMAGE_NAME}:latest
   script:
     - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '.')"
   artifacts:
@@ -78,8 +78,8 @@ check_package:
 #    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['notes']], character(0))) stop('Check with Notes')"
 
 compile_vignette:
-  image: ${CI_IMAGE_NAME}:latest
   stage: vignette
+  image: ${CI_IMAGE_NAME}:latest
   script:
     - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
   artifacts:
@@ -90,8 +90,8 @@ compile_vignette:
     expire_in: 1 month
 
 codecoverage:
-  image: ${CI_IMAGE_NAME}:latest
   stage: codecov
+  image: ${CI_IMAGE_NAME}:latest
   script:
     - R -e 'covr::codecov()'
 
@@ -102,13 +102,13 @@ build_source:
     - R -e "devtools::build(pkg = '.', binary = FALSE, vignettes = FALSE)"
 
 build_binary:
-  image: ${CI_IMAGE_NAME}:latest
   stage: build
+  image: ${CI_IMAGE_NAME}:latest
   script:
     - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
 
 install:
-  image: ${CI_IMAGE_NAME}:latest
   stage: deploy
+  image: ${CI_IMAGE_NAME}:latest
   script:
     - R -e "devtools::install(pkg = '.')"
