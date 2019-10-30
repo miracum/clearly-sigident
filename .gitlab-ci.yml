@@ -16,6 +16,7 @@ variables:
 before_script:
   - echo "options('repos' = 'https://ftp.fau.de/cran/')" >> /usr/local/lib/R/etc/Rprofile.site
   - R -e "install.packages(c('devtools'))"
+  - R -e "devtools::install_git('https://gitlab.miracum.org/clearly/sigident.git')"
 
 #build_binary:
 #  stage: build
