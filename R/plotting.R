@@ -10,7 +10,7 @@
 #'
 #' @export
 plot_import_boxplot <- function(mergeset,
-                                 filename = NULL) {
+                                filename = NULL) {
   if (is.null(filename)) {
     filename <- "./plots/import_boxplot.png"
     if (!dir.exists("./plots/")) {
@@ -18,19 +18,21 @@ plot_import_boxplot <- function(mergeset,
     }
   }
 
-  outplot <- graphics::boxplot(
-    mergeset,
-    main = "Merged microarray data",
-    xlab = "Samples",
-    ylab = "Expression"
-  )
-
-  ggplot2::ggsave(
+  shiny::plotPNG(
+    func = {
+      outplot <- graphics::boxplot(
+        mergeset,
+        main = "Merged microarray data",
+        xlab = "Samples",
+        ylab = "Expression"
+      )
+      return(
+        print(outplot)
+      )
+    },
     filename = filename,
-    plot = outplot,
-    device = "png",
-    height = 10,
-    width = 20
+    height = 1000,
+    width = 2000
   )
 }
 
@@ -50,8 +52,8 @@ plot_import_boxplot <- function(mergeset,
 #'
 #' @export
 plot_batchplot <- function(correction_obj,
-                             filename = NULL,
-                             time) {
+                           filename = NULL,
+                           time) {
 
   if (is.null(filename)) {
     filename <- paste0("./plots/PCplot_", time, ".png")
@@ -60,22 +62,24 @@ plot_batchplot <- function(correction_obj,
     }
   }
 
-  # time == "before" or "after"
-  outplot <- gPCA::PCplot(
-    correction_obj,
-    ug = "guided",
-    type = "1v2",
-    main = paste("gPCA",
-                 time,
-                 "batch correction")
-  )
-
-  ggplot2::ggsave(
+  shiny::plotPNG(
+    func = {
+      # time == "before" or "after"
+      outplot <- gPCA::PCplot(
+        correction_obj,
+        ug = "guided",
+        type = "1v2",
+        main = paste("gPCA",
+                     time,
+                     "batch correction")
+      )
+      return(
+        print(outplot)
+      )
+    },
     filename = filename,
-    plot = outplot,
-    device = "png",
-    height = 15,
-    width = 15
+    height = 1500,
+    width = 1500
   )
 }
 
@@ -102,25 +106,27 @@ plot_deg_heatmap <-
       }
     }
 
-    outplot <- gplots::heatmap.2(
-      mergeset[genes, ],
-      ColSideColors = patientcolors,
-      key = TRUE,
-      symkey = FALSE,
-      density.info = "none",
-      scale = "none",
-      trace = "none",
-      col = grDevices::topo.colors(100),
-      cexRow = 0.4,
-      cexCol = 0.4
-    )
-
-    ggplot2::ggsave(
+    shiny::plotPNG(
+      func = {
+        outplot <- gplots::heatmap.2(
+          mergeset[genes, ],
+          ColSideColors = patientcolors,
+          key = TRUE,
+          symkey = FALSE,
+          density.info = "none",
+          scale = "none",
+          trace = "none",
+          col = grDevices::topo.colors(100),
+          cexRow = 0.4,
+          cexCol = 0.4
+        )
+        return(
+          print(outplot)
+        )
+      },
       filename = filename,
-      plot = outplot,
-      device = "png",
-      height = 20,
-      width = 30
+      height = 2000,
+      width = 3000
     )
   }
 
@@ -140,9 +146,9 @@ plot_deg_heatmap <-
 #'
 #' @export
 plot_enrichted_barplot <- function(enrichmentobj,
-                                    type,
-                                    filename = NULL,
-                                    show_category = 20) {
+                                   type,
+                                   filename = NULL,
+                                   show_category = 20) {
 
   stopifnot(is.character(type),
             type %in% c("GO", "KEGG"),
@@ -154,18 +160,20 @@ plot_enrichted_barplot <- function(enrichmentobj,
     }
   }
 
-  outplot <- graphics::barplot(
-    enrichmentobj,
-    showCategory = show_category) +
-    ggplot2::ggtitle(paste0("Enriched ", type, " terms")) +
-    ggplot2::ylab("Gene count")
-
-  ggplot2::ggsave(
+  shiny::plotPNG(
+    func = {
+      outplot <- graphics::barplot(
+        enrichmentobj,
+        showCategory = show_category) +
+        ggplot2::ggtitle(paste0("Enriched ", type, " terms")) +
+        ggplot2::ylab("Gene count")
+      return(
+        print(outplot)
+      )
+    },
     filename = filename,
-    plot = outplot,
-    device = "png",
-    height = 10,
-    width = 20
+    height = 1000,
+    width = 2000
   )
 }
 
@@ -197,7 +205,9 @@ color_heatmap <-
           discoverydata, function(tumor) {
             #% healthy=blue
             return(
-              ifelse(tumor == controlname, "#0000FF", "#FF0000")
+              ifelse(tumor == controlname,
+                     "#0000FF",
+                     "#FF0000")
             )
           }
         )
@@ -217,19 +227,21 @@ color_heatmap <-
 #'
 #' @export
 plot_rocplot <- function(roc,
-                           filename) {
+                         filename) {
 
-  outplot <- graphics::plot(roc) +
-    graphics::text(0.4,
-                   0,
-                   paste0("AUC: ", round(roc$auc, 4)))
-
-  ggplot2::ggsave(
+  shiny::plotPNG(
+    func = {
+      outplot <- graphics::plot(roc) +
+        graphics::text(0.4,
+                       0,
+                       paste0("AUC: ", round(roc$auc, 4)))
+      return(
+        print(outplot)
+      )
+    },
     filename = filename,
-    plot = outplot,
-    device = "png",
-    height = 10,
-    width = 15
+    height = 1000,
+    width = 1500
   )
 }
 
@@ -244,16 +256,18 @@ plot_rocplot <- function(roc,
 #'
 #' @export
 plot_cvplot <- function(cv_obj,
-                          filename) {
+                        filename) {
 
-  outplot <- graphics::plot(cv_obj)
-
-  ggplot2::ggsave(
+  shiny::plotPNG(
+    func = {
+      outplot <- graphics::plot(cv_obj)
+      return(
+        print(outplot)
+      )
+    },
     filename = filename,
-    plot = outplot,
-    device = "png",
-    height = 10,
-    width = 15
+    height = 1000,
+    width = 1500
   )
 }
 
@@ -270,14 +284,16 @@ plot_cvplot <- function(cv_obj,
 plot_grid_model_plot <- function(model,
                                  filename) {
 
-  outplot <- graphics::plot(model)
-
-  ggplot2::ggsave(
+  shiny::plotPNG(
+    func = {
+      outplot <- graphics::plot(model)
+      return(
+        print(outplot)
+      )
+    },
     filename = filename,
-    plot = outplot,
-    device = "png",
-    height = 10,
-    width = 15
+    height = 1000,
+    width = 1500
   )
 }
 
@@ -292,15 +308,17 @@ plot_grid_model_plot <- function(model,
 plot_grid_varimp_plot <- function(model,
                                   filename) {
 
-  var_imp <- caret::varImp(model)
-  outplot <- graphics::plot(var_imp, top = 20)
-
-  ggplot2::ggsave(
+  shiny::plotPNG(
+    func = {
+      var_imp <- caret::varImp(model)
+      outplot <- graphics::plot(var_imp, top = 20)
+      return(
+        print(outplot)
+      )
+    },
     filename = filename,
-    plot = outplot,
-    device = "png",
-    height = 10,
-    width = 15
+    height = 1000,
+    width = 1500
   )
 }
 
@@ -321,18 +339,20 @@ plot_survplot <- function(fit,
                           risk_table,
                           filename) {
 
-  outplot <- survminer::ggsurvplot(
-    fit,
-    risk_table,
-    conf.int = TRUE,
-    legend.labs = c("Low-Risk", "High-Risk")
-  )
-
-  ggplot2::ggsave(
+  shiny::plotPNG(
+    func = {
+      outplot <- survminer::ggsurvplot(
+        fit,
+        risk_table,
+        conf.int = TRUE,
+        legend.labs = c("Low-Risk", "High-Risk")
+      )
+      return(
+        print(outplot)
+      )
+    },
     filename = filename,
-    plot = outplot,
-    device = "png",
-    height = 10,
-    width = 15
+    height = 1000,
+    width = 1500
   )
 }
