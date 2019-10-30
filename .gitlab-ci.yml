@@ -32,10 +32,8 @@ build_base_image:
   image: docker:stable
   extends: .docker_registry
   script:
-    - mkdir ci/addfolder && cp -r ../ ci/addfolder
-    - docker build -t $IMAGE_NAME:latest -f ci/Dockerfile .
+    - cd .. && docker build -t $IMAGE_NAME:latest -f ci/Dockerfile .
     - docker push $CI_IMAGE_NAME
-    - rm -rf ci/addfolder
 
 check_package:
   image: $CI_IMAGE_NAME:latest
