@@ -2,7 +2,7 @@
 image: rocker/tidyverse:3.6.1
 
 stages:
-  - dependencies
+  - .pre
   - check
   - vignette
   - codecov
@@ -15,6 +15,7 @@ variables:
 
 
 build_base_image:
+  stage: .pre
   image: rocker/tidyverse:3.6.1
   script:
     - docker build -t ci_base_image:latest -f ci/Dockerfile .
