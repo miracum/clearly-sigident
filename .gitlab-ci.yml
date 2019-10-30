@@ -15,7 +15,7 @@ variables:
   DOCKER_REGISTRY: "docker.miracum.org"
   IMAGE_PATH: "r_package_ci"
   CI_IMAGE_NAME: "${DOCKER_REGISTRY}/${IMAGE_PATH}/${CI_PROJECT_NAME}_base_image"
-  IMAGE_TAG: "latest"
+  IMAGE_TAG: "0.0.1"
 
 # set DOCKER_AUTH_CONFIG in settings CI/CD
 # {
@@ -54,7 +54,7 @@ build_base_image:
 check_package:
   stage: check
   script:
-    - devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '.')
+    - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '.')"
   artifacts:
     paths:
       - "*.Rcheck"
