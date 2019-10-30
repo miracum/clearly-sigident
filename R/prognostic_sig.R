@@ -463,13 +463,13 @@ prognostic_classifier <- function(pattern_com,
 fit_kaplan_estimator <- function(risktable) {
   # fit proportional hazards regression model
   res_cox <- survival::coxph(
-    survival::Surv(time, status) ~ Groups,
+    survival::Surv(time, status) ~ groups,
     data = risktable
   )
   new_df <- with(risktable,
                  data.frame(
                    Groups = c(0, 1),
-                   survival_time = rep(mean(time, na.rm = TRUE), 2),
+                   survival_time = rep(mean(risktable$time, na.rm = TRUE), 2),
                    ph.ecog = c(1, 1)
                  ))
   fit <- survival::survfit(res_cox, newdata = new_df)
