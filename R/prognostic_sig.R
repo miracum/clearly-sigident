@@ -448,6 +448,7 @@ prognostic_classifier <- function(pattern_com,
     # prepare classification and required data for Kaplan-Meier estimator
     groups <- risk_table_sig[, "RiskGroup"]
     risk_table <- cbind(risk_table, groups)
+    colnames(risk_table) <- c("time", "status", "groups")
     rownames(risk_table) <- colnames(expr)
 
     kap <- fit_kaplan_estimator(risktable = risk_table)
@@ -463,7 +464,7 @@ prognostic_classifier <- function(pattern_com,
 fit_kaplan_estimator <- function(risktable) {
   # fit proportional hazards regression model
   res_cox <- survival::coxph(
-    survival::Surv(time, status) ~ groups,
+    survival::Surv(time, status) ~ risktable$groups,
     data = risktable
   )
   new_df <- with(risktable,

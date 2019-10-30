@@ -1291,7 +1291,7 @@ fit
 # create roc plot
 filename <- paste0(plotdir, "GSE30219_Prognostic_Kaplan-Meier_Plot.png")
 sigident::plot_survplot(fit = fit,
-                          risk_table =RiskTable,
+                          risk_table = RiskTable,
                           filename = filename)
 ```
 

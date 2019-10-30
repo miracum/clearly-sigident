@@ -14,7 +14,7 @@ variables:
   _R_CHECK_FORCE_SUGGESTS_: "true"
   DOCKER_REGISTRY: docker.miracum.org
   IMAGE_PATH: $DOCKER_REGISTRY/r_package_ci
-  IMAGE_NAME: ci_base_image
+  IMAGE_NAME: ci_sigident_base_image
   CI_IMAGE_NAME: $IMAGE_PATH/$IMAGE_NAME
   PKG_NAME: sigident
 
@@ -32,7 +32,7 @@ build_base_image:
   image: docker:stable
   extends: .docker_registry
   script:
-    - cd .. && docker build -t $IMAGE_NAME:latest -f ${PKG_NAME}/ci/Dockerfile .
+    - cd .. && docker build -t $CI_IMAGE_NAME:latest -f ${PKG_NAME}/ci/Dockerfile .
     - docker push $CI_IMAGE_NAME
 
 check_package:
