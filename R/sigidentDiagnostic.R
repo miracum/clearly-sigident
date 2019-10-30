@@ -1,11 +1,17 @@
-#' @title Perform Diagnostic Signature Analyses in Gene Expression Datasets Derived from MicroArrays
+#' @title Perform Diagnostic Signature Analyses in Gene Expression Datasets
+#'   Derived from MicroArrays
 #'
 #' @description One function to perform diagnostic signature analysis.
 #'
-#' @param diagnosis An object. The output of the function `create_diagnosisdesignbatch()`.
-#' @param seed A integer value. Seed to make machine learning algorithms reproducible. Default: 111.
-#' @param nfolds A integer. The number of folds used for cross validation. Default: 10.
-#' @param split A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.
+#' @param diagnosis An object. The output of the function
+#'   `create_diagnosisdesignbatch()`.
+#' @param seed A integer value. Seed to make machine learning algorithms
+#'   reproducible. Default: 111.
+#' @param nfolds A integer. The number of folds used for cross validation
+#'   (default: 10).
+#' @param split A numeric value between 0 and 1. The proportion of the data
+#'   to be integrated into the training set for machine learning
+#'   (default: 0.8).
 #'
 #' @inheritParams sigidentDEG
 #'
@@ -16,7 +22,7 @@ sigidentDiagnostic <- function(mergeset,
                                seed = 111,
                                nfolds = 10,
                                split = 0.8,
-                               plotdir = "./plots/"){
+                               plotdir = "./plots/") {
 
   stopifnot(
     class(mergeset) == "matrix",
@@ -39,91 +45,133 @@ sigidentDiagnostic <- function(mergeset,
   # set diagnosis
   rv$diagnosis <- diagnosis
 
-  # store seed, traintest.split
+  # store seed, traintest_split
   rv$seed <- seed
   rv$nfolds <- nfolds
-  rv$traintest.split <- split
+  rv$traintest_split <- split
 
   # add mergeset to list
   rv$mergeset <- mergeset
 
   # identification of Diagnostic Signature
   # first, create training_list
-  rv$training_list <- create_training_test_split(diagnosis = rv$diagnosis,
-                                          mergeset = rv$mergeset,
-                                          split = rv$traintest.split,
-                                          seed = rv$seed)
+  rv$training_list <-
+    create_training_test_split(
+      diagnosis = rv$diagnosis,
+      mergeset = rv$mergeset,
+      split = rv$traintest_split,
+      seed = rv$seed
+    )
 
 
   # Lasso regression
-  rv$diagnostic_lasso <- signature(traininglist = rv$training_list,
-                                    type = "lasso",
-                                    nfolds = rv$nfolds,
-                                    seed = rv$seed)
-  plot_cvplot(cv_obj = rv$diagnostic_lasso$fit_cv,
-                filename = paste0(rv$plotdir, "CV_lasso.png"))
-  plot_rocplot(roc = rv$diagnostic_lasso$roc_min,
-                 filename = paste0(rv$plotdir, "ROC_Lasso.min.png"))
-  plot_rocplot(roc = rv$diagnostic_lasso$roc_1se,
-                 filename = paste0(rv$plotdir, "ROC_Lasso.1se.png"))
+  rv$diagnostic_lasso <- signature(
+    traininglist = rv$training_list,
+    type = "lasso",
+    nfolds = rv$nfolds,
+    seed = rv$seed
+  )
+  plot_cvplot(
+    cv_obj = rv$diagnostic_lasso$fit_cv,
+    filename = paste0(rv$plotdir, "CV_lasso.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_lasso$roc_min,
+    filename = paste0(rv$plotdir, "ROC_Lasso.min.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_lasso$roc_1se,
+    filename = paste0(rv$plotdir, "ROC_Lasso.1se.png")
+  )
 
 
   # Elastic net regression
-  rv$diagnostic_elasticnet <- signature(traininglist = rv$training_list,
-                                         type = "elastic",
-                                         alpha = 0.9,
-                                         nfolds = rv$nfolds,
-                                         seed = rv$seed)
-  plot_cvplot(cv_obj = rv$diagnostic_elasticnet$fit_cv,
-                filename = paste0(rv$plotdir, "CV_elasticNet.png"))
-  plot_rocplot(roc = rv$diagnostic_elasticnet$roc_min,
-                 filename = paste0(rv$plotdir, "ROC_elasticNet.min.png"))
-  plot_rocplot(roc = rv$diagnostic_elasticnet$roc_1se,
-                 filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png"))
+  rv$diagnostic_elasticnet <-
+    signature(
+      traininglist = rv$training_list,
+      type = "elastic",
+      alpha = 0.9,
+      nfolds = rv$nfolds,
+      seed = rv$seed
+    )
+  plot_cvplot(
+    cv_obj = rv$diagnostic_elasticnet$fit_cv,
+    filename = paste0(rv$plotdir, "CV_elasticNet.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_elasticnet$roc_min,
+    filename = paste0(rv$plotdir, "ROC_elasticNet.min.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_elasticnet$roc_1se,
+    filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png")
+  )
 
-  # with both calculated hyperparameters alpha and lambda applying grid search
-  rv$diagnostic_glmgrid <- signature(traininglist = rv$training_list,
-                                      type = "grid",
-                                      nfolds = rv$nfolds,
-                                      seed = rv$seed)
+  # with both calculated hyperparameters alpha and
+  # lambda applying grid search
+  rv$diagnostic_glmgrid <-
+    signature(
+      traininglist = rv$training_list,
+      type = "grid",
+      nfolds = rv$nfolds,
+      seed = rv$seed
+    )
   # plot model of gridsearch
-  plot_grid_model_plot(model = rv$diagnostic_glmgrid$caret_train,
-                       filename = paste0(rv$plotdir, "Gridsearch_model.png"))
+  plot_grid_model_plot(
+    model = rv$diagnostic_glmgrid$caret_train,
+    filename = paste0(rv$plotdir, "Gridsearch_model.png")
+  )
   # plot variable importance of gridsearch
-  plot_grid_varimp_plot(model = rv$diagnostic_glmgrid$caret_train,
-                        filename = paste0(rv$plotdir, "Gridsearch_variable_importance.png"))
+  plot_grid_varimp_plot(
+    model = rv$diagnostic_glmgrid$caret_train,
+    filename = paste0(rv$plotdir, "Gridsearch_variable_importance.png")
+  )
   # create roc plot
-  plot_rocplot(roc = rv$diagnostic_glmgrid$roc_elasticnet,
-                 filename = paste0(rv$plotdir, "ROC_elasticNet.grid.png"))
+  plot_rocplot(
+    roc = rv$diagnostic_glmgrid$roc_elasticnet,
+    filename = paste0(rv$plotdir, "ROC_elasticNet.grid.png")
+  )
 
 
   # compare aucs
   diagnostic_models <- list(
-    "lasso" = list("CV" = rv$diagnostic_lasso$fit_cv,
-                   "min" = list("model" = rv$diagnostic_lasso$lambda_min,
-                                "confmat" = rv$diagnostic_lasso$confmat_min,
-                                "prediction" = rv$diagnostic_lasso$predicted_min,
-                                "auc" = as.numeric(rv$diagnostic_lasso$roc_min$auc)),
-                   "1se" = list("model" = rv$diagnostic_lasso$lambda_1se,
-                                "confmat" = rv$diagnostic_lasso$confmat_1se,
-                                "prediction" = rv$diagnostic_lasso$predicted_1se,
-                                "auc" = as.numeric(rv$diagnostic_lasso$roc_1se$auc))
+    "lasso" = list(
+      "CV" = rv$diagnostic_lasso$fit_cv,
+      "min" = list(
+        "model" = rv$diagnostic_lasso$lambda_min,
+        "confmat" = rv$diagnostic_lasso$confmat_min,
+        "prediction" = rv$diagnostic_lasso$predicted_min,
+        "auc" = as.numeric(rv$diagnostic_lasso$roc_min$auc)
+      ),
+      "1se" = list(
+        "model" = rv$diagnostic_lasso$lambda_1se,
+        "confmat" = rv$diagnostic_lasso$confmat_1se,
+        "prediction" = rv$diagnostic_lasso$predicted_1se,
+        "auc" = as.numeric(rv$diagnostic_lasso$roc_1se$auc)
+      )
     ),
-    "elasticnet" = list("CV" = rv$diagnostic_elasticnet$fit_cv,
-                        "min" = list("model" = rv$diagnostic_elasticnet$lambda_min,
-                                     "confmat" = rv$diagnostic_elasticnet$confmat_min,
-                                     "prediction" = rv$diagnostic_elasticnet$predicted_min,
-                                     "auc" = as.numeric(rv$diagnostic_elasticnet$roc_min$auc)),
-                        "1se" = list("model" = rv$diagnostic_elasticnet$lambda_1se,
-                                     "confmat" = rv$diagnostic_elasticnet$confmat_1se,
-                                     "prediction" = rv$diagnostic_elasticnet$predicted_1se,
-                                     "auc" = as.numeric(rv$diagnostic_elasticnet$roc_1se$auc))
+    "elasticnet" = list(
+      "CV" = rv$diagnostic_elasticnet$fit_cv,
+      "min" = list(
+        "model" = rv$diagnostic_elasticnet$lambda_min,
+        "confmat" = rv$diagnostic_elasticnet$confmat_min,
+        "prediction" = rv$diagnostic_elasticnet$predicted_min,
+        "auc" = as.numeric(rv$diagnostic_elasticnet$roc_min$auc)
+      ),
+      "1se" = list(
+        "model" = rv$diagnostic_elasticnet$lambda_1se,
+        "confmat" = rv$diagnostic_elasticnet$confmat_1se,
+        "prediction" = rv$diagnostic_elasticnet$predicted_1se,
+        "auc" = as.numeric(rv$diagnostic_elasticnet$roc_1se$auc)
+      )
     ),
-    "grid" = list("CV" = rv$diagnostic_glmgrid$caret_train,
-                  "model" = rv$diagnostic_glmgrid$elasticnet_auto,
-                  "confmat" = rv$diagnostic_glmgrid$confmat_elasticnet,
-                  "prediction" = rv$diagnostic_glmgrid$predicted_elasticnet,
-                  "auc" = as.numeric(rv$diagnostic_glmgrid$roc_elasticnet$auc))
+    "grid" = list(
+      "CV" = rv$diagnostic_glmgrid$caret_train,
+      "model" = rv$diagnostic_glmgrid$elasticnet_auto,
+      "confmat" = rv$diagnostic_glmgrid$confmat_elasticnet,
+      "prediction" = rv$diagnostic_glmgrid$predicted_elasticnet,
+      "auc" = as.numeric(rv$diagnostic_glmgrid$roc_elasticnet$auc)
+    )
   )
   return(diagnostic_models = diagnostic_models)
 }

@@ -1,4 +1,5 @@
-#' @title Perform Prognostic Signature Analyses in Gene Expression Datasets Derived from MicroArrays
+#' @title Perform Prognostic Signature Analyses in Gene Expression
+#'   Datasets Derived from MicroArrays
 #'
 #' @description One function to perform prognostic signature analysis.
 #'
@@ -25,10 +26,7 @@ sigidentPrognostic <- function(mergeset,
                                datadir,
                                plotdir = "./plots/",
                                csvdir = "./tables/",
-                               targetcol = "target"){
-
-
-
+                               targetcol = "target") {
   stopifnot(
     class(mergeset) == "matrix",
     is.character(plotdir),
@@ -71,66 +69,77 @@ sigidentPrognostic <- function(mergeset,
 
   # initialize storage lists
   rv$survival_table <- list()
-  rv$entrezIDs <- list()
+  rv$entrez_ids <- list()
   rv$surv_correlated <- list()
-  rv$exprPattern <- list()
-  rv$pC <- list()
+  rv$expr_pattern <- list()
+  rv$p_c <- list()
   rv$results <- list()
 
-  # get survivalData
-  rv$survivalData <- get_survival_time(study_metadata = study_metadata,
-                                      sample_metadata = sample_metadata,
-                                      discoverystudies_w_timedata = discoverystudies_w_timedata,
-                                      idtype = rv$idtype,
-                                      genes = rv$genes,
-                                      targetname = rv$targetname,
-                                      controlname = rv$controlname,
-                                      targetcol = rv$targetcol,
-                                      datadir = rv$datadir)
+  # get survival_data
+  rv$survival_data <-
+    get_survival_time(
+      study_metadata = study_metadata,
+      sample_metadata = sample_metadata,
+      discoverystudies_w_timedata = discoverystudies_w_timedata,
+      idtype = rv$idtype,
+      genes = rv$genes,
+      targetname = rv$targetname,
+      controlname = rv$controlname,
+      targetcol = rv$targetcol,
+      datadir = rv$datadir
+    )
 
-  # outlist
-  outlist <- list()
-  for (i in names(discoverystudies_w_timedata)){
+  for (i in names(discoverystudies_w_timedata)) {
     # extract data
-    rv$survival_table[[i]] <- rv$survivalData[[i]]
+    rv$survival_table[[i]] <- rv$survival_data[[i]]
 
     # compute univariat cox regression
-    rv$surv_correlated[[i]] <- univ_cox(survtable = rv$survival_table[[i]],
-                                        genes = rv$genes)
+    rv$surv_correlated[[i]] <-
+      univ_cox(survtable = rv$survival_table[[i]],
+               genes = rv$genes)
     # export table with survival correlated genes
-    data.table::fwrite(rv$surv_correlated[[i]], paste0(rv$csvdir, i, "_survival_correlated_genes.csv"))
+    data.table::fwrite(rv$surv_correlated[[i]],
+                       paste0(rv$csvdir, i, "_survival_correlated_genes.csv"))
 
     # evaluate expression pattern
-    rv$exprPattern[[i]] <- generate_expression_pattern(classifier_studies = classifier_studies,
-                                                      sig_cov = rv$surv_correlated[[i]],
-                                                      mergeset = rv$mergeset,
-                                                      study_metadata = study_metadata,
-                                                      sample_metadata = sample_metadata,
-                                                      controlname = rv$controlname,
-                                                      targetname = rv$targetname,
-                                                      targetcol = rv$targetcol)
+    rv$expr_pattern[[i]] <-
+      generate_expression_pattern(
+        classifier_studies = classifier_studies,
+        sig_cov = rv$surv_correlated[[i]],
+        mergeset = rv$mergeset,
+        study_metadata = study_metadata,
+        sample_metadata = sample_metadata,
+        controlname = rv$controlname,
+        targetname = rv$targetname,
+        targetcol = rv$targetcol
+      )
 
     # apply prognostic classifier
-    rv$pC[[i]] <- prognostic_classifier(pattern_com = rv$exprPattern[[i]],
-                                        validationstudiesinfo = validationstudiesinfo,
-                                        idtype = rv$idtype,
-                                        datadir = rv$datadir,
-                                        controlname = rv$controlname,
-                                        targetname = rv$targetname,
-                                        targetcol = rv$targetcol)
+    rv$p_c[[i]] <-
+      prognostic_classifier(
+        pattern_com = rv$expr_pattern[[i]],
+        validationstudiesinfo = validationstudiesinfo,
+        idtype = rv$idtype,
+        datadir = rv$datadir,
+        controlname = rv$controlname,
+        targetname = rv$targetname,
+        targetcol = rv$targetcol
+      )
 
-    for (n in names(validationstudiesinfo)){
-      fit <- rv$pC[[i]][[n]]$kaplan_estimator$fit
-      RiskTable <- rv$pC[[i]][[n]]$risktable
+    for (n in names(validationstudiesinfo)) {
+      fit <- rv$p_c[[i]][[n]]$kaplan_estimator$fit
+      risk_table <- rv$p_c[[i]][[n]]$risktable
 
-      rv$results[[i]][[n]] <- list(fit = fit, risktable = RiskTable)
+      rv$results[[i]][[n]] <- list(fit = fit,
+                                   risktable = risk_table)
 
-      filename <- paste0(rv$plotdir, n, "_Prognostic_Kaplan-Meier_Plot.png")
+      filename <- paste0(rv$plotdir,
+                         n,
+                         "_Prognostic_Kaplan-Meier_Plot.png")
       plot_survplot(fit = fit,
-                      risk_table =RiskTable,
-                      filename = filename)
+                    risk_table = risk_table,
+                    filename = filename)
     }
   }
   return(rv$results)
 }
-

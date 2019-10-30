@@ -1155,12 +1155,12 @@ discoverystudies_w_timedata <- list(
 
 ### Extract survival data 
 
-Next, the survival data needs to be extracted. `get_survival_time` results in a table named `survivalData`, containing samples (in our example of the class tumor) as rows, survival time and if an event (death) happened as columns. Additionally, the expression values of the selected DEGs (provided as parameter 'genes') are added as columns to the table. 
+Next, the survival data needs to be extracted. `get_survival_time` results in a table named `survival_data`, containing samples (in our example of the class tumor) as rows, survival time and if an event (death) happened as columns. Additionally, the expression values of the selected DEGs (provided as parameter 'genes') are added as columns to the table. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 
 ### Identification of survival correlated genes
-survivalData <- sigident::get_survival_time(study_metadata = study_metadata,
+survival_data <- sigident::get_survival_time(study_metadata = study_metadata,
                                            sample_metadata = sample_metadata,
                                            genes = genes,
                                            idtype = idtype,
@@ -1169,7 +1169,7 @@ survivalData <- sigident::get_survival_time(study_metadata = study_metadata,
                                            controlname = controlname,
                                            targetcol = targetcol,
                                            datadir = datadir)
-survival_table <- survivalData[["GSE19188"]]
+survival_table <- survival_data[["GSE19188"]]
 ```
 
 ```{r}
@@ -1203,7 +1203,7 @@ The classifier takes the expression profiles of the identified survival correlat
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 classifier_studies <- c("GSE18842", "GSE19804")
-exprPattern <- sigident::generate_expression_pattern(classifier_studies = classifier_studies,
+expr_pattern <- sigident::generate_expression_pattern(classifier_studies = classifier_studies,
                                                     sig_cov = surv_correlated,
                                                     mergeset = mergeset,
                                                     study_metadata = study_metadata,
@@ -1214,8 +1214,8 @@ exprPattern <- sigident::generate_expression_pattern(classifier_studies = classi
 ```
 
 ```{r}
-dim(exprPattern)
-head(exprPattern)
+dim(expr_pattern)
+head(expr_pattern)
 ```
 
 ### Apply the prognostic classifier on validation dataset 
@@ -1251,7 +1251,7 @@ validationstudiesinfo <- list(
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-pC <- sigident::prognostic_classifier(pattern_com = exprPattern,
+p_c <- sigident::prognostic_classifier(pattern_com = expr_pattern,
                                       validationstudiesinfo = validationstudiesinfo,
                                       datadir = datadir,
                                       idtype = idtype,
@@ -1265,8 +1265,8 @@ pC <- sigident::prognostic_classifier(pattern_com = exprPattern,
 Here we extract information on the study GSE30219.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-fit <- pC[["GSE30219"]]$kaplan_estimator$fit
-RiskTable <- pC[["GSE30219"]]$risktable
+fit <- p_c[["GSE30219"]]$kaplan_estimator$fit
+RiskTable <- p_c[["GSE30219"]]$risktable
 ```
 
 ```{r}
@@ -1277,7 +1277,7 @@ head(RiskTable)
 #### View proportional hazards regression models
 
 ```{r}
-pC[["GSE30219"]]$kaplan_estimator$res_cox
+p_c[["GSE30219"]]$kaplan_estimator$res_cox
 ```
 
 ```{r}
@@ -1302,8 +1302,8 @@ knitr::include_graphics(filename)
 ### Validation study: GSE50081
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-fit <- pC[["GSE50081"]]$kaplan_estimator$fit
-RiskTable <- pC[["GSE50081"]]$risktable
+fit <- p_c[["GSE50081"]]$kaplan_estimator$fit
+RiskTable <- p_c[["GSE50081"]]$risktable
 ```
 
 ```{r}
@@ -1314,7 +1314,7 @@ head(RiskTable)
 #### View proportional hazards regression models
 
 ```{r}
-pC[["GSE50081"]]$kaplan_estimator$res_cox
+p_c[["GSE50081"]]$kaplan_estimator$res_cox
 ```
 
 ```{r}

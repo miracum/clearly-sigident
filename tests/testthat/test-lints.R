@@ -17,7 +17,12 @@ test_that(
         "enrichment.R" = NULL,
         "otherfunctions.R" = NULL,
         "plotting.R" = NULL,
-        "prognostic_sig.R" = NULL
+        "prognostic_sig.R" = NULL,
+        "sigidentDEG.R" = "snake_case",
+        "sigidentDiagnostic.R" = "snake_case",
+        "sigidentEnrichment.R" = "snake_case",
+        "sigidentPrognostic.R" = "snake_case",
+        "utils.R" = NULL
       ),
       "tests/testthat" = list(
         "test-lints.R" = NULL

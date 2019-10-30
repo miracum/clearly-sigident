@@ -8,10 +8,10 @@
 #'
 #' @export
 #'
-clean_path_name <- function(pathname){
+clean_path_name <- function(pathname) {
   return(gsub("([[:alnum:]])$", "\\1/", pathname))
 }
 
-discovery_func <- function(sample_metadata, study_metadata){
+discovery_func <- function(sample_metadata, study_metadata) {
   return(study_metadata[which(study_metadata$discovery == TRUE), "study"])
 }
