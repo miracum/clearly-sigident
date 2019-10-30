@@ -12,17 +12,27 @@ stages:
 variables:
   _R_CHECK_CRAN_INCOMING_: "false"
   _R_CHECK_FORCE_SUGGESTS_: "true"
-  CI_IMAGE_NAME: $CI_REGISTRY_IMAGE/ci_base_image
+  DOCKER_REGISTRY: docker.miracum.org
+  IMAGE_PATH: $DOCKER_REGISTRY/r_package_ci
+  IMAGE_NAME: ci_base_image
+  CI_IMAGE_NAME: $IMAGE_PATH/$IMAGE_NAME
+
+.docker_registry:
+  before_script:
+    - echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USERNAME $DOCKER_REGISTRY --password-stdin
+  after_script:
+    - docker logout $DOCKER_REGISTRY
+
 
 
 # https://gitlab.com/gitlab-org/gitlab/issues/22801
 build_base_image:
   stage: .pre
   image: docker:stable
+  extends: .docker_registry
   script:
-    - docker -D login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker -D build -t $CI_IMAGE_NAME:latest -f ci/Dockerfile .
-    - docker -D push $CI_IMAGE_NAME
+    - docker build -t $IMAGE_NAME:latest -f ci/Dockerfile .
+    - docker push $CI_IMAGE_NAME
   only:
     changes:
       - "ci/Dockerfile"
@@ -30,6 +40,7 @@ build_base_image:
 check_package:
   image: $CI_IMAGE_NAME:latest
   stage: check
+  extends: .docker_registry
   script:
     - R -e "devtools::check(pkg = '.', args = c('--no-clean'), build_args = c('--no-build-vignettes'), check_dir = '.')"
   artifacts:
@@ -56,6 +67,7 @@ check_package:
 compile_vignette:
   image: $CI_IMAGE_NAME:latest
   stage: vignette
+  extends: .docker_registry
   script:
     - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
   artifacts:
@@ -68,23 +80,27 @@ compile_vignette:
 codecoverage:
   image: $CI_IMAGE_NAME:latest
   stage: codecov
+  extends: .docker_registry
   script:
     - R -e 'covr::codecov()'
 
 build_source:
   image: $CI_IMAGE_NAME:latest
   stage: build
+  extends: .docker_registry
   script:
     - R -e "devtools::build(pkg = '.', binary = FALSE, vignettes = FALSE)"
 
 build_binary:
   image: $CI_IMAGE_NAME:latest
   stage: build
+  extends: .docker_registry
   script:
     - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
 
 install:
   image: $CI_IMAGE_NAME:latest
   stage: deploy
+  extends: .docker_registry
   script:
     - R -e "devtools::install(pkg = '.')"
