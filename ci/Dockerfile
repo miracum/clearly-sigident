@@ -4,7 +4,7 @@ RUN echo "options('repos' = 'https://ftp.fau.de/cran/')" >> /usr/local/lib/R/etc
 RUN apt-get install libjpeg-dev -y --no-install-recommends # dependency of qpdf
 
 ARG PKG_NAME=sigident
-ADD ${PKG_NAME} ${PKG_NAME}
+ADD ./addfolder ${PKG_NAME}
 
 RUN R -e "devtools::install_deps(pkg = '${PKG_NAME}', upgrade = 'always')"
 RUN R -e "devtools::install_dev_deps(pkg = '${PKG_NAME}', upgrade = 'always')"
