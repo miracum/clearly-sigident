@@ -14,25 +14,26 @@ variables:
   _R_CHECK_FORCE_SUGGESTS_: "true"
 
 before_script:
+  - echo "options('repos' = 'https://ftp.fau.de/cran/')" >> /usr/local/lib/R/etc/Rprofile.site
   - R -e "install.packages(c('devtools'))"
 
 #build_binary:
 #  stage: build
 #  script:
-#    - R -e 'devtools::build(binary = TRUE, vignette = FALSE)'
+#    - R -e "devtools::build(binary = TRUE, vignette = FALSE)"
 
 
 check_package:
   stage: check
   script:
-    - R -e 'devtools::check(".", args = "--no-vignettes")'
+      - R -e "devtools::check('.', args = '--no-vignettes')"
 
 compile_vignette:
   stage: vignette
   script:
-    - R -e 'devtools::build_vignettes()'
+    - R -e "devtools::build_vignettes()"
 
 build_source:
   stage: build
   script:
-    - R -e 'devtools::build(binary = FALSE, vignette = FALSE)'
+    - R -e "devtools::build(binary = FALSE, vignette = FALSE)"
