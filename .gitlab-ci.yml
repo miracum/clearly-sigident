@@ -17,9 +17,9 @@ variables:
   IMAGE_NAME: "sigident_base_image"
   CI_IMAGE_NAME: "${DOCKER_REGISTRY}/${IMAGE_PATH}/${IMAGE_NAME}"
   PKG_NAME: "sigident"
+  DOCKER_AUTH_CONFIG: "{\"auths\": {\"${DOCKER_REGISTRY}\": {\"auth\": \"${DOCKER_AUTH_TOKEN}\"}}}"
   # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#define-an-image-from-a-private-container-registry
   # DOCKER_AUTH_TOKEN: echo -n "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" | base64
-  DOCKER_AUTH_CONFIG: "{\"auths\": {\"${DOCKER_REGISTRY}\": {\"auth\": \"${DOCKER_AUTH_TOKEN}\"}}}"
 
 .docker_registry:
   before_script:
