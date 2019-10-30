@@ -5,7 +5,7 @@ stages:
   - dependencies
   - check
   - vignette
-  - test
+  - codecov
   - build
   - deploy
 
@@ -25,36 +25,38 @@ install_dependencies:
 check_package:
   stage: check
   script:
-    - R -e "devtools::check(pkg = '.', args = '--no-vignettes')"
+    - R -e "devtools::check(pkg = '.', args = '--no-vignettes', check_dir = '.')"
+  artifacts:
+    paths:
+      - "*.Rcheck"
+    name: logs
+    when: always
 
-check_errors:
-  stage: check
-  script:
-    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes'))[['errors']], character(0))) stop('Check with Errors')"
+#check_errors:
+#  stage: check
+#  script:
+#    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes'))[['errors']], character(0))) stop('Check with Errors')"
 
-check_warnings:
-  stage: check
-  script:
-    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['warnings']], character(0))) stop('Check with Warnings')"
+#check_warnings:
+#  stage: check
+#  script:
+#    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['warnings']], character(0))) stop('Check with Warnings')"
 
-check_notes:
-  stage: check
-  script:
-    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['notes']], character(0))) stop('Check with Notes')"
-
+#check_notes:
+#  stage: check
+#  script:
+#    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['notes']], character(0))) stop('Check with Notes')"
 
 compile_vignette:
   stage: vignette
   script:
     - R -e "devtools::build_vignettes(pkg = '.')"
+  artifacts:
+    paths:
+      - "vignettes/sigident-Howto_Microarray.HTML"
 
-unittests:
-  stage: test
-  script:
-    - R -e "if (any(as.data.frame(devtools::test(pkg = '.'))[['failed']] > 0)) stop('Some tests failed.')"
-
-codecov:
-  stage: test
+codecoverage:
+  stage: codecov
   script:
     - R -e 'covr::codecov()'
 
