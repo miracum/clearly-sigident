@@ -10,10 +10,10 @@ plot_survplot(fit, risk_table, filename)
 \item{fit}{A cox proportional hazards model. The output of the
 function `fit_kaplan_estimator()` or `prognostic_classifier()`.}
 
-\item{filename}{A character string. The filename.}
-
-\item{RiskTable}{A data.frame. The output of the function
+\item{risk_table}{A data.frame. The output of the function
 `prognostic_classifier()`.}
+
+\item{filename}{A character string. The filename.}
 }
 \description{
 Helper function to create survival plot

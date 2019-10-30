@@ -136,7 +136,7 @@ go_enrichment_analysis <- function(gene,
 
   # pathview
   # https://github.com/egeulgen/pathfindR/issues/10
-  require(pathfindR)
+  utils::data("gene.idtype.bods", package = "pathview")
   # workaround to set correct workingdir for pathview
   oldwd <- getwd()
   setwd(paste0(oldwd, "/", plotdir))

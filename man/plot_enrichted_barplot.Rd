@@ -17,7 +17,7 @@ plot_enrichted_barplot(enrichmentobj, type, filename = NULL,
 (\code{NULL}) a plot named `Enriched_{type}.png` will be created
 inside the directory "./plots".}
 
-\item{showCategory}{An integer. Indicating the number of maximum categories
+\item{show_category}{An integer. Indicating the number of maximum categories
 to show in barplot.}
 }
 \description{

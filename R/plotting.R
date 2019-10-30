@@ -141,7 +141,7 @@ plot_deg_heatmap <-
 #' @param enrichmentobj An object resulting from the function
 #'   `go_enrichment_analysis()`.
 #' @param type A character string. One of eiter "GO" or "KEGG".
-#' @param showCategory An integer. Indicating the number of maximum categories
+#' @param show_category An integer. Indicating the number of maximum categories
 #'   to show in barplot.
 #'
 #' @export
@@ -231,12 +231,13 @@ plot_rocplot <- function(roc,
 
   shiny::plotPNG(
     func = {
-      outplot <- graphics::plot(roc) +
-        graphics::text(0.4,
-                       0,
-                       paste0("AUC: ", round(roc$auc, 4)))
       return(
-        print(outplot)
+        print({
+          graphics::plot(roc)
+          graphics::text(0.4,
+                         0,
+                         paste0("AUC: ", round(roc$auc, 4)))
+        })
       )
     },
     filename = filename,
@@ -329,7 +330,7 @@ plot_grid_varimp_plot <- function(model,
 #'
 #' @param fit A cox proportional hazards model. The output of the
 #'   function `fit_kaplan_estimator()` or `prognostic_classifier()`.
-#' @param RiskTable A data.frame. The output of the function
+#' @param risk_table A data.frame. The output of the function
 #'   `prognostic_classifier()`.
 #'
 #' @inheritParams plot_grid_model_plot

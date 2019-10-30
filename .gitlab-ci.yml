@@ -15,11 +15,12 @@ variables:
 before_script:
   - echo "options('repos' = 'https://ftp.fau.de/cran/')" >> /usr/local/lib/R/etc/Rprofile.site
   - R -e "devtools::install_deps(pkg = '.', upgrade = 'always')"
+  - R -e "devtools::install_dev_deps(pkg = '.', upgrade = 'always')"
 
 check_package:
   stage: check
   script:
-    - R -e "devtools::check(pkg = '.', args = '--no-vignettes', check_dir = '.')"
+    - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '.')"
   artifacts:
     paths:
       - "*.Rcheck"

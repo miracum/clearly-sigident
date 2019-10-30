@@ -107,6 +107,7 @@ usethis::use_package("devtools", type = "Suggests")
 usethis::use_package("rmarkdown", type = "Suggests")
 usethis::use_package("qpdf", type = "Suggests")
 usethis::use_package("knitr", type = "Suggests")
+usethis::use_package("lintr", type = "Suggests")
 
 # buildignore and gitignore
 usethis::use_build_ignore("docker")
