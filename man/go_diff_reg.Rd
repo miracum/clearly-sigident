@@ -7,12 +7,16 @@
 go_diff_reg(mergeset, design, idtype, entrezids = NULL)
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
-\item{design}{A object. The output of the function `create_diagnosisdesignbatch()`.}
+\item{design}{A object. The output of the function
+`create_diagnosisdesignbatch()`.}
 
-\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
-affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
+\item{idtype}{A character string. The type of ID used to name the
+genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
+are being removed!}
 
 \item{entrezids}{A character vector, containing entrez IDs.
 To be used only if 'idtype'= "affy" (default = NULL).}

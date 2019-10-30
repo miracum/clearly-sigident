@@ -16,9 +16,11 @@ Currently implemented are \emph{"grid", "lasso", "elastic"}.}
 \item{alpha}{A numeric between 0 and 1. The elastic net mixing parameter
 passed to `glmnet::glmnet()`.}
 
-\item{nfolds}{A integer. The number of folds used for cross validation. Default: 10.}
+\item{nfolds}{A integer. The number of folds used for cross validation
+(default: 10).}
 
-\item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
+\item{seed}{A integer value. Seed to make machine learning algorithms
+reproducible. Default: 111.}
 }
 \description{
 Helper function to conduct lasso or elastic net regualization

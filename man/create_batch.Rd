@@ -7,9 +7,11 @@
 create_batch(sample_metadata, study_metadata)
 }
 \arguments{
-\item{sample_metadata}{A data frame. The data frame holding the sample metadata.}
+\item{sample_metadata}{A data frame. The data frame holding the
+sample metadata.}
 
-\item{study_metadata}{A data frame. The data frame holding the study metadata.}
+\item{study_metadata}{A data frame. The data frame holding the study
+metadata.}
 }
 \description{
 Helper function to create batch

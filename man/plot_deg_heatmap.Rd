@@ -7,7 +7,8 @@
 plot_deg_heatmap(mergeset, genes, patientcolors, filename = NULL)
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
 \item{genes}{A object. The output of the function `identify_degs()`.}
 

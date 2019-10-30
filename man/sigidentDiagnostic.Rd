@@ -2,23 +2,31 @@
 % Please edit documentation in R/sigidentDiagnostic.R
 \name{sigidentDiagnostic}
 \alias{sigidentDiagnostic}
-\title{Perform Diagnostic Signature Analyses in Gene Expression Datasets Derived from MicroArrays}
+\title{Perform Diagnostic Signature Analyses in Gene Expression Datasets
+  Derived from MicroArrays}
 \usage{
 sigidentDiagnostic(mergeset, diagnosis, seed = 111, nfolds = 10,
   split = 0.8, plotdir = "./plots/")
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
-\item{diagnosis}{An object. The output of the function `create_diagnosisdesignbatch()`.}
+\item{diagnosis}{An object. The output of the function
+`create_diagnosisdesignbatch()`.}
 
-\item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
+\item{seed}{A integer value. Seed to make machine learning algorithms
+reproducible. Default: 111.}
 
-\item{nfolds}{A integer. The number of folds used for cross validation. Default: 10.}
+\item{nfolds}{A integer. The number of folds used for cross validation
+(default: 10).}
 
-\item{split}{A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.}
+\item{split}{A numeric value between 0 and 1. The proportion of the data
+to be integrated into the training set for machine learning
+(default: 0.8).}
 
-\item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
+\item{plotdir}{A character string. Path to the folder to store resulting
+plots. Default: "./plots/".}
 }
 \description{
 One function to perform diagnostic signature analysis.

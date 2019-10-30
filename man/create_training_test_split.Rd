@@ -8,13 +8,18 @@ create_training_test_split(diagnosis, mergeset, split = 0.8,
   seed = 111)
 }
 \arguments{
-\item{diagnosis}{An object. The output of the function `create_diagnosisdesignbatch()`.}
+\item{diagnosis}{An object. The output of the function
+`create_diagnosisdesignbatch()`.}
 
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
-\item{split}{A numeric value between 0 and 1. The proportion of the data to be integrated into the training set for machine learning. Default: 0.8.}
+\item{split}{A numeric value between 0 and 1. The proportion of the data
+to be integrated into the training set for machine learning
+(default: 0.8).}
 
-\item{seed}{A integer value. Seed to make machine learning algorithms reproducible. Default: 111.}
+\item{seed}{A integer value. Seed to make machine learning algorithms
+reproducible. Default: 111.}
 }
 \description{
 Helper function to split data into training and test set

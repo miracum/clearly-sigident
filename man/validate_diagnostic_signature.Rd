@@ -16,15 +16,20 @@ function `sigidentDiagnostic`.}
 
 \item{genes}{A object. The output of the function `identify_degs()`.}
 
-\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
-affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
+\item{idtype}{A character string. The type of ID used to name the
+genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
+are being removed!}
 
 \item{targetname}{A character string. Name of the the targets, specified
 in the 'target' column of `sample_metadata`.}
 
-\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sample_metadata`.}
+\item{controlname}{A character string. Name of the the controls,
+specified in the 'target' column of `sample_metadata`.}
 
-\item{targetcol}{A character string. Columname of `sample_metadata` holding the targets. Default: "target". Caution: this should not be changed.}
+\item{targetcol}{A character string. Columname of `sample_metadata`
+holding the targets. Default: "target". Caution: this should not
+be changed.}
 
 \item{datadir}{A character string. Path to the data-folder inside the
 metadata folder.}

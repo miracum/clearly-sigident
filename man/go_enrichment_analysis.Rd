@@ -12,15 +12,18 @@ go_enrichment_analysis(gene, org_db, organism, fitlm, pathwayid, species,
 
 \item{org_db}{org_db}
 
-\item{organism}{A character string indicating the organism. Currently supported: "hsa".}
+\item{organism}{A character string indicating the organism.
+Currently supported: "hsa".}
 
 \item{fitlm}{An MArrayLM object, returned by `go_diff_reg()`.}
 
 \item{pathwayid}{KEGG pathway ID (like hsa04110 for cell cycle)}
 
-\item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
+\item{species}{A character string indicating the sample's species.
+Currently supported: "Hs".}
 
-\item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
+\item{plotdir}{A character string. Path to the folder to store resulting
+plots. Default: "./plots/".}
 }
 \description{
 Helper function to perform enrichment analysis

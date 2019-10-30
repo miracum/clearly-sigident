@@ -7,7 +7,8 @@
 gene_map_sig(mergeset, model)
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
 \item{model}{An object containing the model information. The
 ouput of the function `glmnetSignature_()` with \code{type = "grid"}.}

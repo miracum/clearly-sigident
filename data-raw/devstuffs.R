@@ -18,7 +18,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.0.1.9000")
+my_desc$set_version("0.0.1.9001")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -58,7 +58,6 @@ usethis::use_gpl3_license(name="Universitätsklinikum Erlangen")
 
 # Imports (CRAN packages)
 usethis::use_package("data.table", type="Imports")
-usethis::use_package("shiny", type="Imports")
 usethis::use_package("ggplot2", type="Imports")
 usethis::use_package("gplots", type="Imports")
 usethis::use_package("grDevices", type="Imports")

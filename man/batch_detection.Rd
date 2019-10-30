@@ -7,7 +7,8 @@
 batch_detection(mergeset, batch)
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
 \item{batch}{Takes the results from \code{create_batch()} as input.}
 }

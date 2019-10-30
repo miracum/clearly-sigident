@@ -2,35 +2,49 @@
 % Please edit documentation in R/sigidentDEG.R
 \name{sigidentDEG}
 \alias{sigidentDEG}
-\title{Perform DEG Analysis in Gene Expression Datasets Derived from MicroArrays}
+\title{Perform DEG Analysis in Gene Expression Datasets Derived
+  from MicroArrays}
 \usage{
 sigidentDEG(mergeset, mergedset, study_metadata, sample_metadata,
   controlname, design, idtype, fdr, targetcol = "target",
   plotdir = "./plots/", csvdir = "./tables/")
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
-\item{mergedset}{A large Expression Set. The output of the function `merge_()`.}
+\item{mergedset}{A large Expression Set. The output of the function
+`merge_()`.}
 
-\item{study_metadata}{A data frame. The data frame holding the study metadata.}
+\item{study_metadata}{A data frame. The data frame holding the study
+metadata.}
 
-\item{sample_metadata}{A data frame. The data frame holding the sample metadata.}
+\item{sample_metadata}{A data frame. The data frame holding the
+sample metadata.}
 
-\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sample_metadata`.}
+\item{controlname}{A character string. Name of the the controls,
+specified in the 'target' column of `sample_metadata`.}
 
-\item{design}{A object. The output of the function `create_diagnosisdesignbatch()`.}
+\item{design}{A object. The output of the function
+`create_diagnosisdesignbatch()`.}
 
-\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
-affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
+\item{idtype}{A character string. The type of ID used to name the
+genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
+are being removed!}
 
-\item{fdr}{A positive numeric value between (max. 0.05) indicating the desired q-Value during DEG analysis (Default: 0.01).}
+\item{fdr}{A positive numeric value between (max. 0.05) indicating the
+desired q-Value during DEG analysis (Default: 0.01).}
 
-\item{targetcol}{A character string. Columname of `sample_metadata` holding the targets. Default: "target". Caution: this should not be changed.}
+\item{targetcol}{A character string. Columname of `sample_metadata`
+holding the targets. Default: "target". Caution: this should not
+be changed.}
 
-\item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
+\item{plotdir}{A character string. Path to the folder to store resulting
+plots. Default: "./plots/".}
 
-\item{csvdir}{A character string. Path to the folder to store output tables. Default: "./tables/".}
+\item{csvdir}{A character string. Path to the folder to store output
+tables. Default: "./tables/".}
 }
 \description{
 One function to perform DEG analysis.

@@ -9,7 +9,8 @@ extract_go_terms(gene, species, fdr = NULL)
 \arguments{
 \item{gene}{A character vector containing the Entrez-IDs.}
 
-\item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
+\item{species}{A character string indicating the sample's species.
+Currently supported: "Hs".}
 
 \item{fdr}{The false discovery rate passed to `limma::goana`.}
 }

@@ -7,14 +7,18 @@
 batch_correction(mergedset, batch, design, idtype)
 }
 \arguments{
-\item{mergedset}{A large Expression Set. The output of the function `merge_()`.}
+\item{mergedset}{A large Expression Set. The output of the function
+`merge_()`.}
 
 \item{batch}{Takes the results from \code{create_batch()} as input.}
 
-\item{design}{A object. The output of the function `create_diagnosisdesignbatch()`.}
+\item{design}{A object. The output of the function
+`create_diagnosisdesignbatch()`.}
 
-\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
-affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
+\item{idtype}{A character string. The type of ID used to name the
+genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
+are being removed!}
 }
 \description{
 Helper function correcting for batch effects and mapping

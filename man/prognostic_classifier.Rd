@@ -11,8 +11,10 @@ prognostic_classifier(pattern_com, idtype, validationstudiesinfo, datadir,
 \item{pattern_com}{A data.frame. The output of the function
 `generate_expression_pattern()`.}
 
-\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
-affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
+\item{idtype}{A character string. The type of ID used to name the
+genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
+are being removed!}
 
 \item{validationstudiesinfo}{A list that contains specifications on
 the study that contains the validation information.}
@@ -20,12 +22,15 @@ the study that contains the validation information.}
 \item{datadir}{A character string. Path to the data-folder inside the
 metadata folder.}
 
-\item{targetcol}{A character string. Columname of `sample_metadata` holding the targets. Default: "target". Caution: this should not be changed.}
+\item{targetcol}{A character string. Columname of `sample_metadata`
+holding the targets. Default: "target". Caution: this should not
+be changed.}
 
 \item{targetname}{A character string. Name of the the targets, specified
 in the 'target' column of `sample_metadata`.}
 
-\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sample_metadata`.}
+\item{controlname}{A character string. Name of the the controls,
+specified in the 'target' column of `sample_metadata`.}
 }
 \description{
 Helper function to get survival time.

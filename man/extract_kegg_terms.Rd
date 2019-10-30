@@ -9,7 +9,8 @@ extract_kegg_terms(gene, species)
 \arguments{
 \item{gene}{A character vector containing the Entrez-IDs.}
 
-\item{species}{A character string indicating the sample's species. Currently supported: "Hs".}
+\item{species}{A character string indicating the sample's species.
+Currently supported: "Hs".}
 }
 \description{
 Helper function to extract KEGG terms

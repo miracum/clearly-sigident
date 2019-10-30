@@ -7,7 +7,8 @@
 plot_import_boxplot(mergeset, filename = NULL)
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
 \item{filename}{A character string indicating the filename. If default
 (\code{NULL}) a plot named `import_boxplot.png` will be created

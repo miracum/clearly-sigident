@@ -7,9 +7,11 @@
 limma_top_table(mergeset, design, q_value)
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
-\item{design}{A object. The output of the function `create_diagnosisdesignbatch()`.}
+\item{design}{A object. The output of the function
+`create_diagnosisdesignbatch()`.}
 
 \item{q_value}{A numeric value for the q-value (false discovery rate)
 (default=0.01).}

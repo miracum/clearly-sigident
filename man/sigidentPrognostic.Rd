@@ -2,7 +2,8 @@
 % Please edit documentation in R/sigidentPrognostic.R
 \name{sigidentPrognostic}
 \alias{sigidentPrognostic}
-\title{Perform Prognostic Signature Analyses in Gene Expression Datasets Derived from MicroArrays}
+\title{Perform Prognostic Signature Analyses in Gene Expression
+  Datasets Derived from MicroArrays}
 \usage{
 sigidentPrognostic(mergeset, study_metadata, sample_metadata, idtype,
   genes, discoverystudies_w_timedata, classifier_studies,
@@ -10,14 +11,19 @@ sigidentPrognostic(mergeset, study_metadata, sample_metadata, idtype,
   plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
 }
 \arguments{
-\item{mergeset}{A matrix of merged expression sets (rows = genes, columns = samples).}
+\item{mergeset}{A matrix of merged expression sets (rows = genes,
+columns = samples).}
 
-\item{study_metadata}{A data frame. The data frame holding the study metadata.}
+\item{study_metadata}{A data frame. The data frame holding the study
+metadata.}
 
-\item{sample_metadata}{A data frame. The data frame holding the sample metadata.}
+\item{sample_metadata}{A data frame. The data frame holding the
+sample metadata.}
 
-\item{idtype}{A character string. The type of ID used to name the genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
-affy IDs. Caution: when using entrez IDs, missing and duplicated IDs are being removed!}
+\item{idtype}{A character string. The type of ID used to name the
+genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
+are being removed!}
 
 \item{genes}{A object. The output of the function `identify_degs()`.}
 
@@ -33,16 +39,21 @@ the study that contains the validation information.}
 \item{targetname}{A character string. Name of the the targets, specified
 in the 'target' column of `sample_metadata`.}
 
-\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sample_metadata`.}
+\item{controlname}{A character string. Name of the the controls,
+specified in the 'target' column of `sample_metadata`.}
 
 \item{datadir}{A character string. Path to the data-folder inside the
 metadata folder.}
 
-\item{plotdir}{A character string. Path to the folder to store resulting plots. Default: "./plots/".}
+\item{plotdir}{A character string. Path to the folder to store resulting
+plots. Default: "./plots/".}
 
-\item{csvdir}{A character string. Path to the folder to store output tables. Default: "./tables/".}
+\item{csvdir}{A character string. Path to the folder to store output
+tables. Default: "./tables/".}
 
-\item{targetcol}{A character string. Columname of `sample_metadata` holding the targets. Default: "target". Caution: this should not be changed.}
+\item{targetcol}{A character string. Columname of `sample_metadata`
+holding the targets. Default: "target". Caution: this should not
+be changed.}
 }
 \description{
 One function to perform prognostic signature analysis.

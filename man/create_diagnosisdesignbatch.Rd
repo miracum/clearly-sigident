@@ -8,16 +8,21 @@ create_diagnosisdesignbatch(sample_metadata, study_metadata, controlname,
   targetname, targetcol)
 }
 \arguments{
-\item{sample_metadata}{A data frame. The data frame holding the sample metadata.}
+\item{sample_metadata}{A data frame. The data frame holding the
+sample metadata.}
 
-\item{study_metadata}{A data frame. The data frame holding the study metadata.}
+\item{study_metadata}{A data frame. The data frame holding the study
+metadata.}
 
-\item{controlname}{A character string. Name of the the controls, specified in the 'target' column of `sample_metadata`.}
+\item{controlname}{A character string. Name of the the controls,
+specified in the 'target' column of `sample_metadata`.}
 
 \item{targetname}{A character string. Name of the the targets, specified
 in the 'target' column of `sample_metadata`.}
 
-\item{targetcol}{A character string. Columname of `sample_metadata` holding the targets. Default: "target". Caution: this should not be changed.}
+\item{targetcol}{A character string. Columname of `sample_metadata`
+holding the targets. Default: "target". Caution: this should not
+be changed.}
 }
 \description{
 Helper function to create diagnosis, design and batch
