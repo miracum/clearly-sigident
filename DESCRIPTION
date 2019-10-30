@@ -22,7 +22,7 @@ URL: https://gitlab.miracum.org/clearly/sigident
 BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
-Date/Publication: 2019-10-30 07:35:55 UTC
+Date/Publication: 2019-10-30 08:12:47 UTC
 biocViews: 
 Imports: 
     data.table,
@@ -66,4 +66,3 @@ Suggests:
     devtools,
     rmarkdown,
     qpdf
-RoxygenNote: 6.1.1

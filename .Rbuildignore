@@ -26,3 +26,4 @@
 ^plots$
 ^Readme\.md$
 ^infos\.R$
+^\.gitlab-ci\.yml$

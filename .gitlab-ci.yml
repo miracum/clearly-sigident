@@ -1,0 +1,31 @@
+image: bioconductor/bioconductor_full
+
+stages:
+  - build
+  - vignette
+#  - document
+#  - check
+#  - test
+#  - deploy
+
+variables:
+  _R_CHECK_CRAN_INCOMING_: "false"
+  _R_CHECK_FORCE_SUGGESTS_: "true"
+
+#before_script:
+#  - apt-get update
+
+buildbinary:
+  stage: build
+  script:
+    - R -e 'devtools::build(binary = TRUE, vignette = FALSE)'
+
+buildsource:
+  stage: build
+  script:
+    - R -e 'devtools::build(binary = FALSE, vignette = FALSE)'
+
+compilevignette:
+  stage: vignette
+  script:
+    - R -e 'devtools::build_vignettes()'
