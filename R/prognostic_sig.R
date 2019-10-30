@@ -14,14 +14,14 @@
 #'
 #' @export
 get_survival_time <- function(study_metadata,
-                             sample_metadata,
-                             genes,
-                             idtype,
-                             discoverystudies_w_timedata,
-                             targetname,
-                             controlname,
-                             targetcol,
-                             datadir) {
+                              sample_metadata,
+                              genes,
+                              idtype,
+                              discoverystudies_w_timedata,
+                              targetname,
+                              controlname,
+                              targetcol,
+                              datadir) {
 
   discovery <- discovery_func(sample_metadata = sample_metadata,
                               study_metadata = study_metadata)
@@ -463,7 +463,7 @@ prognostic_classifier <- function(pattern_com,
 fit_kaplan_estimator <- function(risktable) {
   # fit proportional hazards regression model
   res_cox <- survival::coxph(
-    survival::Surv(time, status) ~ Groups,
+    survival::Surv(time, status) ~ groups,
     data = risktable
   )
   new_df <- with(risktable,
@@ -499,9 +499,9 @@ classify <- function(sigtable) {
 
 
 extract_time_status <- function(eset_targets,
-                               timecol,
-                               statuscol,
-                               statuslevels) {
+                                timecol,
+                                statuscol,
+                                statuslevels) {
   #% time <- eset_targets[, get("timecol")]
   # does not work with expression sets
   time <- eval(parse(text = paste0("eset_targets$", timecol)))
