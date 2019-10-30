@@ -2,7 +2,7 @@
 #image: rocker/tidyverse:3.6.1
 
 stages:
-  - .pre
+  - dependencies
   - check
   - vignette
   - codecov
@@ -27,15 +27,12 @@ variables:
 
 # https://gitlab.com/gitlab-org/gitlab/issues/22801
 build_base_image:
-  stage: .pre
+  stage: dependencies
   image: docker:stable
   extends: .docker_registry
   script:
     - docker build -t $IMAGE_NAME:latest -f ci/Dockerfile .
     - docker push $CI_IMAGE_NAME
-  only:
-    changes:
-      - "ci/Dockerfile"
 
 check_package:
   image: $CI_IMAGE_NAME:latest
