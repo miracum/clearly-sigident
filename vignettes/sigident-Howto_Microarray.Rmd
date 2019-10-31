@@ -1346,7 +1346,7 @@ The preprocessing of the data needs to conform with the above described approach
 
 ### Define Variables
 
-```{r}
+```{r eval = FALSE}
 # initialize filePath:
 filePath <- tempdir()
 maindir <- "./geodata/"

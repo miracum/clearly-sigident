@@ -33,5 +33,5 @@ in the 'target' column of `sample_metadata`.}
 specified in the 'target' column of `sample_metadata`.}
 }
 \description{
-Helper function to get survival time.
+Helper function to perform prognostic classification.
 }

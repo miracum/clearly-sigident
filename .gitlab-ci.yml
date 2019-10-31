@@ -15,6 +15,7 @@ variables:
   IMAGE_PATH: "r_package_ci"
   CI_IMAGE_NAME: "${DOCKER_REGISTRY}/${IMAGE_PATH}/${CI_PROJECT_NAME}_base_image"
   IMAGE_TAG: "0.0.1"
+  R_PKG_NAME: "sigident"
 
 # set DOCKER_AUTH_CONFIG in settings CI/CD
 # {
@@ -43,7 +44,7 @@ build_base_image:
   image: docker:stable
   extends: .docker_registry
   script:
-    - cd .. && docker build --build-arg PKG_NAME=${CI_PROJECT_NAME} -t ${CI_IMAGE_NAME}:${IMAGE_TAG} -f ${CI_PROJECT_NAME}/ci/Dockerfile .
+    - cd .. && docker build --build-arg PKG_NAME=${R_PKG_NAME} -t ${CI_IMAGE_NAME}:${IMAGE_TAG} -f ${CI_PROJECT_NAME}/ci/Dockerfile .
     - docker push ${CI_IMAGE_NAME}
   only:
     # build only when there are changes in dependencies
@@ -53,10 +54,10 @@ build_base_image:
 check_package:
   stage: check
   script:
-    - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '.')"
+    - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
   artifacts:
     paths:
-      - "${CI_PROJECT_DIR}/*.Rcheck"
+      - "${CI_PROJECT_DIR}/ci/*.Rcheck"
     when: on_failure # upload check artifacts when job fails!
     expire_in: 1 month
 

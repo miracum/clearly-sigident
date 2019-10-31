@@ -374,7 +374,7 @@ expression_pattern <- function(mergeset, ids, tumor, control) {
 
 #' @title prognostic_classifier
 #'
-#' @description Helper function to get survival time.
+#' @description Helper function to perform prognostic classification.
 #'
 #' @param validationstudiesinfo A list that contains specifications on
 #'   the study that contains the validation information.
@@ -464,13 +464,13 @@ prognostic_classifier <- function(pattern_com,
 fit_kaplan_estimator <- function(risktable) {
   # fit proportional hazards regression model
   res_cox <- survival::coxph(
-    survival::Surv(time, status) ~ risktable$groups,
+    survival::Surv(time, status) ~ groups,
     data = risktable
   )
   new_df <- with(risktable,
                  data.frame(
-                   Groups = c(0, 1),
-                   survival_time = rep(mean(risktable$time, na.rm = TRUE), 2),
+                   groups = c(0, 1),
+                   survival_time = rep(mean(time, na.rm = TRUE), 2),
                    ph.ecog = c(1, 1)
                  ))
   fit <- survival::survfit(res_cox, newdata = new_df)
