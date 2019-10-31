@@ -3,10 +3,10 @@
 stages:
   - dependencies
   - check
-  - build
-  - vignette
   - codecov
+  - build
   - deploy
+  - vignette
 
 variables:
   _R_CHECK_CRAN_INCOMING_: "false"
@@ -94,6 +94,16 @@ build_binary:
 #  script:
 #    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['notes']], character(0))) stop('Check with Notes')"
 
+code_coverage:
+  stage: codecov
+  script:
+    - R -e "covr::package_coverage(path = '.')"
+
+install:
+  stage: deploy
+  script:
+    - R -e "devtools::install(pkg = '.', upgrade = 'always')"
+
 compile_vignette:
   stage: vignette
   script:
@@ -104,13 +114,3 @@ compile_vignette:
       - "${CI_PROJECT_DIR}/vignettes/csv"
       - "${CI_PROJECT_DIR}/vignettes/plots"
     expire_in: 1 month
-
-code_coverage:
-  stage: codecov
-  script:
-    - R -e "covr::package_coverage(path = '.')"
-
-install:
-  stage: deploy
-  script:
-    - R -e "devtools::install(pkg = '.', upgrade = 'always')"
