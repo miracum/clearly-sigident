@@ -28,3 +28,5 @@ csv
 plots
 tables
 vignettes/.build.timestamp
+doc
+Meta

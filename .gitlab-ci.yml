@@ -110,7 +110,7 @@ compile_vignette:
     - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
   artifacts:
     paths:
-      - "${CI_PROJECT_DIR}/vignettes/doc"
       - "${CI_PROJECT_DIR}/vignettes/csv"
       - "${CI_PROJECT_DIR}/vignettes/plots"
+      - "${CI_PROJECT_DIR}/doc"
     expire_in: 1 month

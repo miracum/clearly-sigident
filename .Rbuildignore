@@ -28,3 +28,5 @@
 ^infos\.R$
 ^\.gitlab-ci\.yml$
 ^ci$
+^doc$
+^Meta$
