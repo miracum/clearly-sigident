@@ -1,5 +1,8 @@
 FROM rocker/tidyverse:3.6.1
 
+# build args
+ARG PKG_NAME
+
 # set cran repo
 RUN echo "options('repos' = 'https://ftp.fau.de/cran/')" >> /usr/local/lib/R/etc/Rprofile.site
 
