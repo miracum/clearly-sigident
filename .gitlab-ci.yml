@@ -1,5 +1,4 @@
-#image: bioconductor/bioconductor_full:release
-#image: rocker/tidyverse:3.6.1
+# have a look at https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
 
 stages:
   - dependencies
@@ -57,7 +56,7 @@ check_package:
     - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '.')"
   artifacts:
     paths:
-      - "*.Rcheck"
+      - "${CI_PROJECT_DIR}/*.Rcheck"
     when: on_failure # upload check artifacts when job fails!
     expire_in: 1 month
 
@@ -65,11 +64,19 @@ build_source:
   stage: build
   script:
     - R -e "devtools::build(pkg = '.', binary = FALSE, vignettes = FALSE)"
+  artifacts:
+    paths:
+      - "${CI_PROJECT_DIR}/../*.tar.gz"
+    expire_in: 1 month
 
 build_binary:
   stage: build
   script:
     - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
+  artifacts:
+  paths:
+    - "${CI_PROJECT_DIR}/../*.tar.gz"
+  expire_in: 1 month
 
 #check_errors:
 #  stage: check
@@ -92,9 +99,9 @@ compile_vignette:
     - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
   artifacts:
     paths:
-      - "vignettes/sigident-Howto_Microarray.HTML"
-      - "vignettes/csv"
-      - "vignettes/plot"
+      - "${CI_PROJECT_DIR}/vignettes/sigident-Howto_Microarray.HTML"
+      - "${CI_PROJECT_DIR}/vignettes/csv"
+      - "${CI_PROJECT_DIR}/vignettes/plot"
     expire_in: 1 month
 
 codecoverage:
