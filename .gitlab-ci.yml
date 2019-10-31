@@ -74,9 +74,9 @@ build_binary:
   script:
     - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
   artifacts:
-  paths:
-    - "${CI_PROJECT_DIR}/../*.tar.gz"
-  expire_in: 1 month
+    paths:
+      - "${CI_PROJECT_DIR}/../*.tar.gz"
+    expire_in: 1 month
 
 #check_errors:
 #  stage: check
