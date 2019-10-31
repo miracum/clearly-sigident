@@ -61,6 +61,16 @@ check_package:
     when: on_failure # upload check artifacts when job fails!
     expire_in: 1 month
 
+build_source:
+  stage: build
+  script:
+    - R -e "devtools::build(pkg = '.', binary = FALSE, vignettes = FALSE)"
+
+build_binary:
+  stage: build
+  script:
+    - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
+
 #check_errors:
 #  stage: check
 #  script:
@@ -91,16 +101,6 @@ codecoverage:
   stage: codecov
   script:
     - R -e 'covr::codecov()'
-
-build_source:
-  stage: build
-  script:
-    - R -e "devtools::build(pkg = '.', binary = FALSE, vignettes = FALSE)"
-
-build_binary:
-  stage: build
-  script:
-    - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
 
 install:
   stage: deploy
