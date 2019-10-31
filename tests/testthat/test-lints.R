@@ -1,8 +1,13 @@
 context("lints")
 
-#% prefix <- "./"
-
-prefix <- "../../00_pkg_src/sigident/"
+print(list.files())
+if (any(grepl("00_pkg_src", list.files("../../")))) {
+  prefix <- "../../00_pkg_src/sigident/"
+} else if (any(grepl("DESCRIPTION", list.files("../../")))) {
+  prefix <- "../../"
+} else {
+  prefix <- "./"
+}
 
 test_that(
   desc = "test lints",
@@ -28,6 +33,9 @@ test_that(
         "test-lints.R" = NULL
       )
     )
+
+    skip_on_covr()
+
     for (directory in names(lintlist)) {
       print(directory)
       for (fname in names(lintlist[[directory]])) {

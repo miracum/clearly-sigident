@@ -105,12 +105,12 @@ compile_vignette:
       - "${CI_PROJECT_DIR}/vignettes/plots"
     expire_in: 1 month
 
-codecoverage:
+code_coverage:
   stage: codecov
   script:
-    - R -e 'covr::codecov()'
+    - R -e "covr::package_coverage(path = '.')"
 
 install:
   stage: deploy
   script:
-    - R -e "devtools::install(pkg = '.')"
+    - R -e "devtools::install(pkg = '.', upgrade = 'always')"
