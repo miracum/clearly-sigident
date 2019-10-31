@@ -15,7 +15,7 @@ extract_go_terms <- function(gene,
   fit <- limma::topGO(limma::goana(
     de = gene,
     species = species,
-    fdr = fdr
+    FDR = fdr
   ))
   return(fit)
 }

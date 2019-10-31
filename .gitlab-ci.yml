@@ -63,19 +63,19 @@ check_package:
 build_source:
   stage: build
   script:
-    - R -e "devtools::build(pkg = '.', binary = FALSE, vignettes = FALSE)"
+    - R -e "devtools::build(pkg = '.', path = '${CI_PROJECT_DIR}/ci', binary = FALSE, vignettes = FALSE)"
   artifacts:
     paths:
-      - "${CI_PROJECT_DIR}/../*.tar.gz"
+      - "${CI_PROJECT_DIR}/ci/*.tar.gz"
     expire_in: 1 month
 
 build_binary:
   stage: build
   script:
-    - R -e "devtools::build(pkg = '.', binary = TRUE, vignettes = FALSE)"
+    - R -e "devtools::build(pkg = '.', path = '${CI_PROJECT_DIR}/ci', binary = TRUE, vignettes = FALSE)"
   artifacts:
     paths:
-      - "${CI_PROJECT_DIR}/../*.tar.gz"
+      - "${CI_PROJECT_DIR}/ci/*.tar.gz"
     expire_in: 1 month
 
 #check_errors:
