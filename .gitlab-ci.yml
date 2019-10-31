@@ -108,9 +108,10 @@ compile_vignette:
   stage: vignette
   script:
     - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
+    - cd .. && cp -r doc/ ${CI_PROJECT_DIR}/ci/
   artifacts:
     paths:
-      - "${CI_PROJECT_DIR}/doc/sigident-Howto_Microarray.HTML"
+      - "${CI_PROJECT_DIR}/ci/doc"
       - "${CI_PROJECT_DIR}/vignettes/csv"
       - "${CI_PROJECT_DIR}/vignettes/plots"
     expire_in: 1 month
