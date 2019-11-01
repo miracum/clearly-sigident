@@ -67,3 +67,4 @@ Suggests:
     rmarkdown,
     qpdf,
     lintr
+RoxygenNote: 6.1.1

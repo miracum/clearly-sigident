@@ -2,9 +2,8 @@
 
 stages:
   - dependencies
-  - check
-  - codecov
   - build
+  - test
   - deploy
   - vignette
 
@@ -14,7 +13,7 @@ variables:
   DOCKER_REGISTRY: "docker.miracum.org"
   IMAGE_PATH: "r_package_ci"
   CI_IMAGE_NAME: "${DOCKER_REGISTRY}/${IMAGE_PATH}/${CI_PROJECT_NAME}_base_image"
-  IMAGE_TAG: "0.0.2"
+  CI_IMAGE_TAG: "0.0.2"
   R_PKG_NAME: "sigident"
 
 # set DOCKER_AUTH_CONFIG in settings CI/CD
@@ -36,7 +35,7 @@ variables:
     - docker logout ${DOCKER_REGISTRY}
 
 default:
-  image: ${CI_IMAGE_NAME}:${IMAGE_TAG}
+  image: ${CI_IMAGE_NAME}:${CI_IMAGE_TAG}
 
 # https://gitlab.com/gitlab-org/gitlab/issues/22801
 build_base_image:
@@ -44,7 +43,7 @@ build_base_image:
   image: docker:stable
   extends: .docker_registry
   script:
-    - cd .. && docker build --build-arg PKG_NAME=${R_PKG_NAME} -t ${CI_IMAGE_NAME}:${IMAGE_TAG} -f ${CI_PROJECT_NAME}/ci/Dockerfile .
+    - cd .. && docker build --build-arg PKG_NAME=${R_PKG_NAME} -t ${CI_IMAGE_NAME}:${CI_IMAGE_TAG} -f ${CI_PROJECT_NAME}/ci/Dockerfile .
     - docker push ${CI_IMAGE_NAME}
   only:
     # build only when there are changes in dependencies
@@ -53,19 +52,14 @@ build_base_image:
       - "ci/Dockerfile"
 
 check_package:
-  stage: check
+  stage: build
   script:
     - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
   artifacts:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.Rcheck"
     when: on_failure # upload check artifacts when job fails!
-    expire_in: 1 month
-
-code_coverage:
-  stage: codecov
-  script:
-    - R -e "covr::package_coverage(path = '.')"
+    expire_in: 1 week
 
 create_manual:
   stage: build
@@ -74,7 +68,7 @@ create_manual:
   artifacts:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.pdf"
-    expire_in: 1 month
+    expire_in: 1 week
 
 build_source:
   stage: build
@@ -83,7 +77,7 @@ build_source:
   artifacts:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.tar.gz"
-    expire_in: 1 month
+    expire_in: 1 week
 
 build_binary:
   stage: build
@@ -92,7 +86,18 @@ build_binary:
   artifacts:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.tar.gz"
-    expire_in: 1 month
+    expire_in: 1 week
+
+testing:
+  stage: test
+  allow_failure: true
+  when: on_success
+  script:
+    - R -e "install.packages('DT')"
+    - R -e "covr::gitlab(quiet = FALSE)"
+  artifacts:
+    paths:
+      - public
 
 #check_errors:
 #  stage: check
