@@ -1,5 +1,10 @@
 # sigident (!!! currently under development !!!)
 
+<!-- badges: start -->
+[![pipeline status](https://gitlab.miracum.org/clearly/sigident/badges/master/pipeline.svg)](https://gitlab.miracum.org/clearly/sigident/commits/master)
+[![coverage report](https://gitlab.miracum.org/clearly/sigident/badges/master/coverage.svg)](https://gitlab.miracum.org/clearly/sigident/commits/master)
+<!-- badges: end -->
+
 This is the repository of the R package 'sigident'. It provides core functionalities to identify diagnostic and prognostic signatures from gene expression datasets.
 
 Currently implemented features are:

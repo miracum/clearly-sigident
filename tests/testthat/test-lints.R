@@ -1,6 +1,5 @@
 context("lints")
 
-print(list.files())
 if (any(grepl("00_pkg_src", list.files("../../")))) {
   prefix <- "../../00_pkg_src/sigident/"
 } else if (any(grepl("DESCRIPTION", list.files("../../")))) {
@@ -34,6 +33,7 @@ test_that(
       )
     )
 
+    # skip on covr
     skip_on_covr()
 
     for (directory in names(lintlist)) {
