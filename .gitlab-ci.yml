@@ -68,8 +68,9 @@ code_coverage:
 
 create_manual:
   stage: build
-  script:
+  before_script:
     - apt-get install -y --no-install-recommends texinfo
+  script:
     - R -e "devtools::build_manual(pkg = '.', path = '${CI_PROJECT_DIR}/ci')"
   artifacts:
     paths:
