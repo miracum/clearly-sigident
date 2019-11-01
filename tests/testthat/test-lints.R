@@ -1,10 +1,10 @@
 context("lints")
 
-if (any(grepl("00_pkg_src", list.files("../../")))) {
+if (dir.exists("../../00_pkg_src")) {
   prefix <- "../../00_pkg_src/sigident/"
-} else if (any(grepl("DESCRIPTION", list.files("../../")))) {
+} else if (dir.exists("../../R")) {
   prefix <- "../../"
-} else {
+} else if (dir.exists("./R")) {
   prefix <- "./"
 }
 
@@ -33,17 +33,14 @@ test_that(
       )
     )
 
-    # skip on covr
-    skip_on_covr()
-
     for (directory in names(lintlist)) {
       print(directory)
       for (fname in names(lintlist[[directory]])) {
         print(fname)
         #% print(list.files(prefix))
 
-        # skip on cran
-        #% skip_on_cran()
+        # skip on covr
+        skip_on_covr()
 
         lintr::expect_lint(
           file = paste0(

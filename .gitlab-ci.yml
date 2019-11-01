@@ -122,7 +122,7 @@ install:
 compile_vignette:
   stage: vignette
   script:
-    - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
+    - R -e "devtools::build_vignettes(pkg = '.')"
   artifacts:
     paths:
       - "${CI_PROJECT_DIR}/vignettes/csv"
