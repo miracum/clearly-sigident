@@ -61,6 +61,20 @@ check_package:
     when: on_failure # upload check artifacts when job fails!
     expire_in: 1 month
 
+code_coverage:
+  stage: codecov
+  script:
+    - R -e "covr::package_coverage(path = '.')"
+
+create_manual:
+  stage: build
+  script:
+    - R -e "devtools::build_manual(pkg = '.', path = '${CI_PROJECT_DIR}/ci')"
+  artifacts:
+    paths:
+      - "${CI_PROJECT_DIR}/ci/*.pdf"
+    expire_in: 1 month
+
 build_source:
   stage: build
   script:
@@ -93,11 +107,6 @@ build_binary:
 #  stage: check
 #  script:
 #    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['notes']], character(0))) stop('Check with Notes')"
-
-code_coverage:
-  stage: codecov
-  script:
-    - R -e "covr::package_coverage(path = '.')"
 
 install:
   stage: deploy
