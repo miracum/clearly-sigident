@@ -69,6 +69,7 @@ code_coverage:
 create_manual:
   stage: build
   script:
+    - apt-get install texinfo
     - R -e "devtools::build_manual(pkg = '.', path = '${CI_PROJECT_DIR}/ci')"
   artifacts:
     paths:
