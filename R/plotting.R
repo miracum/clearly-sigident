@@ -18,22 +18,19 @@ plot_import_boxplot <- function(mergeset,
     }
   }
 
-  shiny::plotPNG(
-    func = {
-      outplot <- graphics::boxplot(
-        mergeset,
-        main = "Merged microarray data",
-        xlab = "Samples",
-        ylab = "Expression"
-      )
-      return(
-        print(outplot)
-      )
-    },
+  grDevices::png(
     filename = filename,
+    res = 300,
     height = 1000,
     width = 2000
   )
+  graphics::boxplot(
+    mergeset,
+    main = "Merged microarray data",
+    xlab = "Samples",
+    ylab = "Expression"
+  )
+  grDevices::dev.off()
 }
 
 
@@ -62,25 +59,22 @@ plot_batchplot <- function(correction_obj,
     }
   }
 
-  shiny::plotPNG(
-    func = {
-      # time == "before" or "after"
-      outplot <- gPCA::PCplot(
-        correction_obj,
-        ug = "guided",
-        type = "1v2",
-        main = paste("gPCA",
-                     time,
-                     "batch correction")
-      )
-      return(
-        print(outplot)
-      )
-    },
+  grDevices::png(
     filename = filename,
+    res = 300,
     height = 1500,
     width = 1500
   )
+  # time == "before" or "after"
+  gPCA::PCplot(
+    correction_obj,
+    ug = "guided",
+    type = "1v2",
+    main = paste("gPCA",
+                 time,
+                 "batch correction")
+  )
+  grDevices::dev.off()
 }
 
 
@@ -106,28 +100,25 @@ plot_deg_heatmap <-
       }
     }
 
-    shiny::plotPNG(
-      func = {
-        outplot <- gplots::heatmap.2(
-          mergeset[genes, ],
-          ColSideColors = patientcolors,
-          key = TRUE,
-          symkey = FALSE,
-          density.info = "none",
-          scale = "none",
-          trace = "none",
-          col = grDevices::topo.colors(100),
-          cexRow = 0.4,
-          cexCol = 0.4
-        )
-        return(
-          print(outplot)
-        )
-      },
+    grDevices::png(
       filename = filename,
+      res = 300,
       height = 2000,
       width = 3000
     )
+    gplots::heatmap.2(
+      mergeset[genes, ],
+      ColSideColors = patientcolors,
+      key = TRUE,
+      symkey = FALSE,
+      density.info = "none",
+      scale = "none",
+      trace = "none",
+      col = grDevices::topo.colors(100),
+      cexRow = 0.4,
+      cexCol = 0.4
+    )
+    grDevices::dev.off()
   }
 
 
@@ -160,21 +151,18 @@ plot_enrichted_barplot <- function(enrichmentobj,
     }
   }
 
-  shiny::plotPNG(
-    func = {
-      outplot <- graphics::barplot(
-        enrichmentobj,
-        showCategory = show_category) +
-        ggplot2::ggtitle(paste0("Enriched ", type, " terms")) +
-        ggplot2::ylab("Gene count")
-      return(
-        print(outplot)
-      )
-    },
+  grDevices::png(
     filename = filename,
+    res = 300,
     height = 1000,
     width = 2000
   )
+  graphics::barplot(
+    enrichmentobj,
+    showCategory = show_category) +
+    ggplot2::ggtitle(paste0("Enriched ", type, " terms")) +
+    ggplot2::ylab("Gene count")
+  grDevices::dev.off()
 }
 
 
@@ -229,21 +217,17 @@ color_heatmap <-
 plot_rocplot <- function(roc,
                          filename) {
 
-  shiny::plotPNG(
-    func = {
-      return(
-        print({
-          graphics::plot(roc)
-          graphics::text(0.4,
-                         0,
-                         paste0("AUC: ", round(roc$auc, 4)))
-        })
-      )
-    },
+  grDevices::png(
     filename = filename,
+    res = 300,
     height = 1000,
     width = 1500
   )
+  graphics::plot(roc)
+  graphics::text(0.4,
+                 0,
+                 paste0("AUC: ", round(roc$auc, 4)))
+  grDevices::dev.off()
 }
 
 
@@ -259,17 +243,14 @@ plot_rocplot <- function(roc,
 plot_cvplot <- function(cv_obj,
                         filename) {
 
-  shiny::plotPNG(
-    func = {
-      outplot <- graphics::plot(cv_obj)
-      return(
-        print(outplot)
-      )
-    },
+  grDevices::png(
     filename = filename,
+    res = 300,
     height = 1000,
     width = 1500
   )
+  graphics::plot(cv_obj)
+  grDevices::dev.off()
 }
 
 
@@ -285,17 +266,14 @@ plot_cvplot <- function(cv_obj,
 plot_grid_model_plot <- function(model,
                                  filename) {
 
-  shiny::plotPNG(
-    func = {
-      outplot <- graphics::plot(model)
-      return(
-        print(outplot)
-      )
-    },
+  grDevices::png(
     filename = filename,
+    res = 300,
     height = 1000,
     width = 1500
   )
+  graphics::plot(model)
+  grDevices::dev.off()
 }
 
 
@@ -309,18 +287,17 @@ plot_grid_model_plot <- function(model,
 plot_grid_varimp_plot <- function(model,
                                   filename) {
 
-  shiny::plotPNG(
-    func = {
-      var_imp <- caret::varImp(model)
-      outplot <- graphics::plot(var_imp, top = 20)
-      return(
-        print(outplot)
-      )
-    },
+
+  var_imp <- caret::varImp(model)
+
+  grDevices::png(
     filename = filename,
+    res = 300,
     height = 1000,
     width = 1500
   )
+  graphics::plot(var_imp, top = 20)
+  grDevices::dev.off()
 }
 
 
@@ -340,20 +317,17 @@ plot_survplot <- function(fit,
                           risk_table,
                           filename) {
 
-  shiny::plotPNG(
-    func = {
-      outplot <- survminer::ggsurvplot(
-        fit,
-        risk_table,
-        conf.int = TRUE,
-        legend.labs = c("Low-Risk", "High-Risk")
-      )
-      return(
-        print(outplot)
-      )
-    },
+  grDevices::png(
     filename = filename,
+    res = 300,
     height = 1000,
     width = 1500
   )
+  survminer::ggsurvplot(
+    fit,
+    risk_table,
+    conf.int = TRUE,
+    legend.labs = c("Low-Risk", "High-Risk")
+  )
+  grDevices::dev.off()
 }

@@ -1,4 +1,4 @@
-FROM rocker/tidyverse:3.6.1
+FROM rocker/verse:3.6.1
 
 # build args
 ARG PKG_NAME
