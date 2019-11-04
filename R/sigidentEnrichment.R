@@ -116,11 +116,11 @@ sigidentEnrichment <- function(mergedset,
                                             plotdir = rv$plotdir)
 
   # plotting enrichmentanalysis
-  plot_enrichted_barplot(enrichmentobj = rv$enr_analysis$go,
+  plot_enriched_barplot(enrichmentobj = rv$enr_analysis$go,
                          type = "GO",
                          filename = paste0(rv$plotdir, "Enriched_GO.png"))
 
-  plot_enrichted_barplot(enrichmentobj = rv$enr_analysis$kegg,
+  plot_enriched_barplot(enrichmentobj = rv$enr_analysis$kegg,
                          type = "KEGG",
                          filename = paste0(rv$plotdir, "Enriched_KEGG.png"))
 }

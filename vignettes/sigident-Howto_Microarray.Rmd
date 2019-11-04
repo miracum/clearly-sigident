@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r, include = FALSE}
@@ -584,11 +584,11 @@ filename <- paste0(plotdir, "/", pathwayid, ".pathview.png")
 knitr::include_graphics(filename)
 ```
 
-Using `plot_enrichted_barplot`, a bar plot is created depicting the enrichment scores (adj. p-value) as bar color and gene count as bar height. The parameter `type` controls whether to depict enriched GO terms or enriched KEGG terms. 
+Using `plot_enriched_barplot`, a bar plot is created depicting the enrichment scores (adj. p-value) as bar color and gene count as bar height. The parameter `type` controls whether to depict enriched GO terms or enriched KEGG terms. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_GO.png")
-sigident::plot_enrichted_barplot(enrichmentobj = enr_analysis$go,
+sigident::plot_enriched_barplot(enrichmentobj = enr_analysis$go,
                                   type = "GO",
                                   filename = filename)
 ```
@@ -599,7 +599,7 @@ knitr::include_graphics(filename)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_KEGG.png")
-sigident::plot_enrichted_barplot(enrichmentobj = enr_analysis$kegg,
+sigident::plot_enriched_barplot(enrichmentobj = enr_analysis$kegg,
                                   type = "KEGG",
                                   filename = filename)
 ```

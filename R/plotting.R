@@ -20,7 +20,7 @@ plot_import_boxplot <- function(mergeset,
 
   grDevices::png(
     filename = filename,
-    res = 300,
+    res = 150,
     height = 1000,
     width = 2000
   )
@@ -61,7 +61,7 @@ plot_batchplot <- function(correction_obj,
 
   grDevices::png(
     filename = filename,
-    res = 300,
+    res = 150,
     height = 1500,
     width = 1500
   )
@@ -91,38 +91,40 @@ plot_batchplot <- function(correction_obj,
 #' @inheritParams sigidentDEG
 #'
 #' @export
-plot_deg_heatmap <-
-  function(mergeset, genes, patientcolors, filename = NULL) {
-    if (is.null(filename)) {
-      filename <- "./plots/DEG_heatmap.png"
-      if (!dir.exists("./plots/")) {
-        dir.create("./plots/")
-      }
+plot_deg_heatmap <- function(mergeset,
+                             genes,
+                             patientcolors,
+                             filename = NULL) {
+  if (is.null(filename)) {
+    filename <- "./plots/DEG_heatmap.png"
+    if (!dir.exists("./plots/")) {
+      dir.create("./plots/")
     }
-
-    grDevices::png(
-      filename = filename,
-      res = 300,
-      height = 2000,
-      width = 3000
-    )
-    gplots::heatmap.2(
-      mergeset[genes, ],
-      ColSideColors = patientcolors,
-      key = TRUE,
-      symkey = FALSE,
-      density.info = "none",
-      scale = "none",
-      trace = "none",
-      col = grDevices::topo.colors(100),
-      cexRow = 0.4,
-      cexCol = 0.4
-    )
-    grDevices::dev.off()
   }
 
+  grDevices::png(
+    filename = filename,
+    res = 150,
+    height = 2000,
+    width = 3000
+  )
+  gplots::heatmap.2(
+    mergeset[genes, ],
+    ColSideColors = patientcolors,
+    key = TRUE,
+    symkey = FALSE,
+    density.info = "none",
+    scale = "none",
+    trace = "none",
+    col = grDevices::topo.colors(100),
+    cexRow = 0.4,
+    cexCol = 0.4
+  )
+  grDevices::dev.off()
+}
 
-#' @title plot_enrichted_barplot
+
+#' @title plot_enriched_barplot
 #'
 #' @description Helper function to create enrichted barplots
 #'
@@ -136,14 +138,15 @@ plot_deg_heatmap <-
 #'   to show in barplot.
 #'
 #' @export
-plot_enrichted_barplot <- function(enrichmentobj,
-                                   type,
-                                   filename = NULL,
-                                   show_category = 20) {
+plot_enriched_barplot <- function(enrichmentobj,
+                                  type,
+                                  filename = NULL,
+                                  show_category = 20) {
 
   stopifnot(is.character(type),
             type %in% c("GO", "KEGG"),
             is.numeric(show_category))
+
   if (is.null(filename)) {
     filename <- paste0("./plots/Enriched_", type, ".png")
     if (!dir.exists("./plots/")) {
@@ -153,15 +156,17 @@ plot_enrichted_barplot <- function(enrichmentobj,
 
   grDevices::png(
     filename = filename,
-    res = 300,
+    res = 150,
     height = 1000,
     width = 2000
   )
-  graphics::barplot(
-    enrichmentobj,
-    showCategory = show_category) +
-    ggplot2::ggtitle(paste0("Enriched ", type, " terms")) +
-    ggplot2::ylab("Gene count")
+  print({
+    graphics::barplot(
+      enrichmentobj,
+      showCategory = show_category) +
+      ggplot2::ggtitle(paste0("Enriched ", type, " terms")) +
+      ggplot2::ylab("Gene count")
+  })
   grDevices::dev.off()
 }
 
@@ -219,14 +224,16 @@ plot_rocplot <- function(roc,
 
   grDevices::png(
     filename = filename,
-    res = 300,
+    res = 150,
     height = 1000,
     width = 1500
   )
-  graphics::plot(roc)
-  graphics::text(0.4,
-                 0,
-                 paste0("AUC: ", round(roc$auc, 4)))
+  print({
+    graphics::plot(roc)
+    graphics::text(0.4,
+                   0,
+                   paste0("AUC: ", round(roc$auc, 4)))
+  })
   grDevices::dev.off()
 }
 
@@ -245,7 +252,7 @@ plot_cvplot <- function(cv_obj,
 
   grDevices::png(
     filename = filename,
-    res = 300,
+    res = 150,
     height = 1000,
     width = 1500
   )
@@ -268,7 +275,7 @@ plot_grid_model_plot <- function(model,
 
   grDevices::png(
     filename = filename,
-    res = 300,
+    res = 150,
     height = 1000,
     width = 1500
   )
@@ -292,7 +299,7 @@ plot_grid_varimp_plot <- function(model,
 
   grDevices::png(
     filename = filename,
-    res = 300,
+    res = 150,
     height = 1000,
     width = 1500
   )
@@ -319,7 +326,7 @@ plot_survplot <- function(fit,
 
   grDevices::png(
     filename = filename,
-    res = 300,
+    res = 150,
     height = 1000,
     width = 1500
   )
