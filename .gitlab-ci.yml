@@ -128,4 +128,6 @@ compile_vignette:
       - "${CI_PROJECT_DIR}/vignettes/csv"
       - "${CI_PROJECT_DIR}/vignettes/plots"
       - "${CI_PROJECT_DIR}/doc"
+    when: always
+    expire_in: 1 week
     expire_in: 1 month
