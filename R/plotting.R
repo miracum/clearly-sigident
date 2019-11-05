@@ -17,7 +17,7 @@ plot_import_boxplot <- function(mergeset,
       dir.create("./plots/")
     }
   }
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
@@ -53,14 +53,14 @@ plot_import_boxplot <- function(mergeset,
 plot_batchplot <- function(correction_obj,
                            filename = NULL,
                            time) {
-  
+
   if (is.null(filename)) {
     filename <- paste0("./plots/PCplot_", time, ".png")
     if (!dir.exists("./plots/")) {
       dir.create("./plots/")
     }
   }
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
@@ -105,7 +105,7 @@ plot_deg_heatmap <- function(mergeset,
       dir.create("./plots/")
     }
   }
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
@@ -148,18 +148,18 @@ plot_enriched_barplot <- function(enrichmentobj,
                                   type,
                                   filename = NULL,
                                   show_category = 20) {
-  
+
   stopifnot(is.character(type),
             type %in% c("GO", "KEGG"),
             is.numeric(show_category))
-  
+
   if (is.null(filename)) {
     filename <- paste0("./plots/Enriched_", type, ".png")
     if (!dir.exists("./plots/")) {
       dir.create("./plots/")
     }
   }
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
@@ -193,11 +193,11 @@ color_heatmap <-
       sample_metadata = sample_metadata,
       study_metadata = study_metadata
     )
-    
+
     discoverydata <- sample_metadata[which(
       sample_metadata$study %in% discovery
     ), ][[targetcol]]
-    
+
     return(
       unlist(
         lapply(
@@ -227,7 +227,7 @@ color_heatmap <-
 #' @export
 plot_rocplot <- function(roc,
                          filename) {
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
@@ -255,7 +255,7 @@ plot_rocplot <- function(roc,
 #' @export
 plot_cvplot <- function(cv_obj,
                         filename) {
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
@@ -280,7 +280,7 @@ plot_cvplot <- function(cv_obj,
 #' @export
 plot_grid_model_plot <- function(model,
                                  filename) {
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
@@ -303,10 +303,10 @@ plot_grid_model_plot <- function(model,
 #' @export
 plot_grid_varimp_plot <- function(model,
                                   filename) {
-  
-  
+
+
   var_imp <- caret::varImp(model)
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
@@ -335,7 +335,7 @@ plot_grid_varimp_plot <- function(model,
 plot_survplot <- function(fit,
                           risk_table,
                           filename) {
-  
+
   grDevices::png(
     filename = filename,
     res = 150,
