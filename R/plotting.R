@@ -17,19 +17,21 @@ plot_import_boxplot <- function(mergeset,
       dir.create("./plots/")
     }
   }
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
     height = 1000,
     width = 2000
   )
-  graphics::boxplot(
-    mergeset,
-    main = "Merged microarray data",
-    xlab = "Samples",
-    ylab = "Expression"
-  )
+  print({
+    graphics::boxplot(
+      mergeset,
+      main = "Merged microarray data",
+      xlab = "Samples",
+      ylab = "Expression"
+    )
+  })
   grDevices::dev.off()
 }
 
@@ -51,29 +53,31 @@ plot_import_boxplot <- function(mergeset,
 plot_batchplot <- function(correction_obj,
                            filename = NULL,
                            time) {
-
+  
   if (is.null(filename)) {
     filename <- paste0("./plots/PCplot_", time, ".png")
     if (!dir.exists("./plots/")) {
       dir.create("./plots/")
     }
   }
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
     height = 1500,
     width = 1500
   )
-  # time == "before" or "after"
-  gPCA::PCplot(
-    correction_obj,
-    ug = "guided",
-    type = "1v2",
-    main = paste("gPCA",
-                 time,
-                 "batch correction")
-  )
+  print({
+    # time == "before" or "after"
+    gPCA::PCplot(
+      correction_obj,
+      ug = "guided",
+      type = "1v2",
+      main = paste("gPCA",
+                   time,
+                   "batch correction")
+    )
+  })
   grDevices::dev.off()
 }
 
@@ -101,25 +105,27 @@ plot_deg_heatmap <- function(mergeset,
       dir.create("./plots/")
     }
   }
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
     height = 2000,
     width = 3000
   )
-  gplots::heatmap.2(
-    mergeset[genes, ],
-    ColSideColors = patientcolors,
-    key = TRUE,
-    symkey = FALSE,
-    density.info = "none",
-    scale = "none",
-    trace = "none",
-    col = grDevices::topo.colors(100),
-    cexRow = 0.4,
-    cexCol = 0.4
-  )
+  print({
+    gplots::heatmap.2(
+      mergeset[genes, ],
+      ColSideColors = patientcolors,
+      key = TRUE,
+      symkey = FALSE,
+      density.info = "none",
+      scale = "none",
+      trace = "none",
+      col = grDevices::topo.colors(100),
+      cexRow = 0.4,
+      cexCol = 0.4
+    )
+  })
   grDevices::dev.off()
 }
 
@@ -142,18 +148,18 @@ plot_enriched_barplot <- function(enrichmentobj,
                                   type,
                                   filename = NULL,
                                   show_category = 20) {
-
+  
   stopifnot(is.character(type),
             type %in% c("GO", "KEGG"),
             is.numeric(show_category))
-
+  
   if (is.null(filename)) {
     filename <- paste0("./plots/Enriched_", type, ".png")
     if (!dir.exists("./plots/")) {
       dir.create("./plots/")
     }
   }
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
@@ -187,11 +193,11 @@ color_heatmap <-
       sample_metadata = sample_metadata,
       study_metadata = study_metadata
     )
-
+    
     discoverydata <- sample_metadata[which(
       sample_metadata$study %in% discovery
     ), ][[targetcol]]
-
+    
     return(
       unlist(
         lapply(
@@ -221,7 +227,7 @@ color_heatmap <-
 #' @export
 plot_rocplot <- function(roc,
                          filename) {
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
@@ -249,14 +255,16 @@ plot_rocplot <- function(roc,
 #' @export
 plot_cvplot <- function(cv_obj,
                         filename) {
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
     height = 1000,
     width = 1500
   )
-  graphics::plot(cv_obj)
+  print({
+    graphics::plot(cv_obj)
+  })
   grDevices::dev.off()
 }
 
@@ -272,14 +280,16 @@ plot_cvplot <- function(cv_obj,
 #' @export
 plot_grid_model_plot <- function(model,
                                  filename) {
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
     height = 1000,
     width = 1500
   )
-  graphics::plot(model)
+  print({
+    graphics::plot(model)
+  })
   grDevices::dev.off()
 }
 
@@ -293,17 +303,19 @@ plot_grid_model_plot <- function(model,
 #' @export
 plot_grid_varimp_plot <- function(model,
                                   filename) {
-
-
+  
+  
   var_imp <- caret::varImp(model)
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
     height = 1000,
     width = 1500
   )
-  graphics::plot(var_imp, top = 20)
+  print({
+    graphics::plot(var_imp, top = 20)
+  })
   grDevices::dev.off()
 }
 
@@ -323,18 +335,20 @@ plot_grid_varimp_plot <- function(model,
 plot_survplot <- function(fit,
                           risk_table,
                           filename) {
-
+  
   grDevices::png(
     filename = filename,
     res = 150,
     height = 1000,
     width = 1500
   )
-  survminer::ggsurvplot(
-    fit,
-    risk_table,
-    conf.int = TRUE,
-    legend.labs = c("Low-Risk", "High-Risk")
-  )
+  print({
+    survminer::ggsurvplot(
+      fit,
+      risk_table,
+      conf.int = TRUE,
+      legend.labs = c("Low-Risk", "High-Risk")
+    )
+  })
   grDevices::dev.off()
 }
