@@ -30,7 +30,9 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 ## Example
 
-Please view the package's vignette to see a detailled description how to perform merging, signature and functional analyses of microarray data.
+Please view the package's vignette to see a detailled description how to prepare datasets in order to be suitable for usage with the `sigident` package and to learn, how to perform merging, signature and functional analyses of microarray data.
+
+Since the building the package vignette takes rather long (~ 40 min.), we provide the already built vignettes in [this repository](https://gitlab.miracum.org/clearly/sigident_vignettes).
 
 ## Citation  
 
