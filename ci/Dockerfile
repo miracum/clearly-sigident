@@ -13,7 +13,6 @@ RUN apt-get install -y --no-install-recommends \
 ADD ${PKG_NAME} ${PKG_NAME}
 
 # install package dependencies
-RUN R -e "devtools::install_deps(pkg = '${PKG_NAME}', upgrade = 'always')"
 RUN R -e "devtools::install_dev_deps(pkg = '${PKG_NAME}', upgrade = 'always')"
 
 # clean up
