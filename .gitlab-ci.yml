@@ -54,7 +54,7 @@ build_base_image:
 check_package:
   stage: build
   script:
-    - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
+    - R -e "devtools::check(pkg = '.', args = c('--no-tests'), build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
   artifacts:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.Rcheck"
