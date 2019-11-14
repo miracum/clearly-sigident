@@ -100,6 +100,13 @@ testing:
     paths:
       - public
 
+testing:
+  stage: test
+  allow_failure: true
+  when: on_success
+  script:
+    - R -e "devtools::test(pkg = '.')"
+
 #check_errors:
 #  stage: check
 #  script:
