@@ -54,7 +54,7 @@ build_base_image:
 check_package:
   stage: build
   script:
-    - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
+    - R -e "devtools::check(pkg = '.', args = c('--no-tests'), build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
   artifacts:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.Rcheck"
@@ -100,6 +100,13 @@ testing:
     paths:
       - public
 
+testing:
+  stage: test
+  allow_failure: true
+  when: on_success
+  script:
+    - R -e "devtools::test(pkg = '.')"
+
 #check_errors:
 #  stage: check
 #  script:
@@ -132,5 +139,6 @@ compile_vignette:
     when: always
     expire_in: 1 week
     expire_in: 1 month
-  except:
-    - svm_classifier
+  only:
+    - master
+    - development
