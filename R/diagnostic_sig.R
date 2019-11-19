@@ -151,7 +151,7 @@ signature <- function(traininglist,
                       seed) {
 
   stopifnot(
-    type %in% c("grid", "lasso", "elastic"),
+    type %in% c("grid", "lasso", "elastic", "svm"),
     is.numeric(nfolds),
     is.numeric(seed),
     is.list(traininglist)
@@ -159,6 +159,8 @@ signature <- function(traininglist,
 
   if (type == "grid") {
     outlist <- glmnet_gridsearch(traininglist, seed)
+  } else if (type == "svm") {
+    outlist <- svm_classifier(traininglist, seed)
   } else {
     # use provided alpha only in elastic
     if (type == "lasso") {
