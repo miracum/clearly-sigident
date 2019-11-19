@@ -139,3 +139,6 @@ compile_vignette:
     when: always
     expire_in: 1 week
     expire_in: 1 month
+  only:
+    - master
+    - development
