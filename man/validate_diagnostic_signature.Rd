@@ -4,8 +4,16 @@
 \alias{validate_diagnostic_signature}
 \title{validate_diagnostic_signature}
 \usage{
-validate_diagnostic_signature(validationstudylist, models, genes, idtype,
-  targetname, controlname, targetcol, datadir)
+validate_diagnostic_signature(
+  validationstudylist,
+  models,
+  genes,
+  idtype,
+  targetname,
+  controlname,
+  targetcol,
+  datadir
+)
 }
 \arguments{
 \item{validationstudylist}{A list, containing metainformation on the

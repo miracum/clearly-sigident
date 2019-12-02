@@ -4,8 +4,17 @@
 \alias{get_survival_time}
 \title{get_survival_time}
 \usage{
-get_survival_time(study_metadata, sample_metadata, genes, idtype,
-  discoverystudies_w_timedata, targetname, controlname, targetcol, datadir)
+get_survival_time(
+  study_metadata,
+  sample_metadata,
+  genes,
+  idtype,
+  discoverystudies_w_timedata,
+  targetname,
+  controlname,
+  targetcol,
+  datadir
+)
 }
 \arguments{
 \item{study_metadata}{A data frame. The data frame holding the study

@@ -5,16 +5,15 @@ Authors@R:
     c(person(given = "Lorenz A.",
              family = "Kapsner",
              role = c("cre", "aut"),
-             email = "lorenz.kapsner@uk-erlangen.de"),
+             email = "lorenz.kapsner@uk-erlangen.de",
+             comment = c(ORCID = "0000-0003-1866-860X")),
       person(given = "Johannes",
              family = "Vey",
              role = "aut"),
       person(given = "Meik",
-             family = "Kunz",
-             role = "aut"),
+             family = "Kunz"),
       person(given = "Andreas",
-             family = "Pittroff",
-             role = "aut"))
+             family = "Pittroff"))
 Description: Identify diagnostic and prognostic signatures from gene expression datasets.
 License: GPL-3
 LazyData: true
@@ -22,7 +21,7 @@ URL: https://gitlab.miracum.org/clearly/sigident
 BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
-Date/Publication: 2019-11-08 13:36:03 UTC
+Date/Publication: 2019-12-02 15:56:34 UTC
 biocViews: 
 Imports: 
     data.table,
@@ -47,15 +46,9 @@ Imports:
     plyr,
     survminer,
     knitr,
-    BiocManager,
     Biobase,
     sva,
-    GEOquery,
     limma,
-    affy,
-    gcrma,
-    hgu133plus2cdf,
-    hgu133plus2probe,
     GO.db,
     org.Hs.eg.db,
     clusterProfiler,
@@ -67,4 +60,6 @@ Suggests:
     rmarkdown,
     qpdf,
     lintr
-RoxygenNote: 6.1.1
+Remotes: 
+    url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/master/clearly/sigident.preproc-master.zip
+RoxygenNote: 7.0.1

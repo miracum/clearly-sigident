@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(sigident)
+library(sigident.preproc)
 library(knitr)
 ```
 
@@ -36,157 +37,57 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 ## Data preparation 
 
-In order to use this R package and its functions, you need to prepare a merged gene expression dataset manually. The workflow to achieve this is presented in the following. 
+In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-### Download of GEO datasets and normalization
+### Initialization of important variables
 
-This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).  
-
-To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The object `targetcol` should also be titled "target" (correspondingly to the column name of the object `sample_metadata` below). `targetcol` contains the outcome variable of interest for subsequent analysis. The levels of `targetcol` are to be defined with `controlname` and `targetname`. For this example we used the package to analyze DEGs and identify diagnostic and prognostic gene signatures for the separation of two groups (or subtypes, healthy vs cancer, etc) we named `controlname` and `targetname` as "Control" and "Lung Cancer". 
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# initialize filePath:
+```{r}
 filePath <- tempdir()
 maindir <- "./geodata/"
 datadir <- paste0(maindir, "data/")
 dir.create(maindir)
 dir.create(datadir)
-
-# initialize more infos on the study
-targetcol <- "target" # should be named "target"
-controlname <- "Control"
-targetname <- "Lung Cancer"
 ```
 
-Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expression, pheno and feature data as well as the annotations of the probe sets and store it as '.txt.gz' files in the defined `datadir` folder. 
+### Definition of a list that contains a representation of the studie's / studies' metadata
 
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
-GSE19804 <- GEOquery::getGEO("GSE19804", destdir = datadir)
+This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).  
 
-# extracting ExpressionSets
-eset1 <- GSE18842[[1]]
-eset2 <- GSE19804[[1]]
-```
-
-Moreover, this approach enables us to download also the raw data in CEL file format. These files need to be uncompressed. Subsequently a GCRMA normalization has to be conducted.  
-
-For this, further commands are necessary to subsequently import the CEL files into the R environment. `eset_c` represents a normalized ExpressionSet, though only containing expression data without pheno data or feature data. These data can be added later. (The study GSE19188 could also be downloaded directly by applying `getGEO()` instead of using the raw data and manually adding pheno and feature data afterwards. We just wanted to demonstrate how to use raw data in form of CEL files and apply normalization to it.)
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# download raw data, uncompress them and execute GCRMA normalization
-# actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
-GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
-utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir=maindir)
-cels <- list.files(maindir, pattern = "[gz]")
-tryCatch({
-  sapply(paste(maindir, cels, sep="/"), GEOquery::gunzip)
-  # at this point, first the textfile "phenodata.txt must be generated
-  ## For downloading raw data use the function: getGEOSuppFiles("").
-  ## After downloading and uncompressing the raw file (*_RAW.tar) we need to capture
-  ## the experimental information. Therefore a text file is created in the terminal 
-  ## window or rather in the command line.
-  system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
-  ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.
-  ## After this step the normalization can be started.
-}, error = function(e){
-  print(e)
-})
-
-cels <- list.files(maindir, pattern = "CEL$")
-
-celfiles <- paste0(maindir, cels)
-# use justGCRMA now due to memory issues with gcrma --> justGCRMA is much more memory efficient
-# https://www.rdocumentation.org/packages/gcrma/versions/2.44.0/topics/justGCRMA
-eset_c <- gcrma::justGCRMA(filenames = celfiles, fast = TRUE)
-# call garbage collection here
-gc()
-
-# old code
-#celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")
-#eset_c <- gcrma::gcrma(celfiles, fast = TRUE)
-
-# eset_c = now is a normalized ExpressionSet, but without f- and pData
-# the f- and pData are transfered manually from dataset GSE19188
-
-GSE19188 <- GEOquery::getGEO("GSE19188", destdir = datadir)
-
-eset3 <- GSE19188[[1]]
-pData3 <- Biobase::pData(eset3)
-fData3 <- Biobase::fData(eset3)
-Biobase::pData(eset_c) <- pData3
-Biobase::fData(eset_c) <- fData3
-colnames(Biobase::exprs(eset_c)) <- colnames(Biobase::exprs(eset3))
-Biobase::annotation(eset_c) <- Biobase::annotation(eset3)
-eset3 <- eset_c
-```
-
-### Formatting the phenoData 
-
-The phenoData of the expresssionSets need to be formatted so that the phenoData columns overlap perfectly. This means that all ExpressionSets should contain identical columns in the same order. Non consistent columns need to be removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
+The mapping information include the `setid` (which GEO set should be used, normally '1'), the `targetcolname` (the name of the column holding the variable of interest), the `targetlevelname` (the value of the positive outcomes in `targetcolname`) and the `controllevelname`  (the value of the negative outcomes in `targetcolname`) need to be represented in the `studiesinfo` list object. If specifying `'use_rawdata' = TRUE`, raw the data is downloaded in CEL file format, uncompressed and subsequently normalized with a GCRMA normalization. The directory specified in `datadir` will be used for storing downloaded files.
 
 ```{r}
-# create version b, that original ExpressionSets persist
-eset1b <- eset1
-eset2b <- eset2
-eset3b <- eset3
+studiesinfo <- list(
+  "GSE18842" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "Human Lung Tumor",
+    controllevelname = "Human Lung Control"
+    ),
+  
+  "GSE19804" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "frozen tissue of primary tumor",
+    controllevelname = "frozen tissue of adjacent normal"
+  ),
+  
+  "GSE19188" = list(
+    setid = 1,
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue type: healthy",
+    targetlevelname = "tissue type: tumor",
+    use_rawdata = TRUE
+  )
+)
+```
 
-# show number of samples and phenoData columns
-dim(Biobase::pData(eset1b))
-dim(Biobase::pData(eset2b))
-dim(Biobase::pData(eset3b))
-# depict phenoData column names
-colnames(Biobase::pData(eset1b))
-colnames(Biobase::pData(eset2b))
-colnames(Biobase::pData(eset3b))
+### Load GEO datasets
 
+All downloaded datasets will be assigned to the global environment.
 
-# remove unnecessary phenoData
-# rename desired column names and if necessary the column entries (as we did for 'Tumor')
-
-# eset1b
-eset1b$relation <- NULL
-eset1b$characteristics_ch1 <- NULL
-eset1b$`sample type:ch1` <- NULL
-eset1b$`tissue:ch1` <- NULL
-colnames(Biobase::pData(eset1b))[8] = targetcol
-levels(eset1b[[targetcol]]) = c(controlname, targetname)
-dim(eset1b)
-
-
-# eset2b
-eset2b$characteristics_ch1.2 <- NULL
-eset2b$characteristics_ch1.3 <- NULL
-eset2b$contact_department <- NULL
-eset2b$characteristics_ch1 <- NULL
-eset2b$`age:ch1` <- NULL
-eset2b$`gender:ch1` <- NULL
-eset2b$`stage:ch1` <- NULL
-eset2b$`tissue:ch1` <- NULL
-colnames(Biobase::pData(eset2b))[8] = targetcol
-levels(eset2b[[targetcol]]) = c(controlname, targetname)
-dim(eset2b)
-
-
-# eset3b
-eset3b$characteristics_ch1.2 <- NULL
-eset3b$characteristics_ch1.3 <- NULL
-eset3b$characteristics_ch1.4 <- NULL
-eset3b$contact_phone <- NULL
-eset3b$contact_fax <- NULL
-eset3b$contact_department <- NULL
-eset3b$contact_web_link <- NULL
-eset3b$relation <- NULL
-eset3b$source_name_ch1 <- NULL
-colnames(Biobase::pData(eset3b))[9] = targetcol
-levels(eset3b[[targetcol]]) = c(controlname, targetname)
-pNew <- Biobase::pData(eset3b)[,c(1:7,9,8,10:29)] # reorder columns
-Biobase::pData(eset3b) = pNew
-dim(eset3b)
-
-# now, all phenoData columns are consistent
-cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), 
-      colnames(Biobase::pData(eset3b)))
+```{r}
+load_geo_data(studiesinfo = studiesinfo,
+              datadir = datadir) 
 ```
 
 ## Preparations for utilizing the sigident package 
@@ -216,44 +117,7 @@ split <- 0.8
 nfolds <- 10
 ```
 
-### Extract metadata 
-
-The metadata are extracted directly from the ExpressionSets and are deposited for a easier applicability in the data frame `sample_metadata`. This data frame consists of the GEO accession numbers of the study (GPLxxx), the sample accession numbers (GSMxxx) and the `targetcol` (named "target") containing the outcome of interest (currently, only a binary coded target variable is supported for the subsequent analyses, e.g. "Cancer - No Cancer"). 
-
-#### Extract sample metadata 
-
-```{r}
-# workaround
-GSE18842_meta <- data.table::data.table(
-  cbind(
-    study = "GSE18842",
-    sample = eset1b@phenoData@data[,"geo_accession"],
-    target = as.character(eset1b@phenoData@data[,targetcol])
-  )
-)
-
-GSE19804_meta <- data.table::data.table(
-  cbind(
-    study = "GSE19804",
-    sample = eset2b@phenoData@data[,"geo_accession"],
-    target = as.character(eset2b@phenoData@data[,targetcol])
-  )
-)
-
-GSE19188_meta <- data.table::data.table(
-  cbind(
-    study = "GSE19188",
-    sample = eset3b@phenoData@data[,"geo_accession"],
-    target = as.character(eset3b@phenoData@data[,targetcol])
-  )
-)
-
-sample_metadata <- rbind(GSE18842_meta,
-                        GSE19804_meta,
-                        GSE19188_meta)
-```
-
-#### Define study metadata 
+### Define study metadata 
 
 `sutdyMetadata` contains the GEO series accession numbers of the studies and the assignment due to its usage as discovery dataset or validation dataset. 
 
@@ -265,15 +129,6 @@ study_metadata <- data.frame(
   ),
   stringsAsFactors = FALSE
 )
-```
-
-## Merging and batch correction
-
-In this framework for merging, only genes that are present in all datasets are preserved. In our example the entire probe set of 54675 transcripts remains. `mergedset` contains the samples of the studies grouped as discovery and represents an "ExpressionSet" object describing samples, annotations and further information about the features.  
-
-```{r}
-esets=c(eset1b,eset2b,eset3b)
-mergedset <- sigident::merge_(esets)
 ```
 
 # Discovering batch effects 

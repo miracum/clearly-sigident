@@ -5,10 +5,22 @@
 \title{Perform Prognostic Signature Analyses in Gene Expression
   Datasets Derived from MicroArrays}
 \usage{
-sigidentPrognostic(mergeset, study_metadata, sample_metadata, idtype,
-  genes, discoverystudies_w_timedata, classifier_studies,
-  validationstudiesinfo, targetname, controlname, datadir,
-  plotdir = "./plots/", csvdir = "./tables/", targetcol = "target")
+sigidentPrognostic(
+  mergeset,
+  study_metadata,
+  sample_metadata,
+  idtype,
+  genes,
+  discoverystudies_w_timedata,
+  classifier_studies,
+  validationstudiesinfo,
+  targetname,
+  controlname,
+  datadir,
+  plotdir = "./plots/",
+  csvdir = "./tables/",
+  targetcol = "target"
+)
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
