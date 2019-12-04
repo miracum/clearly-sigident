@@ -24,8 +24,10 @@ svm_classifier <- function(traininglist, seed) {
   #  maxit = 1e7
   #)
 
-  #train.svm <- caret::trainControl(method = "repeatedcv", number = 10,
-  #                                  repeats = 5, savePredictions = TRUE, search = "random")
+  train.svm <- caret::trainControl(method = "repeatedcv", number = 10,
+                                    repeats = 5, savePredictions = TRUE, search = "random")
+
+  print("step1")
 
   outlist$svm_train <- caret::train(
                x = traininglist$train$x,
@@ -33,22 +35,22 @@ svm_classifier <- function(traininglist, seed) {
                method = "svmLinear",
                #family = "binomial",
                #tuneGrid = gr_init$srchGrd,
-               trControl = gr_init$trnCtrl, # or train.svm
+               trControl = train.svm, # or train.svm
                preProc = c("center", "scale"),
                tuneLength = 10,
                allowParallel = T)
 
 
-  importance.svm <- varImp(svm, scale = FALSE)
-  print(importance.svm)
-  plot(importance.svm, top = 20)
+  # importance.svm <- varImp(svm, scale = FALSE)
+  # print(importance.svm)
+  # plot(importance.svm, top = 20)
 
-  svm.pred <- predict(svm, test)
+  # svm.pred <- predict(svm, test)
 
-  confusion.svm <- confusionMatrix(svm.pred, test$Therapy)
-  confusion.svm
+  # confusion.svm <- confusionMatrix(svm.pred, test$Therapy)
+  # confusion.svm
 
-  svm.outcome <- test$Therapy
+  # svm.outcome <- test$Therapy
 
 
   # stop parallel computation
@@ -56,48 +58,4 @@ svm_classifier <- function(traininglist, seed) {
   gc()
 
   ########################################
-
-  outlist$svm_auto <-
-    perform_glmnet(
-      train_x = traininglist$train$x,
-      train_y = traininglist$train$y,
-      alpha = outlist$svm_train$bestTune$alpha,
-      lambda = outlist$svm_train$bestTune$lambda
-    )
-
-  # prediction
-  pred_svm <- glm_prediction(
-    model = outlist$svm_auto,
-    test_x = traininglist$test$x,
-    test_y = traininglist$test$y,
-    s = NULL
-  )
-
-  outlist$predicted_svm <- pred_svm$prediction
-  outlist$confmat_svm <- pred_svm$confmat
-  outlist$roc_svm <- pred_svm$roc
-
-  ########################################
-
-  outlist$elasticnet_auto <-
-    perform_glmnet(
-      train_x = traininglist$train$x,
-      train_y = traininglist$train$y,
-      alpha = outlist$caret_train$bestTune$alpha,
-      lambda = outlist$caret_train$bestTune$lambda
-    )
-
-  # prediction
-  pred_elasticnet <- glm_prediction(
-    model = outlist$elasticnet_auto,
-    test_x = traininglist$test$x,
-    test_y = traininglist$test$y,
-    s = NULL
-  )
-
-  outlist$predicted_elasticnet <- pred_elasticnet$prediction
-  outlist$confmat_elasticnet <- pred_elasticnet$confmat
-  outlist$roc_elasticnet <- pred_elasticnet$roc
-
-  return(outlist)
 }
