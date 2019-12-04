@@ -13,26 +13,19 @@
 #' @inheritParams create_diagnosisdesignbatch
 #'
 #' @export
-get_survival_time <- function(study_metadata,
-                              sample_metadata,
+get_survival_time <- function(sample_metadata,
                               genes,
                               idtype,
                               discoverystudies_w_timedata,
-                              targetname,
-                              controlname,
-                              targetcol,
                               datadir) {
 
-  discovery <- discovery_func(sample_metadata = sample_metadata,
-                              study_metadata = study_metadata)
   stopifnot(
-    is.character(targetcol),
-    is.character(targetname),
-    is.list(discoverystudies_w_timedata),
-    length(setdiff(
-      names(discoverystudies_w_timedata), discovery
-    )) == 0
+    is.list(discoverystudies_w_timedata)
   )
+
+  targetcol <- "target"
+  controlname <- "Control"
+  targetname <- "Target"
 
   outlist <- list()
 
@@ -49,68 +42,39 @@ get_survival_time <- function(study_metadata,
       is.numeric(discoverystudies_w_timedata[[st]]$setid)
     )
 
-    samples <- sample_metadata[sample_metadata$study == st, ]
-    tumorsamples <- samples[eval(
-      parse(text = paste0("samples$", targetcol))
+    tumorsamples <- sample_metadata[eval(
+      parse(text = paste0("sample_metadata$", targetcol))
     ) == targetname, ]
 
-
-    eset <- load_eset(
-      name = st,
-      datadir = datadir,
-      targetcolname = discoverystudies_w_timedata[[st]]$targetcolname,
-      targetlevelname = discoverystudies_w_timedata[[st]]$targetlevelname,
-      controllevelname = discoverystudies_w_timedata[[st]]$controllevelname,
-      targetcol = targetcol,
-      targetname = targetname,
-      controlname = controlname,
-      setid = discoverystudies_w_timedata[[st]]$setid
+    # setd use_raw, if not provided with function arguments
+    use_raw <- ifelse(
+      is.null(discoverystudies_w_timedata[[st]]$use_rawdata),
+      FALSE,
+      TRUE
     )
 
-    if (isTRUE(discoverystudies_w_timedata[[st]]$use_rawdata)) {
-      rawdir <- paste0(datadir, "rawdata/")
-      dir.create(rawdir)
-      exdir <- paste0(rawdir, "celfiles/")
-      dir.create(exdir)
-
-      GEOquery::getGEOSuppFiles(st, baseDir = rawdir)
-
-      tar_file <- list.files(paste0(rawdir, st), pattern = ".tar$")
-
-      stopifnot(length(tar_file) == 1)
-
-      utils::untar(paste0(rawdir, st, "/", tar_file), exdir = exdir)
-
-      cels <- list.files(exdir, pattern = "[gz]")
-
-      tryCatch({
-        sapply(paste(exdir, cels, sep = "/"), GEOquery::gunzip)
-        cmd <-
-          paste0("bash -c 'ls ",
-                 exdir,
-                 "/*.CEL > ",
-                 exdir,
-                 "/phenodata.txt'")
-        system(cmd)
+    eset <- tryCatch(
+      expr = {
+        eset <- eval(parse(text = st))
+        eset
       }, error = function(e) {
-        print(e)
-      })
-
-      cels <- list.files(exdir, pattern = "CEL$")
-
-      celfiles <- paste0(exdir, cels)
-      eset_c <- gcrma::justGCRMA(filenames = celfiles, fast = TRUE)
-      gc()
-
-      p_data <- Biobase::pData(eset)
-      f_data <- Biobase::fData(eset)
-      Biobase::pData(eset_c) <- p_data
-      Biobase::fData(eset_c) <- f_data
-      colnames(Biobase::exprs(eset_c)) <-
-        colnames(Biobase::exprs(eset))
-      Biobase::annotation(eset_c) <- Biobase::annotation(eset)
-      eset <- eset_c
-    }
+        eset <- sigident.preproc::geo_load_eset(
+          name = st,
+          datadir = datadir,
+          targetcolname = discoverystudies_w_timedata[[st]]$targetcolname,
+          targetcol = targetcol,
+          targetname = targetname,
+          controlname = controlname,
+          targetlevelname = discoverystudies_w_timedata[[st]]$targetlevelname,
+          controllevelname = discoverystudies_w_timedata[[st]]$controllevelname,
+          use_rawdata = use_raw,
+          setid = discoverystudies_w_timedata[[st]]$setid
+        )
+        eset
+      }, finally = function(f) {
+        return(eset)
+      }
+    )
 
     # filter only data of tumor samples
     if (!is.null(discoverystudies_w_timedata[[st]]$targetlevelname)) {
@@ -134,8 +98,10 @@ get_survival_time <- function(study_metadata,
     # rows: individual samples
     survival_table <- data.frame(time, status)
 
-    expr <- create_expressionset(eset = eset_targets,
-                                 idtype = idtype)
+    expr <- sigident.preproc::geo_create_expressionset(
+      eset = eset_targets,
+      idtype = idtype
+    )
 
     #% ids <- rownames(expr)
 
@@ -270,23 +236,16 @@ exprs_vector <- function(deg) {
 generate_expression_pattern <- function(classifier_studies,
                                         sig_cov,
                                         mergeset,
-                                        study_metadata,
-                                        sample_metadata,
-                                        controlname,
-                                        targetname,
-                                        targetcol) {
-  stopifnot(length(setdiff(
-    classifier_studies, study_metadata$study
-  )) == 0)
+                                        sample_metadata) {
 
-  dd <- create_diagnosisdesignbatch(
+  targetcol <- "target"
+  controlname <- "Control"
+  targetname <- "Target"
+
+
+  dd <- sigident.preproc::geo_create_diagnosisdesignbatch(
     sample_metadata =
-      sample_metadata[sample_metadata$study %in% classifier_studies, ],
-    study_metadata =
-      study_metadata[study_metadata$study %in% classifier_studies, ],
-    controlname = controlname,
-    targetname = targetname,
-    targetcol = targetcol
+      sample_metadata[sample_metadata$study %in% classifier_studies, ]
   )
   diagnosis <- dd$diagnosis
 
@@ -390,23 +349,44 @@ expression_pattern <- function(mergeset, ids, tumor, control) {
 prognostic_classifier <- function(pattern_com,
                                   idtype,
                                   validationstudiesinfo,
-                                  datadir,
-                                  targetcol,
-                                  targetname,
-                                  controlname) {
+                                  datadir) {
+
+  targetcol <- "target"
+  controlname <- "Control"
+  targetname <- "Target"
+
   outlist <- list()
 
   for (st in names(validationstudiesinfo)) {
-    eset <- load_eset(
-      name = st,
-      datadir = datadir,
-      targetcolname = validationstudiesinfo[[st]]$targetcolname,
-      targetlevelname = validationstudiesinfo[[st]]$targetlevelname,
-      controllevelname = validationstudiesinfo[[st]]$controllevelname,
-      targetcol = targetcol,
-      targetname = targetname,
-      controlname = controlname,
-      setid = validationstudiesinfo[[st]]$setid
+
+    # setd use_raw, if not provided with function arguments
+    use_raw <- ifelse(
+      is.null(validationstudiesinfo[[st]]$use_rawdata),
+      FALSE,
+      TRUE
+    )
+
+    eset <- tryCatch(
+      expr = {
+        eset <- eval(parse(text = st))
+        eset
+      }, error = function(e) {
+        eset <- sigident.preproc::geo_load_eset(
+          name = st,
+          datadir = datadir,
+          targetcolname = validationstudiesinfo[[st]]$targetcolname,
+          targetcol = targetcol,
+          targetname = targetname,
+          controlname = controlname,
+          targetlevelname = validationstudiesinfo[[st]]$targetlevelname,
+          controllevelname = validationstudiesinfo[[st]]$controllevelname,
+          use_rawdata = use_raw,
+          setid = validationstudiesinfo[[st]]$setid
+        )
+        eset
+      }, finally = function(f) {
+        return(eset)
+      }
     )
 
     #% diagnosis <- create_diagnosis(vector = eset[[targetcol]],
@@ -438,8 +418,10 @@ prognostic_classifier <- function(pattern_com,
     status <- timestatus$status
     risk_table <- data.frame(time, status)
 
-    expr <- create_expressionset(eset = eset_targets,
-                                 idtype = idtype)
+    expr <- sigident.preproc::geo_create_expressionset(
+      eset = eset_targets,
+      idtype = idtype
+    )
 
     # classification and Kaplan-Meier estimator
     sig <- sig_analysis(expr = expr, pattern_com = pattern_com)

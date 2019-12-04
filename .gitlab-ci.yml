@@ -53,6 +53,7 @@ build_base_image:
 
 check_package:
   stage: build
+  allow_failure: true
   script:
     - R -e "devtools::check(pkg = '.', build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
   artifacts:

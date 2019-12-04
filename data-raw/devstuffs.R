@@ -11,8 +11,8 @@ my_desc$set_authors(c(
   person("Lorenz A.", "Kapsner", email = "lorenz.kapsner@uk-erlangen.de", role = c('cre', 'aut'),
          comment = c(ORCID = "0000-0003-1866-860X")),
   person("Johannes", "Vey", role = c('aut')),
-  person("Meik", "Kunz", role = c('cbt')),
-  person("Andreas", "Pittroff", role = c('cbt'))
+  person("Meik", "Kunz", role = c('ctb')),
+  person("Andreas", "Pittroff", role = c('ctb'))
 ))
 # Remove some author fields
 my_desc$del("Maintainer")
@@ -68,7 +68,6 @@ usethis::use_package("stats", type="Imports")
 usethis::use_package("graphics", type="Imports")
 usethis::use_package("DT", type="Imports")
 usethis::use_package("jsonlite", type="Imports")
-usethis::use_package("gPCA", type="Imports")
 usethis::use_package("caret", type="Imports")
 usethis::use_package("glmnet", type="Imports")
 usethis::use_package("pROC", type="Imports")
@@ -86,7 +85,6 @@ usethis::use_package("knitr", type="Imports")
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700
 usethis::use_package("Biobase", type="Import")
-usethis::use_package("sva", type="Imports")
 usethis::use_package("limma", type="Imports")
 usethis::use_package("GO.db", type = "Imports")
 usethis::use_package("org.Hs.eg.db", type = "Imports")

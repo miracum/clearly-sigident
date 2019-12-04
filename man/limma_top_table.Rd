@@ -11,7 +11,7 @@ limma_top_table(mergeset, design, q_value)
 columns = samples).}
 
 \item{design}{A object. The output of the function
-`create_diagnosisdesignbatch()`.}
+`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
 
 \item{q_value}{A numeric value for the q-value (false discovery rate)
 (default=0.01).}

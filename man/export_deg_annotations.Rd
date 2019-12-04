@@ -7,15 +7,7 @@
 export_deg_annotations(mergedset, genes, idtype)
 }
 \arguments{
-\item{mergedset}{A large Expression Set. The output of the function
-`merge_()`.}
-
 \item{genes}{A object. The output of the function `identify_degs()`.}
-
-\item{idtype}{A character string. The type of ID used to name the
-genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
-affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
-are being removed!}
 }
 \description{
 Helper function to export DEG annotations from mergedset.

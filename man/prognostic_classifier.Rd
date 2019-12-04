@@ -4,15 +4,7 @@
 \alias{prognostic_classifier}
 \title{prognostic_classifier}
 \usage{
-prognostic_classifier(
-  pattern_com,
-  idtype,
-  validationstudiesinfo,
-  datadir,
-  targetcol,
-  targetname,
-  controlname
-)
+prognostic_classifier(pattern_com, idtype, validationstudiesinfo, datadir)
 }
 \arguments{
 \item{pattern_com}{A data.frame. The output of the function
@@ -28,16 +20,6 @@ the study that contains the validation information.}
 
 \item{datadir}{A character string. Path to the data-folder inside the
 metadata folder.}
-
-\item{targetcol}{A character string. Columname of `sample_metadata`
-holding the targets. Default: "target". Caution: this should not
-be changed.}
-
-\item{targetname}{A character string. Name of the the targets, specified
-in the 'target' column of `sample_metadata`.}
-
-\item{controlname}{A character string. Name of the the controls,
-specified in the 'target' column of `sample_metadata`.}
 }
 \description{
 Helper function to perform prognostic classification.

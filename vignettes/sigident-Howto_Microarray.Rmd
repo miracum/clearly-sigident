@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -16,44 +16,54 @@ knitr::opts_chunk$set(
 )
 ```
 
-
-```{r setup}
-library(sigident)
-library(sigident.preproc)
-library(knitr)
-```
-
 # Prerequisites and installation 
+
+## Install sigident.preproc package
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+options('repos' = 'https://ftp.fau.de/cran/')
+install.packages("devtools")
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.preproc.git",
+                      upgrade = "always")
+```
 
 ## Install sigident package
 
 ```{r eval=FALSE}
-options('repos' = 'https://ftp.fau.de/cran/')
-install.packages("devtools")
 devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 ```
 
 # Preprocessing 
 
-## Data preparation 
-
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-### Initialization of important variables
+For a detailed background on the following steps please view the `sigident.preproc` package's vignette.
 
-```{r}
+## Initialization of important variables
+
+```{r setup}
+library(sigident)
+library(sigident.preproc)
+library(knitr)
+
+# initialize filePath:
 filePath <- tempdir()
+
+# define datadir
 maindir <- "./geodata/"
 datadir <- paste0(maindir, "data/")
 dir.create(maindir)
 dir.create(datadir)
+
+# define plotdir
+plotdir <- "./plots/"
+dir.create(plotdir)
+
+# define idtype
+idtype = "affy"
 ```
 
-### Definition of a list that contains a representation of the studie's / studies' metadata
-
-This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).  
-
-The mapping information include the `setid` (which GEO set should be used, normally '1'), the `targetcolname` (the name of the column holding the variable of interest), the `targetlevelname` (the value of the positive outcomes in `targetcolname`) and the `controllevelname`  (the value of the negative outcomes in `targetcolname`) need to be represented in the `studiesinfo` list object. If specifying `'use_rawdata' = TRUE`, raw the data is downloaded in CEL file format, uncompressed and subsequently normalized with a GCRMA normalization. The directory specified in `datadir` will be used for storing downloaded files.
+## Define list that contains a representation of the studies metadata
 
 ```{r}
 studiesinfo <- list(
@@ -81,203 +91,36 @@ studiesinfo <- list(
 )
 ```
 
-### Load GEO datasets
+## Load GEO datasets
 
 All downloaded datasets will be assigned to the global environment.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-load_geo_data(studiesinfo = studiesinfo,
-              datadir = datadir) 
+sigident.preproc::load_geo_data(studiesinfo = studiesinfo,
+                                datadir = datadir,
+                                plotdir = plotdir,
+                                idtype = idtype) 
 ```
-
-## Preparations for utilizing the sigident package 
-
-Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. `idtype` can be either "affy" or "entrez", indicating, if either Affy-IDs or Entrez-IDs are to be used as feature names for the subsequent analyses.  
-Selecting "entrez" usually results in a reduction of total features due to the removing of empty strings and duplicate IDs.  
-We here use `idtype` = "affy" for all subsequent analyses.  
-
-```{r}
-# general
-plotdir <- "./plots/"
-dir.create(plotdir)
-csvdir <- "./csv/"
-dir.create(csvdir)
-idtype = "affy"
-
-# enrichment analysis
-species <- "Hs"
-OrgDb <- "org.Hs.eg.db"
-organism <- "hsa"
-#pathwayid <- "hsa04110" # Cell Cycle
-pathwayid <- "hsa04151" # PI3K-Akt
-
-# diagnostic signature
-seed <- 111
-split <- 0.8
-nfolds <- 10
-```
-
-### Define study metadata 
-
-`sutdyMetadata` contains the GEO series accession numbers of the studies and the assignment due to its usage as discovery dataset or validation dataset. 
-
-```{r}
-study_metadata <- data.frame(
-  cbind(study = c("GSE18842", "GSE19804", "GSE19188", "GSE30219", "GSE50081"),
-        discovery = as.logical(c(1, 1, 1, 0, 0)),
-        validation = as.logical(c(0, 0, 0, 1, 1))
-  ),
-  stringsAsFactors = FALSE
-)
-```
-
-# Discovering batch effects 
-
-Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studies can already be recognized.    
 
 ## Visualize batch effect
 
+These plots are created when executing the function `sigident.preproc::load_geo_data` and stored in the directory specified in `plotdir`.
 
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE18842.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset1b), main = "GSE18842 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE19804.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset2b), main = "GSE19804 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE19188.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset3b), main = "GSE19188 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(mergedset@assayData$exprs, main = "Merged data before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-A more powerfull approach for batch effect detection is conducting a guided Principle Component Analysis (gPCA) implemented in the [gPCA](https://CRAN.R-project.org/package=gPCA) package.  
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# conducting gPCA for batch effect detection
-DF <- mergedset@assayData$exprs
-
-# define batches with number of samples
-batch <- sigident::create_batch(study_metadata = study_metadata,
-                                sample_metadata = sample_metadata)
-
-gPCA_before <- sigident::batch_detection(mergeset = DF,
-                                          batch = batch)
-filename <- paste0(plotdir, "PCplot_before.png")
-sigident::plot_batchplot(correction_obj = gPCA_before,
-                           filename = filename,
-                           time = "before")
-```
+### Before batch correction
 
 ```{r out.width='80%'}
-knitr::include_graphics(filename)
+knitr::include_graphics(paste0(plotdir, "GSE18842_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "GSE19804_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "GSE19188_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "Merged_before_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "PCplot_before.png"))
 ```
 
-In order to correct for occurring batch effects and other unwanted variation in high-throughput experiments, the `ComBat` function from the [sva](10.1093/bioinformatics/bts034) package is applied inside the function `batch_correction()`. The `ComBat` function adjusts for known batches using an empirical Bayesian framework [1].  
-
-```{r message=FALSE, warning=FALSE, error=FALSE}
-table(mergedset@phenoData@data[[targetcol]])
-
-# generate list dd with diagnosis and design
-dd <- sigident::create_diagnosisdesignbatch(
-  sample_metadata = sample_metadata,
-  study_metadata = study_metadata,
-  controlname = controlname,
-  targetname = targetname,
-  targetcol = targetcol
-  )
-diagnosis <- dd$diagnosis
-length(diagnosis)
-table(diagnosis)
-
-design <- dd$design
-
-
-# check batch assignment
-# (batch is also created during createDiagnosisDesignBatch_())
-batch <- dd$batch
-table(batch)
-length(batch)
-
-# removing batch effects computing linear models, take variance between the diagnosis into consideration
-
-mergeset <- sigident::batch_correction(mergedset = mergedset,
-                                       batch = batch,
-                                       design = design,
-                                       idtype = idtype)
-
-dim(mergeset)
-```
-
-```{r results='hide'}
-# remove unneeded objects
-rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
-# also no further purpose, but takes a lot of memory and may slow down your computer
-rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804", "fData3", "eset_c")
-gc()
-```
-
-`mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet anymore. 
-
-## Visualize batch effect removal
-
-Creating a boxplot and a gPCA plot with `mergeset` shows that no batch effect is present anymore. 
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "import_boxplot.png")
-sigident::plot_import_boxplot(mergeset, filename)
-```
+### After batch correction
 
 ```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-gPCA_after <- sigident::batch_detection(mergeset = mergeset,
-                                        batch = batch)
-filename <- paste0(plotdir, "PCplot_after.png")
-sigident::plot_batchplot(correction_obj = gPCA_after,
-                           filename = filename,
-                           time = "after")
-```
-
-```{r out.width='80%'}
-knitr::include_graphics(filename)
+knitr::include_graphics(paste0(plotdir, "Merged_after_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "PCplot_after.png"))
 ```
 
 # DEG analysis 
@@ -296,10 +139,7 @@ genes <- sigident::identify_degs(mergeset = mergeset,
 # heatmap creation
 filename <- paste0(plotdir, "DEG_heatmap.png")
 # create colors for map
-ht_colors <- sigident::color_heatmap(sample_metadata = sample_metadata,
-                                     study_metadata = study_metadata,
-                                     targetcol = targetcol,
-                                     controlname = controlname) # cancer = red
+ht_colors <- sigident::color_heatmap(sample_metadata = sample_metadata)
 sigident::plot_deg_heatmap(mergeset = mergeset,
                             genes = genes,
                             patientcolors = ht_colors,
@@ -729,9 +569,6 @@ GSE30219_validation <- sigident::validate_diagnostic_signature(
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  targetname = targetname,
-  controlname = controlname,
-  targetcol = targetcol,
   datadir = datadir
 )
 ```
@@ -816,9 +653,6 @@ GSE33356_validation <- sigident::validate_diagnostic_signature(
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  targetname = targetname,
-  controlname = controlname,
-  targetcol = targetcol,
   datadir = datadir
 )
 ```
@@ -903,9 +737,6 @@ GSE102287_validation <- sigident::validate_diagnostic_signature(
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  targetname = targetname,
-  controlname = controlname,
-  targetcol = targetcol,
   datadir = datadir
 )
 ```
@@ -1015,14 +846,10 @@ Next, the survival data needs to be extracted. `get_survival_time` results in a 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 
 ### Identification of survival correlated genes
-survival_data <- sigident::get_survival_time(study_metadata = study_metadata,
-                                           sample_metadata = sample_metadata,
+survival_data <- sigident::get_survival_time(sample_metadata = sample_metadata,
                                            genes = genes,
                                            idtype = idtype,
                                            discoverystudies_w_timedata = discoverystudies_w_timedata,
-                                           targetname = targetname,
-                                           controlname = controlname,
-                                           targetcol = targetcol,
                                            datadir = datadir)
 survival_table <- survival_data[["GSE19188"]]
 ```
@@ -1061,11 +888,7 @@ classifier_studies <- c("GSE18842", "GSE19804")
 expr_pattern <- sigident::generate_expression_pattern(classifier_studies = classifier_studies,
                                                     sig_cov = surv_correlated,
                                                     mergeset = mergeset,
-                                                    study_metadata = study_metadata,
-                                                    sample_metadata = sample_metadata,
-                                                    controlname = controlname,
-                                                    targetname = targetname,
-                                                    targetcol = targetcol)
+                                                    sample_metadata = sample_metadata)
 ```
 
 ```{r}
@@ -1109,10 +932,7 @@ validationstudiesinfo <- list(
 p_c <- sigident::prognostic_classifier(pattern_com = expr_pattern,
                                       validationstudiesinfo = validationstudiesinfo,
                                       datadir = datadir,
-                                      idtype = idtype,
-                                      controlname = controlname,
-                                      targetname = targetname,
-                                      targetcol = targetcol)
+                                      idtype = idtype)
 ```
 
 ### Validation study: GSE30219  
@@ -1209,11 +1029,6 @@ datadir <- paste0(maindir, "data/")
 dir.create(maindir)
 dir.create(datadir)
 
-# initialize more infos on the study
-targetcol <- "target" # should be named "target"
-controlname <- "Control"
-targetname <- "Lung Cancer"
-
 # define more variables
 plotdir <- "./plots/"
 dir.create(plotdir)
@@ -1240,11 +1055,7 @@ fdr <- 0.05
 ## Create Diagnosis, Design and Batch
 
 ```{r eval = FALSE}
-dd <- sigident::createDiagnosisDesignBatch_(sample_metadata = sample_metadata,
-                                            study_metadata = study_metadata,
-                                            controlname = controlname,
-                                            targetname = targetname,
-                                            targetcol = targetcol)
+dd <- sigident.preproc::geo_create_diagnosisdesignbatch(sample_metadata = sample_metadata)
 diagnosis <- dd$diagnosis
 design <- dd$design
 batch <- dd$batch
@@ -1266,10 +1077,7 @@ mergeset <- sigident::batch_correction(mergedset = mergedset,
 ```{r eval = FALSE}
 genes <- sigident::sigidentDEG(mergeset = mergeset,
                                mergedset = mergedset,
-                               study_metadata = study_metadata,
                                sample_metadata = sample_metadata,
-                               targetcol = targetcol,
-                               controlname = controlname,
                                design = design,
                                idtype = idtype,
                                fdr = fdr,
@@ -1341,9 +1149,6 @@ GSE30219_validation <- sigident::validate_diagnostic_signature(
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  targetname = targetname,
-  controlname = controlname,
-  targetcol = targetcol,
   datadir = datadir
 )
 ```
@@ -1393,19 +1198,15 @@ validationstudiesinfo <- list(
 
 ```{r eval = FALSE}
 progn_results <- sigident::sigidentPrognostic(mergeset = mergeset,
-                                              study_metadata = study_metadata,
                                               sample_metadata = sample_metadata,
                                               idtype = idtype,
                                               genes = genes,
                                               discoverystudies_w_timedata = discoverystudies_w_timedata,
                                               classifier_studies = c("GSE18842", "GSE19804"),
                                               validationstudiesinfo = validationstudiesinfo,
-                                              targetname = targetname,
-                                              controlname = controlname,
                                               datadir = datadir,
                                               plotdir = plotdir,
-                                              csvdir = csvdir,
-                                              targetcol = targetcol)
+                                              csvdir = csvdir)
 ```
 
 ```{r eval = FALSE}

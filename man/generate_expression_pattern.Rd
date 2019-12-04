@@ -8,11 +8,7 @@ generate_expression_pattern(
   classifier_studies,
   sig_cov,
   mergeset,
-  study_metadata,
-  sample_metadata,
-  controlname,
-  targetname,
-  targetcol
+  sample_metadata
 )
 }
 \arguments{
@@ -24,21 +20,8 @@ used to train the classifier.}
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
 columns = samples).}
 
-\item{study_metadata}{A data frame. The data frame holding the study
-metadata.}
-
 \item{sample_metadata}{A data frame. The data frame holding the
 sample metadata.}
-
-\item{controlname}{A character string. Name of the the controls,
-specified in the 'target' column of `sample_metadata`.}
-
-\item{targetname}{A character string. Name of the the targets, specified
-in the 'target' column of `sample_metadata`.}
-
-\item{targetcol}{A character string. Columname of `sample_metadata`
-holding the targets. Default: "target". Caution: this should not
-be changed.}
 }
 \description{
 Helper function to generate expression pattern

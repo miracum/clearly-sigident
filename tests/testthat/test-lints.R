@@ -13,9 +13,7 @@ test_that(
   code = {
     lintlist <- list(
       "R" = list(
-        "batchcorrection.R" = NULL,
         "compare_diagnostic_models.R" = NULL,
-        "data_handling.R" = NULL,
         "DEG.R" = NULL,
         "diagnostic_sig.R" = NULL,
         "enrichment.R" = NULL,

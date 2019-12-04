@@ -342,14 +342,8 @@ validate_diagnostic_signature <- function(validationstudylist,
                                           models,
                                           genes,
                                           idtype,
-                                          targetname,
-                                          controlname,
-                                          targetcol,
                                           datadir) {
   stopifnot(
-    is.character(targetcol),
-    is.character(targetname),
-    is.character(controlname),
     is.list(validationstudylist),
     is.character(validationstudylist$studyname),
     is.character(validationstudylist$targetcolname),
@@ -358,29 +352,52 @@ validate_diagnostic_signature <- function(validationstudylist,
     is.numeric(validationstudylist$setid)
   )
 
+  targetcol <- "target"
+  controlname <- "Control"
+  targetname <- "Target"
+
   outlist <- list()
 
-  eset <- load_eset(
-    name = validationstudylist$studyname,
-    datadir = datadir,
-    targetcolname = validationstudylist$targetcolname,
-    targetlevelname = validationstudylist$targetlevelname,
-    controllevelname = validationstudylist$controllevelname,
-    targetcol = targetcol,
-    targetname = targetname,
-    controlname = controlname,
-    setid = validationstudylist$setid
+  # setd use_raw, if not provided with function arguments
+  use_raw <- ifelse(
+    is.null(validationstudylist$use_rawdata),
+    FALSE,
+    TRUE
   )
 
+  eset <- tryCatch(
+    expr = {
+      eset <- eval(parse(text = validationstudylist$studyname))
+      eset
+    }, error = function(e) {
+      eset <- sigident.preproc::geo_load_eset(
+        name = validationstudylist$studyname,
+        datadir = datadir,
+        targetcolname = validationstudylist$targetcolname,
+        targetcol = targetcol,
+        targetname = targetname,
+        controlname = controlname,
+        targetlevelname = validationstudylist$targetlevelname,
+        controllevelname = validationstudylist$controllevelname,
+        use_rawdata = use_raw,
+        setid = validationstudylist$setid
+      )
+      eset
+    }, finally = function(f) {
+      return(eset)
+    }
+  )
 
+  diagnosis <- sigident.preproc::geo_create_diagnosis(
+    vector = eset[[targetcol]],
+    targetname = targetname,
+    controlname = controlname
+  )
 
-  diagnosis <- create_diagnosis(vector = eset[[targetcol]],
-                                targetname = targetname,
-                                controlname = controlname)
-
-
-  expr <- create_expressionset(eset = eset,
-                               idtype = idtype)
+  expr <- sigident.preproc::geo_create_expressionset(
+    eset = eset,
+    idtype = idtype
+  )
 
   # TODO why is this code in the original script?
   # # creating data frame, selecting only DEGs

@@ -7,27 +7,20 @@
 \usage{
 sigidentPrognostic(
   mergeset,
-  study_metadata,
   sample_metadata,
   idtype,
   genes,
   discoverystudies_w_timedata,
   classifier_studies,
   validationstudiesinfo,
-  targetname,
-  controlname,
   datadir,
   plotdir = "./plots/",
-  csvdir = "./tables/",
-  targetcol = "target"
+  csvdir = "./tables/"
 )
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
 columns = samples).}
-
-\item{study_metadata}{A data frame. The data frame holding the study
-metadata.}
 
 \item{sample_metadata}{A data frame. The data frame holding the
 sample metadata.}
@@ -48,12 +41,6 @@ used to train the classifier.}
 \item{validationstudiesinfo}{A list that contains specifications on
 the study that contains the validation information.}
 
-\item{targetname}{A character string. Name of the the targets, specified
-in the 'target' column of `sample_metadata`.}
-
-\item{controlname}{A character string. Name of the the controls,
-specified in the 'target' column of `sample_metadata`.}
-
 \item{datadir}{A character string. Path to the data-folder inside the
 metadata folder.}
 
@@ -62,10 +49,6 @@ plots. Default: "./plots/".}
 
 \item{csvdir}{A character string. Path to the folder to store output
 tables. Default: "./tables/".}
-
-\item{targetcol}{A character string. Columname of `sample_metadata`
-holding the targets. Default: "target". Caution: this should not
-be changed.}
 }
 \description{
 One function to perform prognostic signature analysis.
