@@ -5,8 +5,18 @@
 \title{Perform Enrichtment Analysis in Gene Expression Datasets
   Derived from MicroArrays}
 \usage{
-sigidentEnrichment(mergedset, mergeset, idtype, design, species, org_db,
-  organism, pathwayid, plotdir = "./plots/", csvdir = "./tables/")
+sigidentEnrichment(
+  mergedset,
+  mergeset,
+  idtype,
+  design,
+  species,
+  org_db,
+  organism,
+  pathwayid,
+  plotdir = "./plots/",
+  csvdir = "./tables/"
+)
 }
 \arguments{
 \item{mergedset}{A large merged Expression Data set. The output

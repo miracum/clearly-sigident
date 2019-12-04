@@ -4,8 +4,15 @@
 \alias{prognostic_classifier}
 \title{prognostic_classifier}
 \usage{
-prognostic_classifier(pattern_com, idtype, validationstudiesinfo, datadir,
-  targetcol, targetname, controlname)
+prognostic_classifier(
+  pattern_com,
+  idtype,
+  validationstudiesinfo,
+  datadir,
+  targetcol,
+  targetname,
+  controlname
+)
 }
 \arguments{
 \item{pattern_com}{A data.frame. The output of the function

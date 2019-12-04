@@ -4,8 +4,13 @@
 \alias{create_diagnosisdesignbatch}
 \title{create_diagnosisdesignbatch}
 \usage{
-create_diagnosisdesignbatch(sample_metadata, study_metadata, controlname,
-  targetname, targetcol)
+create_diagnosisdesignbatch(
+  sample_metadata,
+  study_metadata,
+  controlname,
+  targetname,
+  targetcol
+)
 }
 \arguments{
 \item{sample_metadata}{A data frame. The data frame holding the

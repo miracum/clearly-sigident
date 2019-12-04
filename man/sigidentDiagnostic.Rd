@@ -5,8 +5,14 @@
 \title{Perform Diagnostic Signature Analyses in Gene Expression Datasets
   Derived from MicroArrays}
 \usage{
-sigidentDiagnostic(mergeset, diagnosis, seed = 111, nfolds = 10,
-  split = 0.8, plotdir = "./plots/")
+sigidentDiagnostic(
+  mergeset,
+  diagnosis,
+  seed = 111,
+  nfolds = 10,
+  split = 0.8,
+  plotdir = "./plots/"
+)
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,

@@ -5,9 +5,19 @@
 \title{Perform DEG Analysis in Gene Expression Datasets Derived
   from MicroArrays}
 \usage{
-sigidentDEG(mergeset, mergedset, study_metadata, sample_metadata,
-  controlname, design, idtype, fdr, targetcol = "target",
-  plotdir = "./plots/", csvdir = "./tables/")
+sigidentDEG(
+  mergeset,
+  mergedset,
+  study_metadata,
+  sample_metadata,
+  controlname,
+  design,
+  idtype,
+  fdr,
+  targetcol = "target",
+  plotdir = "./plots/",
+  csvdir = "./tables/"
+)
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,

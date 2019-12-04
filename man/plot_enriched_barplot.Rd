@@ -4,8 +4,7 @@
 \alias{plot_enriched_barplot}
 \title{plot_enriched_barplot}
 \usage{
-plot_enriched_barplot(enrichmentobj, type, filename = NULL,
-  show_category = 20)
+plot_enriched_barplot(enrichmentobj, type, filename = NULL, show_category = 20)
 }
 \arguments{
 \item{enrichmentobj}{An object resulting from the function

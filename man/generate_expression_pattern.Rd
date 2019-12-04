@@ -4,8 +4,16 @@
 \alias{generate_expression_pattern}
 \title{generate_expression_pattern}
 \usage{
-generate_expression_pattern(classifier_studies, sig_cov, mergeset,
-  study_metadata, sample_metadata, controlname, targetname, targetcol)
+generate_expression_pattern(
+  classifier_studies,
+  sig_cov,
+  mergeset,
+  study_metadata,
+  sample_metadata,
+  controlname,
+  targetname,
+  targetcol
+)
 }
 \arguments{
 \item{classifier_studies}{A character vector. Names of the studies
