@@ -1,0 +1,34 @@
+# Set variables
+rm(list=ls())
+pathDiagnosis = "vignettes/data-prepared/diagnosis.csv"
+pathMergeset = "vignettes/data-prepared/mergeset_small.csv"
+seed <- 111
+split <- 0.8
+nfolds <- 10
+plotdir <- "./plots/"
+dir.create(plotdir)
+
+# Read in small mergeset file (1 000 features instead of 54 000)
+mergeset <- read.csv(pathMergeset, header=TRUE, row.names=1)
+
+# Read in diagnosis file
+diagnosis <- read.csv(pathDiagnosis, header=TRUE, row.names=1)
+# diagnosis <- subset(diagnosis, select=c("a"))
+
+# Create training list
+training_list <- sigident::create_training_test_split(diagnosis = diagnosis,
+                                               mergeset = mergeset,
+                                               split = split,
+                                               seed = seed)
+                                               
+# Lasso
+diagnostic_lasso <- sigident::signature(traininglist = training_list,
+                                         type = "svm",
+                                         nfolds = nfolds,
+                                         seed = seed)
+filename <- paste0(plotdir, "CV_lasso.png")
+sigident::plot_cvplot(cv_obj = diagnostic_lasso$fit_cv,
+                        filename = filename)
+
+knitr::include_graphics(filename)
+
