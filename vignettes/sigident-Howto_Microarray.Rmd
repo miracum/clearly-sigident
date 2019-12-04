@@ -85,7 +85,7 @@ studiesinfo <- list(
 
 All downloaded datasets will be assigned to the global environment.
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 load_geo_data(studiesinfo = studiesinfo,
               datadir = datadir) 
 ```
