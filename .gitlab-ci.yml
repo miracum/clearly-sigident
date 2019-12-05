@@ -50,6 +50,12 @@ build_base_image:
     changes:
       - "data-raw/devstuffs.R"
       - "ci/Dockerfile"
+    refs:
+      - master
+      - development
+  except:
+    refs:
+      - tags
 
 check_package:
   stage: build
@@ -61,6 +67,13 @@ check_package:
       - "${CI_PROJECT_DIR}/ci/*.Rcheck"
     when: on_failure # upload check artifacts when job fails!
     expire_in: 1 week
+  except:
+    refs:
+      - tags
+  only:
+    refs:
+      - master
+      - development
 
 create_manual:
   stage: build
@@ -71,6 +84,13 @@ create_manual:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.pdf"
     expire_in: 1 week
+  except:
+    refs:
+      - tags
+  only:
+    refs:
+      - master
+      - development
 
 build_source:
   stage: build
@@ -80,6 +100,13 @@ build_source:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.tar.gz"
     expire_in: 1 week
+  except:
+    refs:
+      - tags
+  only:
+    refs:
+      - master
+      - development
 
 build_binary:
   stage: build
@@ -89,6 +116,13 @@ build_binary:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.tar.gz"
     expire_in: 1 week
+  except:
+    refs:
+      - tags
+  only:
+    refs:
+      - master
+      - development
 
 testing:
   stage: test
@@ -100,6 +134,13 @@ testing:
   artifacts:
     paths:
       - public
+  except:
+    refs:
+      - tags
+  only:
+    refs:
+      - master
+      - development
 
 #check_errors:
 #  stage: check
@@ -120,6 +161,13 @@ install:
   stage: deploy
   script:
     - R -e "devtools::install(pkg = '.', upgrade = 'always')"
+  except:
+    refs:
+      - tags
+  only:
+    refs:
+      - master
+      - development
 
 compile_vignette:
   stage: vignette
@@ -133,3 +181,10 @@ compile_vignette:
     when: always
     expire_in: 1 week
     expire_in: 1 month
+  except:
+    refs:
+      - tags
+  only:
+    refs:
+      - master
+      - development

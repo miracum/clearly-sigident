@@ -9,7 +9,7 @@ This is the repository of the R package 'sigident'. It provides core functionali
 
 Currently implemented features are:
 
-- merging of microarray datasets
+- merging of microarray datasets (via the R package `sigident.preproc`)
 - DEG analysis
 - functional analysis (gene enrichment)
 - Identification of diagnostic signatures, using
