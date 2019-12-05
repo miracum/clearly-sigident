@@ -4,8 +4,7 @@
 \alias{create_training_test_split}
 \title{create_training_test_split}
 \usage{
-create_training_test_split(diagnosis, mergeset, split = 0.8,
-  seed = 111)
+create_training_test_split(diagnosis, mergeset, split = 0.8, seed = 111)
 }
 \arguments{
 \item{diagnosis}{An object. The output of the function

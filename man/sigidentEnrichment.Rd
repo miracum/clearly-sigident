@@ -5,8 +5,18 @@
 \title{Perform Enrichtment Analysis in Gene Expression Datasets
   Derived from MicroArrays}
 \usage{
-sigidentEnrichment(mergedset, mergeset, idtype, design, species, org_db,
-  organism, pathwayid, plotdir = "./plots/", csvdir = "./tables/")
+sigidentEnrichment(
+  mergedset,
+  mergeset,
+  idtype,
+  design,
+  species,
+  org_db,
+  organism,
+  pathwayid,
+  plotdir = "./plots/",
+  csvdir = "./tables/"
+)
 }
 \arguments{
 \item{mergedset}{A large merged Expression Data set. The output
@@ -21,7 +31,7 @@ affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
 are being removed!}
 
 \item{design}{A object. The output of the function
-`create_diagnosisdesignbatch()`.}
+`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
 
 \item{species}{A character string indicating the sample's species.
 Currently supported: "Hs".}

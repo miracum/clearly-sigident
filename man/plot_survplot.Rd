@@ -4,13 +4,13 @@
 \alias{plot_survplot}
 \title{plot_survplot}
 \usage{
-plot_survplot(fit, risk_table, filename)
+plot_survplot(fit, risktable, filename)
 }
 \arguments{
 \item{fit}{A cox proportional hazards model. The output of the
 function `fit_kaplan_estimator()` or `prognostic_classifier()`.}
 
-\item{risk_table}{A data.frame. The output of the function
+\item{risktable}{A data.frame. The output of the function
 `prognostic_classifier()`.}
 
 \item{filename}{A character string. The filename.}

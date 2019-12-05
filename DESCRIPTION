@@ -1,20 +1,21 @@
 Package: sigident
 Title: Signature Analyses in Genomic Expression Sets
-Version: 0.0.2.9000
+Version: 0.0.3.9000
 Authors@R: 
     c(person(given = "Lorenz A.",
              family = "Kapsner",
              role = c("cre", "aut"),
-             email = "lorenz.kapsner@uk-erlangen.de"),
+             email = "lorenz.kapsner@uk-erlangen.de",
+             comment = c(ORCID = "0000-0003-1866-860X")),
       person(given = "Johannes",
              family = "Vey",
              role = "aut"),
       person(given = "Meik",
              family = "Kunz",
-             role = "aut"),
+             role = "ctb"),
       person(given = "Andreas",
              family = "Pittroff",
-             role = "aut"))
+             role = "ctb"))
 Description: Identify diagnostic and prognostic signatures from gene expression datasets.
 License: GPL-3
 LazyData: true
@@ -22,7 +23,7 @@ URL: https://gitlab.miracum.org/clearly/sigident
 BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
-Date/Publication: 2019-11-08 13:36:03 UTC
+Date/Publication: 2019-12-05 15:24:52 UTC
 biocViews: 
 Imports: 
     data.table,
@@ -35,7 +36,6 @@ Imports:
     graphics,
     DT,
     jsonlite,
-    gPCA,
     caret,
     glmnet,
     pROC,
@@ -47,15 +47,8 @@ Imports:
     plyr,
     survminer,
     knitr,
-    BiocManager,
     Biobase,
-    sva,
-    GEOquery,
     limma,
-    affy,
-    gcrma,
-    hgu133plus2cdf,
-    hgu133plus2probe,
     GO.db,
     org.Hs.eg.db,
     clusterProfiler,
@@ -67,4 +60,5 @@ Suggests:
     rmarkdown,
     qpdf,
     lintr
-RoxygenNote: 6.1.1
+Remotes:  
+    url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/v0.0.1/clearly/sigident.preproc-v0.0.1.zip

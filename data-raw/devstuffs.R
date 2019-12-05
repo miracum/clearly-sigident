@@ -8,17 +8,18 @@ my_desc <- desc::description$new("!new")
 my_desc$set("Package", packagename)
 # Set author names
 my_desc$set_authors(c(
-  person("Lorenz A.", "Kapsner", email = "lorenz.kapsner@uk-erlangen.de", role = c('cre', 'aut')),
+  person("Lorenz A.", "Kapsner", email = "lorenz.kapsner@uk-erlangen.de", role = c('cre', 'aut'),
+         comment = c(ORCID = "0000-0003-1866-860X")),
   person("Johannes", "Vey", role = c('aut')),
-  person("Meik", "Kunz", role = c('aut')),
-  person("Andreas", "Pittroff", role = c('aut'))
+  person("Meik", "Kunz", role = c('ctb')),
+  person("Andreas", "Pittroff", role = c('ctb'))
 ))
 # Remove some author fields
 my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.0.2.9000")
+my_desc$set_version("0.0.3.9000")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -67,7 +68,6 @@ usethis::use_package("stats", type="Imports")
 usethis::use_package("graphics", type="Imports")
 usethis::use_package("DT", type="Imports")
 usethis::use_package("jsonlite", type="Imports")
-usethis::use_package("gPCA", type="Imports")
 usethis::use_package("caret", type="Imports")
 usethis::use_package("glmnet", type="Imports")
 usethis::use_package("pROC", type="Imports")
@@ -84,21 +84,13 @@ usethis::use_package("knitr", type="Imports")
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700
-usethis::use_package("BiocManager", type="Imports")
 usethis::use_package("Biobase", type="Import")
-usethis::use_package("sva", type="Imports")
-usethis::use_package("GEOquery", type="Imports")
 usethis::use_package("limma", type="Imports")
-usethis::use_package("affy", type="Imports")
-usethis::use_package("gcrma", type="Imports")
-usethis::use_package("hgu133plus2cdf", type="Imports")
-usethis::use_package("hgu133plus2probe", type="Imports")
 usethis::use_package("GO.db", type = "Imports")
 usethis::use_package("org.Hs.eg.db", type = "Imports")
 usethis::use_package("clusterProfiler", type = "Imports")
 usethis::use_package("pathfindR", type = "Imports")
 usethis::use_package("pathview", type = "Imports")
-
 
 # Suggests
 usethis::use_package("testthat", type = "Suggests")
@@ -107,6 +99,18 @@ usethis::use_package("rmarkdown", type = "Suggests")
 usethis::use_package("qpdf", type = "Suggests")
 usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
+
+# Development package
+mytag <- "v0.0.1"
+devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = mytag, upgrade = "always")
+#usethis::use_dev_package("DQAstats", type = "Imports")
+# https://cran.r-project.org/web/packages/devtools/vignettes/dependencies.html
+desc::desc_set_remotes(c(
+  paste0(
+    "url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/", mytag, "/clearly/sigident.preproc-", mytag, ".zip")
+),
+file = usethis::proj_get())
+
 
 # buildignore and gitignore
 usethis::use_build_ignore("docker")
@@ -140,6 +144,7 @@ usethis::use_git_ignore("vignettes/plots")
 usethis::use_git_ignore("vignettes/csv")
 usethis::use_git_ignore("vignettes/GSE19188")
 usethis::use_git_ignore("vignettes/preview.dir")
+usethis::use_git_ignore("!/.gitlab-ci.yml")
 usethis::use_git_ignore("geodata")
 usethis::use_git_ignore("csv")
 usethis::use_git_ignore("plots")

@@ -4,8 +4,15 @@
 \alias{go_enrichment_analysis}
 \title{go_enrichment_analysis}
 \usage{
-go_enrichment_analysis(gene, org_db, organism, fitlm, pathwayid, species,
-  plotdir = NULL)
+go_enrichment_analysis(
+  gene,
+  org_db,
+  organism,
+  fitlm,
+  pathwayid,
+  species,
+  plotdir = NULL
+)
 }
 \arguments{
 \item{gene}{A character vector containing the Entrez-IDs.}

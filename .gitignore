@@ -30,3 +30,4 @@ tables
 vignettes/.build.timestamp
 doc
 Meta
+!/.gitlab-ci.yml

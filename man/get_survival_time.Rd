@@ -4,13 +4,15 @@
 \alias{get_survival_time}
 \title{get_survival_time}
 \usage{
-get_survival_time(study_metadata, sample_metadata, genes, idtype,
-  discoverystudies_w_timedata, targetname, controlname, targetcol, datadir)
+get_survival_time(
+  sample_metadata,
+  genes,
+  idtype,
+  discoverystudies_w_timedata,
+  datadir
+)
 }
 \arguments{
-\item{study_metadata}{A data frame. The data frame holding the study
-metadata.}
-
 \item{sample_metadata}{A data frame. The data frame holding the
 sample metadata.}
 
@@ -23,16 +25,6 @@ are being removed!}
 
 \item{discoverystudies_w_timedata}{A list that contains specifications
 on the study/studies that contain(s) survival time information.}
-
-\item{targetname}{A character string. Name of the the targets, specified
-in the 'target' column of `sample_metadata`.}
-
-\item{controlname}{A character string. Name of the the controls,
-specified in the 'target' column of `sample_metadata`.}
-
-\item{targetcol}{A character string. Columname of `sample_metadata`
-holding the targets. Default: "target". Caution: this should not
-be changed.}
 
 \item{datadir}{A character string. Path to the data-folder inside the
 metadata folder.}
