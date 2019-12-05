@@ -148,6 +148,13 @@ testing:
   when: on_success
   script:
     - R -e "devtools::test(pkg = '.')"
+  except:
+    refs:
+      - tags
+  only:
+    refs:
+      - master
+      - development
 
 #check_errors:
 #  stage: check
