@@ -136,7 +136,7 @@ glm_prediction <- function(model,
 #' @param traininglist A list object containing the training data. The output
 #'   of the function `create_training_test_split()`.
 #' @param type A character string. The algorihm used to perform calculations.
-#'   Currently implemented are \emph{"grid", "lasso", "elastic"}.
+#'   Currently implemented are \emph{"elasitnet_grid", "lasso", "elastic"}.
 #'
 #' @param alpha A numeric between 0 and 1. The elastic net mixing parameter
 #'   passed to `glmnet::glmnet()`.
@@ -151,13 +151,13 @@ signature <- function(traininglist,
                       seed) {
 
   stopifnot(
-    type %in% c("grid", "lasso", "elastic"),
+    type %in% c("elasitnet_grid", "lasso", "elastic"),
     is.numeric(nfolds),
     is.numeric(seed),
     is.list(traininglist)
   )
 
-  if (type == "grid") {
+  if (type == "elasitnet_grid") {
     outlist <- glmnet_gridsearch(traininglist, seed)
   } else {
     # use provided alpha only in elastic
@@ -334,8 +334,6 @@ gene_map_sig <- function(mergeset, model) {
 #'
 #' @inheritParams sigidentDEG
 #' @inheritParams plot_deg_heatmap
-#' @inheritParams batch_correction
-#' @inheritParams create_diagnosisdesignbatch
 #'
 #' @export
 validate_diagnostic_signature <- function(validationstudylist,
@@ -367,7 +365,11 @@ validate_diagnostic_signature <- function(validationstudylist,
 
   eset <- tryCatch(
     expr = {
-      eset <- eval(parse(text = validationstudylist$studyname))
+      eset <- eval(parse(text = validationstudylist$studyname),
+                   envir = 1L)
+      cat(paste0("\nLoaded ",
+                 validationstudylist$studyname,
+                 " from .Globalenv...\n"))
       eset
     }, error = function(e) {
       eset <- sigident.preproc::geo_load_eset(
@@ -382,6 +384,9 @@ validate_diagnostic_signature <- function(validationstudylist,
         use_rawdata = use_raw,
         setid = validationstudylist$setid
       )
+      cat(paste0("\nLoaded ",
+                 validationstudylist$studyname,
+                 " from URL\n"))
       eset
     }, finally = function(f) {
       return(eset)

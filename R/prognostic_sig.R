@@ -9,8 +9,6 @@
 #'
 #' @inheritParams sigidentDEG
 #' @inheritParams plot_deg_heatmap
-#' @inheritParams batch_correction
-#' @inheritParams create_diagnosisdesignbatch
 #'
 #' @export
 get_survival_time <- function(sample_metadata,
@@ -55,7 +53,9 @@ get_survival_time <- function(sample_metadata,
 
     eset <- tryCatch(
       expr = {
-        eset <- eval(parse(text = st))
+        eset <- eval(parse(text = st),
+                     envir = 1L)
+        cat(paste0("\nLoaded ", st, " from .Globalenv...\n"))
         eset
       }, error = function(e) {
         eset <- sigident.preproc::geo_load_eset(
@@ -70,6 +70,9 @@ get_survival_time <- function(sample_metadata,
           use_rawdata = use_raw,
           setid = discoverystudies_w_timedata[[st]]$setid
         )
+        cat(paste0("\nLoaded ",
+                   st,
+                   " from URL\n"))
         eset
       }, finally = function(f) {
         return(eset)
@@ -230,18 +233,12 @@ exprs_vector <- function(deg) {
 #' @param sig_cov A data.frame. Output of the function `univ_cox()`.
 #'
 #' @inheritParams sigidentDEG
-#' @inheritParams create_diagnosisdesignbatch
 #'
 #' @export
 generate_expression_pattern <- function(classifier_studies,
                                         sig_cov,
                                         mergeset,
                                         sample_metadata) {
-
-  targetcol <- "target"
-  controlname <- "Control"
-  targetname <- "Target"
-
 
   dd <- sigident.preproc::geo_create_diagnosisdesignbatch(
     sample_metadata =
@@ -342,8 +339,6 @@ expression_pattern <- function(mergeset, ids, tumor, control) {
 #'
 #' @inheritParams sigidentDEG
 #' @inheritParams get_survival_time
-#' @inheritParams batch_correction
-#' @inheritParams create_diagnosisdesignbatch
 #'
 #' @export
 prognostic_classifier <- function(pattern_com,
@@ -368,7 +363,9 @@ prognostic_classifier <- function(pattern_com,
 
     eset <- tryCatch(
       expr = {
-        eset <- eval(parse(text = st))
+        eset <- eval(parse(text = st),
+                     envir = 1L)
+        cat(paste0("\nLoaded ", st, " from .Globalenv...\n"))
         eset
       }, error = function(e) {
         eset <- sigident.preproc::geo_load_eset(
@@ -383,6 +380,9 @@ prognostic_classifier <- function(pattern_com,
           use_rawdata = use_raw,
           setid = validationstudiesinfo[[st]]$setid
         )
+        cat(paste0("\nLoaded ",
+                   st,
+                   " from URL\n"))
         eset
       }, finally = function(f) {
         return(eset)
@@ -444,18 +444,30 @@ prognostic_classifier <- function(pattern_com,
 }
 
 fit_kaplan_estimator <- function(risktable) {
-  # fit proportional hazards regression model
-  res_cox <- survival::coxph(
-    survival::Surv(time, status) ~ groups,
-    data = risktable
-  )
+
+  # create new data
   new_df <- with(risktable,
                  data.frame(
                    groups = c(0, 1),
                    survival_time = rep(mean(time, na.rm = TRUE), 2),
                    ph.ecog = c(1, 1)
                  ))
-  fit <- survival::survfit(res_cox, newdata = new_df)
+
+  # fit proportional hazards regression model
+  fit <- survival::survfit(
+    formula = survival::coxph(
+      survival::Surv(time, status) ~ groups,
+      data = risktable
+    ),
+    newdata = new_df # argument, passed to survfit.coxph
+  )
+  # return model (this is redundant; however, if you provide this
+  # res_cox object to the formula argument in survfit, the ggsurvplot-
+  # function will fail)
+  res_cox <- survival::coxph(
+    survival::Surv(time, status) ~ groups,
+    data = risktable
+  )
   return(list(res_cox = res_cox,
               fit = fit))
 }

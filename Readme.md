@@ -18,9 +18,9 @@ Currently implemented features are:
   + glmnet (grid search for best alpha and lambda)
 - Identification of prognostic signatures
 
-## Installation
+# Installation
 
-You can install the development version of *sigident* with:
+You can install *sigident* with the following commands in R:
 
 ``` r
 options('repos' = 'https://ftp.fau.de/cran/')
@@ -28,13 +28,26 @@ install.packages("devtools")
 devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 ```
 
-## Example
+The version of the package, which was used for the publication [A Toolbox for Functional Analysis and the Systematic Identification of Diagnostic and Prognostic Gene Expression Signatures Combining Meta-Analysis and Machine Learning](https://www.mdpi.com/2072-6694/11/10/1606) can anytime be reproduced using the version tag *v0.0.2* during the installation process:
+
+``` r
+options('repos' = 'https://ftp.fau.de/cran/')
+install.packages("devtools")
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git", ref = "v0.0.2")
+```
+
+# Example
 
 Please view the package's vignette to see a detailled description how to prepare datasets in order to be suitable for usage with the `sigident` package and to learn, how to perform merging, signature and functional analyses of microarray data.
 
-Since the building the package vignette takes rather long (~ 40 min.), we provide the already built vignettes in [this repository](https://gitlab.miracum.org/clearly/sigident_vignettes).
+Since the building the package vignette takes rather long (~ 40 min.), we provide the already built vignettes in [this repository](https://gitlab.miracum.org/clearly/sigident_vignettes). 
 
-## Citation  
+# Caution 
+
+The *sigident* package is under active development and not on CRAN yet - this means, that from time to time, the API can break, due to extending and modifying its functionality. It can also happen, that previoulsy included functions and/or function arguments are no longer supported. 
+However, a detailed package vignette will be provided alongside with every major change in order to describe the currently supported workflow.
+
+# Citation  
 
 To cite the 'sigident' package in publications, please use: 
 

@@ -236,14 +236,14 @@ plot_grid_varimp_plot <- function(model,
 #'
 #' @param fit A cox proportional hazards model. The output of the
 #'   function `fit_kaplan_estimator()` or `prognostic_classifier()`.
-#' @param risk_table A data.frame. The output of the function
+#' @param risktable A data.frame. The output of the function
 #'   `prognostic_classifier()`.
 #'
 #' @inheritParams plot_grid_model_plot
 #'
 #' @export
 plot_survplot <- function(fit,
-                          risk_table,
+                          risktable,
                           filename) {
 
   grDevices::png(
@@ -255,7 +255,7 @@ plot_survplot <- function(fit,
   print({
     survminer::ggsurvplot(
       fit,
-      risk_table,
+      risktable,
       conf.int = TRUE,
       legend.labs = c("Low-Risk", "High-Risk")
     )

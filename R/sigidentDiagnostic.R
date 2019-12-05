@@ -112,7 +112,7 @@ sigidentDiagnostic <- function(mergeset,
   rv$diagnostic_glmgrid <-
     signature(
       traininglist = rv$training_list,
-      type = "grid",
+      type = "elasitnet_grid",
       nfolds = rv$nfolds,
       seed = rv$seed
     )
@@ -165,7 +165,7 @@ sigidentDiagnostic <- function(mergeset,
         "auc" = as.numeric(rv$diagnostic_elasticnet$roc_1se$auc)
       )
     ),
-    "grid" = list(
+    "elasitnet_grid" = list(
       "CV" = rv$diagnostic_glmgrid$caret_train,
       "model" = rv$diagnostic_glmgrid$elasticnet_auto,
       "confmat" = rv$diagnostic_glmgrid$confmat_elasticnet,

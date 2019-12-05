@@ -113,16 +113,16 @@ sigidentPrognostic <- function(mergeset,
 
     for (n in names(validationstudiesinfo)) {
       fit <- rv$p_c[[i]][[n]]$kaplan_estimator$fit
-      risk_table <- rv$p_c[[i]][[n]]$risktable
+      risktable <- rv$p_c[[i]][[n]]$risktable
 
       rv$results[[i]][[n]] <- list(fit = fit,
-                                   risktable = risk_table)
+                                   risktable = risktable)
 
       filename <- paste0(rv$plotdir,
                          n,
                          "_Prognostic_Kaplan-Meier_Plot.png")
       plot_survplot(fit = fit,
-                    risk_table = risk_table,
+                    risktable = risktable,
                     filename = filename)
     }
   }
