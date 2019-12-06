@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Install sigident.preproc package
 
-```{r eval=FALSE}
+```{r eval = FALSE}
 options('repos' = 'https://ftp.fau.de/cran/')
 install.packages("devtools")
 devtools::install_git("https://gitlab.miracum.org/clearly/sigident.preproc.git",
@@ -29,7 +29,7 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.preproc.git",
 
 ## Install sigident package
 
-```{r eval=FALSE}
+```{r eval = FALSE}
 devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 ```
 
@@ -96,10 +96,12 @@ studiesinfo <- list(
 All downloaded datasets will be assigned to the global environment.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-sigident.preproc::load_geo_data(studiesinfo = studiesinfo,
-                                datadir = datadir,
-                                plotdir = plotdir,
-                                idtype = idtype) 
+sigident.preproc::load_geo_data(
+  studiesinfo = studiesinfo,
+  datadir = datadir,
+  plotdir = plotdir,
+  idtype = idtype
+) 
 ```
 
 ## Visualize batch effect
@@ -123,7 +125,7 @@ knitr::include_graphics(paste0(plotdir, "Merged_after_batch_effect_boxplot.jpg")
 knitr::include_graphics(paste0(plotdir, "PCplot_after.png"))
 ```
 
-# reparations for utilizing the sigident package 
+# Preparations for utilizing the sigident package 
 
 Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. 
 `idtype` and `plotdir` have already been defined during the preprocessing steps.
@@ -198,6 +200,12 @@ data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 dim(deg_results)
 knitr::kable(head(deg_results))
 ```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(deg_info, deg_results, studiesinfo, affinity.spline.coefs)
+gc()
+```
+
 
 # Functional analysis
 
@@ -335,6 +343,13 @@ sigident::plot_enriched_barplot(
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(bods, enr_analysis, enr_fitlm, enr_fitlm_topgo, enr_fitlm_topkegg,
+   enr_topgo, enr_topkegg, gene.idtype.bods, korg, cpd.simtypes,
+   deg_entrez, gene.idtype.list, ht_colors, mergedset)
+gc()
 ```
 
 # Identification of diagnostic signatures 
@@ -522,6 +537,12 @@ knitr::kable(
 )
 ```
 
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(diagnostic_glmgrid, diagnostic_elasticnet, diagnostic_lasso,
+   training_list)
+gc()
+```
+
 ### Extract lambda values 
 
 A function `get_diagnostic_lambda_values` was designed, to extract the results of the cross validation.
@@ -560,7 +581,7 @@ diagnostic_models$elasticnet$min$confmat
 diagnostic_models$elasticnet[["1se"]]$confmat
 ```
 
-##### Elastic net (grid search)
+#### Elastic net (grid search)
 
 ```{r}
 diagnostic_models$grid$confmat
@@ -606,6 +627,10 @@ data.table::fwrite(signaturegenes,
                    paste0(csvdir, "signaturegenes_elasticnet_1se.csv"))
 ```
 
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(signaturegenes)
+gc()
+```
 
 ## Validation of diagnostic signatures 
 
@@ -704,6 +729,11 @@ sigident::plot_rocplot(roc = GSE30219_validation$elasticnet[["1se"]]$roc,
 knitr::include_graphics(filename)
 ```
 
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(GSE30219_validation)
+gc()
+```
+
 ### GSE33356 
 
 ```{r}
@@ -788,6 +818,11 @@ sigident::plot_rocplot(roc = GSE33356_validation$elasticnet[["1se"]]$roc,
 knitr::include_graphics(filename)
 ```
 
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(GSE33356_validation)
+gc()
+```
+
 ### GSE102287 
 
 ```{r}
@@ -870,6 +905,12 @@ sigident::plot_rocplot(roc = GSE102287_validation$elasticnet[["1se"]]$roc,
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(GSE102287_validation, validationstudylist, diagnostic_models,
+   GSE102287, GSE33356)
+gc()
 ```
 
 # Identification of prognostic signatures 
