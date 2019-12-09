@@ -11,7 +11,7 @@ identify_degs(mergeset, design, q_value = 0.01)
 columns = samples).}
 
 \item{design}{A object. The output of the function
-`create_diagnosisdesignbatch()`.}
+`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
 
 \item{q_value}{A numeric value for the q-value (false discovery rate)
 (default=0.01).}

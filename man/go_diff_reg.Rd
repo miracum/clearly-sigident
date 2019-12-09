@@ -11,7 +11,7 @@ go_diff_reg(mergeset, design, idtype, entrezids = NULL)
 columns = samples).}
 
 \item{design}{A object. The output of the function
-`create_diagnosisdesignbatch()`.}
+`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
 
 \item{idtype}{A character string. The type of ID used to name the
 genes. One of 'entrez' or 'affy' intended to use either entrez IDs or

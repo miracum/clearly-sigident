@@ -8,7 +8,8 @@ export_deg_annotations(mergedset, genes, idtype)
 }
 \arguments{
 \item{mergedset}{A large Expression Set. The output of the function
-`merge_()`.}
+`sigident.preproc::geo_merge`. Please note, that mergedset holds data,
+which are not yet batch corrected.}
 
 \item{genes}{A object. The output of the function `identify_degs()`.}
 
@@ -19,4 +20,7 @@ are being removed!}
 }
 \description{
 Helper function to export DEG annotations from mergedset.
+}
+\seealso{
+sigident.preproc
 }

@@ -14,26 +14,19 @@
 #'
 #' @export
 sigidentPrognostic <- function(mergeset,
-                               study_metadata,
                                sample_metadata,
                                idtype,
                                genes,
                                discoverystudies_w_timedata,
                                classifier_studies,
                                validationstudiesinfo,
-                               targetname,
-                               controlname,
                                datadir,
                                plotdir = "./plots/",
-                               csvdir = "./tables/",
-                               targetcol = "target") {
+                               csvdir = "./tables/") {
   stopifnot(
     class(mergeset) == "matrix",
     is.character(plotdir),
     is.character(csvdir),
-    is.character(controlname),
-    is.character(targetname),
-    is.character(targetcol),
     is.list(discoverystudies_w_timedata),
     is.list(validationstudiesinfo),
     is.character(classifier_studies),
@@ -42,6 +35,9 @@ sigidentPrognostic <- function(mergeset,
     idtype %in% c("entrez", "affy")
   )
 
+  targetcol <- "target"
+  controlname <- "Control"
+  targetname <- "Target"
 
   # create internal list for storage
   rv <- list()
@@ -78,14 +74,10 @@ sigidentPrognostic <- function(mergeset,
   # get survival_data
   rv$survival_data <-
     get_survival_time(
-      study_metadata = study_metadata,
       sample_metadata = sample_metadata,
       discoverystudies_w_timedata = discoverystudies_w_timedata,
       idtype = rv$idtype,
       genes = rv$genes,
-      targetname = rv$targetname,
-      controlname = rv$controlname,
-      targetcol = rv$targetcol,
       datadir = rv$datadir
     )
 
@@ -107,11 +99,7 @@ sigidentPrognostic <- function(mergeset,
         classifier_studies = classifier_studies,
         sig_cov = rv$surv_correlated[[i]],
         mergeset = rv$mergeset,
-        study_metadata = study_metadata,
-        sample_metadata = sample_metadata,
-        controlname = rv$controlname,
-        targetname = rv$targetname,
-        targetcol = rv$targetcol
+        sample_metadata = sample_metadata
       )
 
     # apply prognostic classifier
@@ -120,24 +108,21 @@ sigidentPrognostic <- function(mergeset,
         pattern_com = rv$expr_pattern[[i]],
         validationstudiesinfo = validationstudiesinfo,
         idtype = rv$idtype,
-        datadir = rv$datadir,
-        controlname = rv$controlname,
-        targetname = rv$targetname,
-        targetcol = rv$targetcol
+        datadir = rv$datadir
       )
 
     for (n in names(validationstudiesinfo)) {
       fit <- rv$p_c[[i]][[n]]$kaplan_estimator$fit
-      risk_table <- rv$p_c[[i]][[n]]$risktable
+      risktable <- rv$p_c[[i]][[n]]$risktable
 
       rv$results[[i]][[n]] <- list(fit = fit,
-                                   risktable = risk_table)
+                                   risktable = risktable)
 
       filename <- paste0(rv$plotdir,
                          n,
                          "_Prognostic_Kaplan-Meier_Plot.png")
       plot_survplot(fit = fit,
-                    risk_table = risk_table,
+                    risktable = risktable,
                     filename = filename)
     }
   }

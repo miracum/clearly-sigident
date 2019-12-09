@@ -7,17 +7,10 @@
 #'   columns = samples).
 #' @param mergedset A large Expression Set. The output of the function
 #'   `merge_()`.
-#' @param study_metadata A data frame. The data frame holding the study
-#'   metadata.
 #' @param sample_metadata A data frame. The data frame holding the
 #'   sample metadata.
-#' @param targetcol A character string. Columname of `sample_metadata`
-#'   holding the targets. Default: "target". Caution: this should not
-#'   be changed.
-#' @param controlname A character string. Name of the the controls,
-#'   specified in the 'target' column of `sample_metadata`.
 #' @param design A object. The output of the function
-#'   `create_diagnosisdesignbatch()`.
+#'   `sigident.preproc::geo_create_diagnosisdesignbatch()`.
 #' @param idtype A character string. The type of ID used to name the
 #'   genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 #'   affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
@@ -37,21 +30,15 @@
 
 sigidentDEG <- function(mergeset,
                         mergedset,
-                        study_metadata,
                         sample_metadata,
-                        controlname,
                         design,
                         idtype,
                         fdr,
-                        targetcol = "target",
                         plotdir = "./plots/",
                         csvdir = "./tables/") {
   stopifnot(
     class(mergeset) == "matrix",
     is.data.frame(sample_metadata),
-    is.data.frame(study_metadata),
-    is.character(targetcol),
-    is.character(controlname),
     is.character(idtype),
     idtype %in% c("entrez", "affy"),
     is.numeric(fdr),
@@ -59,6 +46,9 @@ sigidentDEG <- function(mergeset,
     is.character(plotdir),
     is.character(csvdir)
   )
+
+  targetcol <- "target"
+  controlname <- "Control"
 
   # create internal list for storage
   rv <- list()
@@ -90,10 +80,7 @@ sigidentDEG <- function(mergeset,
   # heatmap creation
   # create colors for map
   ht_colors <- color_heatmap(
-    sample_metadata = sample_metadata,
-    study_metadata = study_metadata,
-    targetcol = rv$targetcol,
-    controlname = rv$controlname
+    sample_metadata = sample_metadata
   ) #% cancer = red
 
   plot_deg_heatmap(

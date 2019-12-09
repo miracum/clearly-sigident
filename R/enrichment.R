@@ -45,7 +45,6 @@ extract_kegg_terms <- function(gene,
 #'   To be used only if 'idtype'= "affy" (default = NULL).
 #'
 #' @inheritParams identify_degs
-#' @inheritParams batch_correction
 #' @inheritParams sigidentDEG
 #'
 #' @export

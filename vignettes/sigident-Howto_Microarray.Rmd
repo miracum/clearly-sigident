@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -16,192 +16,124 @@ knitr::opts_chunk$set(
 )
 ```
 
-
-```{r setup}
-library(sigident)
-library(knitr)
-```
-
 # Prerequisites and installation 
+
+## Install sigident.preproc package
+
+```{r eval = FALSE}
+options('repos' = 'https://ftp.fau.de/cran/')
+install.packages("devtools")
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.preproc.git",
+                      upgrade = "always")
+```
 
 ## Install sigident package
 
-```{r eval=FALSE}
-options('repos' = 'https://ftp.fau.de/cran/')
-install.packages("devtools")
+```{r eval = FALSE}
 devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 ```
 
 # Preprocessing 
 
-## Data preparation 
+In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-In order to use this R package and its functions, you need to prepare a merged gene expression dataset manually. The workflow to achieve this is presented in the following. 
+For a detailed background on the following steps please view the `sigident.preproc` package's vignette.
 
-### Download of GEO datasets and normalization
+## Initialization of important variables
 
-This example uses the GEO lung cancer studies "GSE18842", "GSE19804" and "GSE19188", which contain in total 367 samples (197 tumor; 170 non-tumor) and 54,675 transcripts obtained by using Affymetrix GeneChip Human Genome U133 Plus 2.0 Array (platform GPL570).  
+```{r setup}
+library(sigident)
+library(sigident.preproc)
+library(knitr)
 
-To use microarray datasets from the GEO database the studies can be downloaded directly executing R code. Therefore, initializing the directory and creating the required folders is needed before downloading GEO studies. The object `targetcol` should also be titled "target" (correspondingly to the column name of the object `sample_metadata` below). `targetcol` contains the outcome variable of interest for subsequent analysis. The levels of `targetcol` are to be defined with `controlname` and `targetname`. For this example we used the package to analyze DEGs and identify diagnostic and prognostic gene signatures for the separation of two groups (or subtypes, healthy vs cancer, etc) we named `controlname` and `targetname` as "Control" and "Lung Cancer". 
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # initialize filePath:
 filePath <- tempdir()
+
+# define datadir
 maindir <- "./geodata/"
 datadir <- paste0(maindir, "data/")
 dir.create(maindir)
 dir.create(datadir)
 
-# initialize more infos on the study
-targetcol <- "target" # should be named "target"
-controlname <- "Control"
-targetname <- "Lung Cancer"
+# define plotdir
+plotdir <- "./plots/"
+dir.create(plotdir)
+
+# define idtype
+idtype = "affy"
 ```
 
-Insert the GEO accesion numbers of the desired GEO studies into the `getGEO()` function. This will download the datasets containing expression, pheno and feature data as well as the annotations of the probe sets and store it as '.txt.gz' files in the defined `datadir` folder. 
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-GSE18842 <- GEOquery::getGEO("GSE18842", destdir = datadir)
-GSE19804 <- GEOquery::getGEO("GSE19804", destdir = datadir)
-
-# extracting ExpressionSets
-eset1 <- GSE18842[[1]]
-eset2 <- GSE19804[[1]]
-```
-
-Moreover, this approach enables us to download also the raw data in CEL file format. These files need to be uncompressed. Subsequently a GCRMA normalization has to be conducted.  
-
-For this, further commands are necessary to subsequently import the CEL files into the R environment. `eset_c` represents a normalized ExpressionSet, though only containing expression data without pheno data or feature data. These data can be added later. (The study GSE19188 could also be downloaded directly by applying `getGEO()` instead of using the raw data and manually adding pheno and feature data afterwards. We just wanted to demonstrate how to use raw data in form of CEL files and apply normalization to it.)
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# download raw data, uncompress them and execute GCRMA normalization
-# actually not necessary for GSE19188 but to showcase feasibility of dealing with .CEL files
-GEOquery::getGEOSuppFiles("GSE19188", baseDir = filePath)
-utils::untar(paste0(filePath, "/GSE19188/GSE19188_RAW.tar"), exdir=maindir)
-cels <- list.files(maindir, pattern = "[gz]")
-tryCatch({
-  sapply(paste(maindir, cels, sep="/"), GEOquery::gunzip)
-  # at this point, first the textfile "phenodata.txt must be generated
-  ## For downloading raw data use the function: getGEOSuppFiles("").
-  ## After downloading and uncompressing the raw file (*_RAW.tar) we need to capture
-  ## the experimental information. Therefore a text file is created in the terminal 
-  ## window or rather in the command line.
-  system("bash -c 'ls ./geodata/*.CEL > ./geodata/phenodata.txt'")
-  ## The command: ls data/*.CEL > data/phenodata.txt puts all .CEl files in one text file.
-  ## After this step the normalization can be started.
-}, error = function(e){
-  print(e)
-})
-
-cels <- list.files(maindir, pattern = "CEL$")
-
-celfiles <- paste0(maindir, cels)
-# use justGCRMA now due to memory issues with gcrma --> justGCRMA is much more memory efficient
-# https://www.rdocumentation.org/packages/gcrma/versions/2.44.0/topics/justGCRMA
-eset_c <- gcrma::justGCRMA(filenames = celfiles, fast = TRUE)
-# call garbage collection here
-gc()
-
-# old code
-#celfiles <- affy::ReadAffy(filenames = gsub("\\.gz", "", cels), celfile.path = "./geodata")
-#eset_c <- gcrma::gcrma(celfiles, fast = TRUE)
-
-# eset_c = now is a normalized ExpressionSet, but without f- and pData
-# the f- and pData are transfered manually from dataset GSE19188
-
-GSE19188 <- GEOquery::getGEO("GSE19188", destdir = datadir)
-
-eset3 <- GSE19188[[1]]
-pData3 <- Biobase::pData(eset3)
-fData3 <- Biobase::fData(eset3)
-Biobase::pData(eset_c) <- pData3
-Biobase::fData(eset_c) <- fData3
-colnames(Biobase::exprs(eset_c)) <- colnames(Biobase::exprs(eset3))
-Biobase::annotation(eset_c) <- Biobase::annotation(eset3)
-eset3 <- eset_c
-```
-
-### Formatting the phenoData 
-
-The phenoData of the expresssionSets need to be formatted so that the phenoData columns overlap perfectly. This means that all ExpressionSets should contain identical columns in the same order. Non consistent columns need to be removed. For a simpler procedure we recommend only retaining phenoData columns required for the downstream analysis (e.g. targetcol and survival data). 
+## Define list that contains a representation of the studies metadata
 
 ```{r}
-# create version b, that original ExpressionSets persist
-eset1b <- eset1
-eset2b <- eset2
-eset3b <- eset3
-
-# show number of samples and phenoData columns
-dim(Biobase::pData(eset1b))
-dim(Biobase::pData(eset2b))
-dim(Biobase::pData(eset3b))
-# depict phenoData column names
-colnames(Biobase::pData(eset1b))
-colnames(Biobase::pData(eset2b))
-colnames(Biobase::pData(eset3b))
-
-
-# remove unnecessary phenoData
-# rename desired column names and if necessary the column entries (as we did for 'Tumor')
-
-# eset1b
-eset1b$relation <- NULL
-eset1b$characteristics_ch1 <- NULL
-eset1b$`sample type:ch1` <- NULL
-eset1b$`tissue:ch1` <- NULL
-colnames(Biobase::pData(eset1b))[8] = targetcol
-levels(eset1b[[targetcol]]) = c(controlname, targetname)
-dim(eset1b)
-
-
-# eset2b
-eset2b$characteristics_ch1.2 <- NULL
-eset2b$characteristics_ch1.3 <- NULL
-eset2b$contact_department <- NULL
-eset2b$characteristics_ch1 <- NULL
-eset2b$`age:ch1` <- NULL
-eset2b$`gender:ch1` <- NULL
-eset2b$`stage:ch1` <- NULL
-eset2b$`tissue:ch1` <- NULL
-colnames(Biobase::pData(eset2b))[8] = targetcol
-levels(eset2b[[targetcol]]) = c(controlname, targetname)
-dim(eset2b)
-
-
-# eset3b
-eset3b$characteristics_ch1.2 <- NULL
-eset3b$characteristics_ch1.3 <- NULL
-eset3b$characteristics_ch1.4 <- NULL
-eset3b$contact_phone <- NULL
-eset3b$contact_fax <- NULL
-eset3b$contact_department <- NULL
-eset3b$contact_web_link <- NULL
-eset3b$relation <- NULL
-eset3b$source_name_ch1 <- NULL
-colnames(Biobase::pData(eset3b))[9] = targetcol
-levels(eset3b[[targetcol]]) = c(controlname, targetname)
-pNew <- Biobase::pData(eset3b)[,c(1:7,9,8,10:29)] # reorder columns
-Biobase::pData(eset3b) = pNew
-dim(eset3b)
-
-# now, all phenoData columns are consistent
-cbind(colnames(Biobase::pData(eset1b)), colnames(Biobase::pData(eset2b)), 
-      colnames(Biobase::pData(eset3b)))
+studiesinfo <- list(
+  "GSE18842" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "Human Lung Tumor",
+    controllevelname = "Human Lung Control"
+    ),
+  
+  "GSE19804" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "frozen tissue of primary tumor",
+    controllevelname = "frozen tissue of adjacent normal"
+  ),
+  
+  "GSE19188" = list(
+    setid = 1,
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue type: healthy",
+    targetlevelname = "tissue type: tumor",
+    use_rawdata = TRUE
+  )
+)
 ```
 
-## Preparations for utilizing the sigident package 
+## Load GEO datasets
 
-Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. `idtype` can be either "affy" or "entrez", indicating, if either Affy-IDs or Entrez-IDs are to be used as feature names for the subsequent analyses.  
-Selecting "entrez" usually results in a reduction of total features due to the removing of empty strings and duplicate IDs.  
-We here use `idtype` = "affy" for all subsequent analyses.  
+All downloaded datasets will be assigned to the global environment.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+sigident.preproc::load_geo_data(
+  studiesinfo = studiesinfo,
+  datadir = datadir,
+  plotdir = plotdir,
+  idtype = idtype
+) 
+```
+
+## Visualize batch effect
+
+These plots are created when executing the function `sigident.preproc::load_geo_data` and stored in the directory specified in `plotdir`.
+
+### Before batch correction
+
+```{r out.width='80%'}
+knitr::include_graphics(paste0(plotdir, "GSE18842_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "GSE19804_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "GSE19188_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "Merged_before_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "PCplot_before.png"))
+```
+
+### After batch correction
+
+```{r out.width='80%'}
+knitr::include_graphics(paste0(plotdir, "Merged_after_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "PCplot_after.png"))
+```
+
+# Preparations for utilizing the sigident package 
+
+Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. 
+`idtype` and `plotdir` have already been defined during the preprocessing steps.
 
 ```{r}
 # general
-plotdir <- "./plots/"
-dir.create(plotdir)
 csvdir <- "./csv/"
 dir.create(csvdir)
-idtype = "affy"
 
 # enrichment analysis
 species <- "Hs"
@@ -214,215 +146,6 @@ pathwayid <- "hsa04151" # PI3K-Akt
 seed <- 111
 split <- 0.8
 nfolds <- 10
-```
-
-### Extract metadata 
-
-The metadata are extracted directly from the ExpressionSets and are deposited for a easier applicability in the data frame `sample_metadata`. This data frame consists of the GEO accession numbers of the study (GPLxxx), the sample accession numbers (GSMxxx) and the `targetcol` (named "target") containing the outcome of interest (currently, only a binary coded target variable is supported for the subsequent analyses, e.g. "Cancer - No Cancer"). 
-
-#### Extract sample metadata 
-
-```{r}
-# workaround
-GSE18842_meta <- data.table::data.table(
-  cbind(
-    study = "GSE18842",
-    sample = eset1b@phenoData@data[,"geo_accession"],
-    target = as.character(eset1b@phenoData@data[,targetcol])
-  )
-)
-
-GSE19804_meta <- data.table::data.table(
-  cbind(
-    study = "GSE19804",
-    sample = eset2b@phenoData@data[,"geo_accession"],
-    target = as.character(eset2b@phenoData@data[,targetcol])
-  )
-)
-
-GSE19188_meta <- data.table::data.table(
-  cbind(
-    study = "GSE19188",
-    sample = eset3b@phenoData@data[,"geo_accession"],
-    target = as.character(eset3b@phenoData@data[,targetcol])
-  )
-)
-
-sample_metadata <- rbind(GSE18842_meta,
-                        GSE19804_meta,
-                        GSE19188_meta)
-```
-
-#### Define study metadata 
-
-`sutdyMetadata` contains the GEO series accession numbers of the studies and the assignment due to its usage as discovery dataset or validation dataset. 
-
-```{r}
-study_metadata <- data.frame(
-  cbind(study = c("GSE18842", "GSE19804", "GSE19188", "GSE30219", "GSE50081"),
-        discovery = as.logical(c(1, 1, 1, 0, 0)),
-        validation = as.logical(c(0, 0, 0, 1, 1))
-  ),
-  stringsAsFactors = FALSE
-)
-```
-
-## Merging and batch correction
-
-In this framework for merging, only genes that are present in all datasets are preserved. In our example the entire probe set of 54675 transcripts remains. `mergedset` contains the samples of the studies grouped as discovery and represents an "ExpressionSet" object describing samples, annotations and further information about the features.  
-
-```{r}
-esets=c(eset1b,eset2b,eset3b)
-mergedset <- sigident::merge_(esets)
-```
-
-# Discovering batch effects 
-
-Batch effects are systematic non-biological variation between studies due to experimental and technical artifacts. As first visualization a boxplot is created with the included samples on the x-axis and the expression values on the y-axis. Thereby, considerable discrepancies between the three studies can already be recognized.    
-
-## Visualize batch effect
-
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE18842.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset1b), main = "GSE18842 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE19804.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset2b), main = "GSE19804 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_GSE19188.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(Biobase::exprs(eset3b), main = "GSE19188 before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# visualize log2 transformed expression values of the merged dataset as boxplot
-filename <- paste0(plotdir, "boxplot_merged_data.jpeg")
-jpeg(filename, width = 2000, height = 1000, res = 150, units = "px")
-boxplot(mergedset@assayData$exprs, main = "Merged data before batch correction", 
-        xlab = "Samples", ylab ="Expression value")
-dev.off()
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-A more powerfull approach for batch effect detection is conducting a guided Principle Component Analysis (gPCA) implemented in the [gPCA](https://CRAN.R-project.org/package=gPCA) package.  
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-# conducting gPCA for batch effect detection
-DF <- mergedset@assayData$exprs
-
-# define batches with number of samples
-batch <- sigident::create_batch(study_metadata = study_metadata,
-                                sample_metadata = sample_metadata)
-
-gPCA_before <- sigident::batch_detection(mergeset = DF,
-                                          batch = batch)
-filename <- paste0(plotdir, "PCplot_before.png")
-sigident::plot_batchplot(correction_obj = gPCA_before,
-                           filename = filename,
-                           time = "before")
-```
-
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-In order to correct for occurring batch effects and other unwanted variation in high-throughput experiments, the `ComBat` function from the [sva](10.1093/bioinformatics/bts034) package is applied inside the function `batch_correction()`. The `ComBat` function adjusts for known batches using an empirical Bayesian framework [1].  
-
-```{r message=FALSE, warning=FALSE, error=FALSE}
-table(mergedset@phenoData@data[[targetcol]])
-
-# generate list dd with diagnosis and design
-dd <- sigident::create_diagnosisdesignbatch(
-  sample_metadata = sample_metadata,
-  study_metadata = study_metadata,
-  controlname = controlname,
-  targetname = targetname,
-  targetcol = targetcol
-  )
-diagnosis <- dd$diagnosis
-length(diagnosis)
-table(diagnosis)
-
-design <- dd$design
-
-
-# check batch assignment
-# (batch is also created during createDiagnosisDesignBatch_())
-batch <- dd$batch
-table(batch)
-length(batch)
-
-# removing batch effects computing linear models, take variance between the diagnosis into consideration
-
-mergeset <- sigident::batch_correction(mergedset = mergedset,
-                                       batch = batch,
-                                       design = design,
-                                       idtype = idtype)
-
-dim(mergeset)
-```
-
-```{r results='hide'}
-# remove unneeded objects
-rm("DF", "GSE18842_meta", "GSE19188_meta", "GSE19804_meta")
-# also no further purpose, but takes a lot of memory and may slow down your computer
-rm("eset1", "eset1b", "eset2", "eset2b", "eset3", "eset3b", "esets", "GSE18842", "GSE19188", "GSE19804", "fData3", "eset_c")
-gc()
-```
-
-`mergeset` results as output of the above described merging approach and represents a matrix containing batch corrected expression data with genes in the rows and samples in the columns, not an ExpressionSet anymore. 
-
-## Visualize batch effect removal
-
-Creating a boxplot and a gPCA plot with `mergeset` shows that no batch effect is present anymore. 
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "import_boxplot.png")
-sigident::plot_import_boxplot(mergeset, filename)
-```
-
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-gPCA_after <- sigident::batch_detection(mergeset = mergeset,
-                                        batch = batch)
-filename <- paste0(plotdir, "PCplot_after.png")
-sigident::plot_batchplot(correction_obj = gPCA_after,
-                           filename = filename,
-                           time = "after")
-```
-
-```{r out.width='80%'}
-knitr::include_graphics(filename)
 ```
 
 # DEG analysis 
@@ -441,14 +164,11 @@ genes <- sigident::identify_degs(mergeset = mergeset,
 # heatmap creation
 filename <- paste0(plotdir, "DEG_heatmap.png")
 # create colors for map
-ht_colors <- sigident::color_heatmap(sample_metadata = sample_metadata,
-                                     study_metadata = study_metadata,
-                                     targetcol = targetcol,
-                                     controlname = controlname) # cancer = red
+ht_colors <- sigident::color_heatmap(sample_metadata = sample_metadata)
 sigident::plot_deg_heatmap(mergeset = mergeset,
-                            genes = genes,
-                            patientcolors = ht_colors,
-                            filename = filename)
+                           genes = genes,
+                           patientcolors = ht_colors,
+                           filename = filename)
 ```
 
 ```{r out.width='80%'}
@@ -459,8 +179,8 @@ Some investigations may have been finished at this point yielding the DEGs. We p
 
 ```{r}
 deg_info <- sigident::export_deg_annotations(mergedset = mergedset,
-                                            genes = genes,
-                                            idtype = idtype)
+                                             genes = genes,
+                                             idtype = idtype)
 data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
@@ -471,8 +191,8 @@ knitr::kable(head(deg_info))
 
 ```{r}
 deg_results <- sigident::limma_top_table(mergeset = mergeset,
-                                        design = design,
-                                        q_value = fdr)
+                                         design = design,
+                                         q_value = fdr)
 data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
@@ -480,6 +200,12 @@ data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 dim(deg_results)
 knitr::kable(head(deg_results))
 ```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(deg_info, deg_results, studiesinfo, affinity.spline.coefs)
+gc()
+```
+
 
 # Functional analysis
 
@@ -504,7 +230,7 @@ For the identification of enriched GO terms and KEGG pathways an over-representa
 
 ```{r}
 enr_topgo <- sigident::extract_go_terms(gene = deg_entrez,
-                                       species = species)
+                                        species = species)
 data.table::fwrite(enr_topgo, paste0(csvdir, "Top_GO.csv"))
 ```
 ```{r}
@@ -514,7 +240,7 @@ knitr::kable(head(enr_topgo))
 
 ```{r}
 enr_topkegg <- sigident::extract_kegg_terms(gene = deg_entrez,
-                                           species = species)
+                                            species = species)
 data.table::fwrite(enr_topkegg, paste0(csvdir, "Top_KEGG.csv"))
 ```
 ```{r}
@@ -532,14 +258,18 @@ The following test for over-representation is based on the same method, but also
 - P.Down: p-value for over-representation of GO term in down-regulated genes  
 
 ```{r}
-enr_fitlm <- sigident::go_diff_reg(mergeset = mergeset,
-                                  idtype = idtype,
-                                  design = design,
-                                  entrezids = mergedset@featureData@data$ENTREZ_GENE_ID)
+enr_fitlm <- sigident::go_diff_reg(
+  mergeset = mergeset,
+  idtype = idtype,
+  design = design,
+  entrezids = mergedset@featureData@data$ENTREZ_GENE_ID
+)
 
-enr_fitlm_topgo <- sigident::extract_go_terms(gene = enr_fitlm,
-                                             species = species,
-                                             fdr = 0.01)
+enr_fitlm_topgo <- sigident::extract_go_terms(
+  gene = enr_fitlm,
+  species = species,
+  fdr = 0.01
+)
 data.table::fwrite(enr_fitlm_topgo, paste0(csvdir, "Top_GO_fitlm.csv"))
 ```
 ```{r}
@@ -548,8 +278,10 @@ knitr::kable(head(enr_fitlm_topgo))
 ```
 
 ```{r}
-enr_fitlm_topkegg <- sigident::extract_kegg_terms(gene = enr_fitlm,
-                                                 species = species)
+enr_fitlm_topkegg <- sigident::extract_kegg_terms(
+  gene = enr_fitlm,
+  species = species
+)
 data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv"))
 ```
 ```{r}
@@ -563,13 +295,15 @@ GO enrichment analysis of a given set of genes (`deg_entrez`) with the defined o
 `goEnrichmentAnalysis` provides the presentation of the desired KEGG pathway ID (in this case `hsa04151` - PI3K-Akt-Pathway) including under expressed (red) and over expressed (green) genes inside the pathway as png images in the folder named 'plots' (object 'plotdir'). 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-enr_analysis <- sigident::go_enrichment_analysis(gene = deg_entrez,
-                                                org_db = OrgDb,
-                                                organism = organism,
-                                                fitlm = enr_fitlm,
-                                                pathwayid = pathwayid,
-                                                species = organism,
-                                                plotdir = plotdir)
+enr_analysis <- sigident::go_enrichment_analysis(
+  gene = deg_entrez,
+  org_db = OrgDb,
+  organism = organism,
+  fitlm = enr_fitlm,
+  pathwayid = pathwayid,
+  species = organism,
+  plotdir = plotdir
+)
 ```
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "/", pathwayid, ".png")
@@ -588,9 +322,11 @@ Using `plot_enriched_barplot`, a bar plot is created depicting the enrichment sc
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_GO.png")
-sigident::plot_enriched_barplot(enrichmentobj = enr_analysis$go,
-                                  type = "GO",
-                                  filename = filename)
+sigident::plot_enriched_barplot(
+  enrichmentobj = enr_analysis$go,
+  type = "GO",
+  filename = filename
+)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -599,12 +335,21 @@ knitr::include_graphics(filename)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_KEGG.png")
-sigident::plot_enriched_barplot(enrichmentobj = enr_analysis$kegg,
-                                  type = "KEGG",
-                                  filename = filename)
+sigident::plot_enriched_barplot(
+  enrichmentobj = enr_analysis$kegg,
+  type = "KEGG",
+  filename = filename
+)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(bods, enr_analysis, enr_fitlm, enr_fitlm_topgo, enr_fitlm_topkegg,
+   enr_topgo, enr_topkegg, gene.idtype.bods, korg, cpd.simtypes,
+   deg_entrez, gene.idtype.list, ht_colors, mergedset)
+gc()
 ```
 
 # Identification of diagnostic signatures 
@@ -618,10 +363,12 @@ Therefore, we implemented the elastic net regularization method for the identifi
 A statistical prediction model is usually trained on 70%-80% percent of the present data. `create_training_test_split` randomly splits the merged dataset into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). For reproducibility, a seed must be set.  
 
 ```{r}
-training_list <- sigident::create_training_test_split(diagnosis = diagnosis,
-                                               mergeset = mergeset,
-                                               split = split,
-                                               seed = seed)
+training_list <- sigident::create_training_test_split(
+  diagnosis = diagnosis,
+  mergeset = mergeset,
+  split = split,
+  seed = seed
+)
 ```
 
 ## Lasso regression
@@ -630,13 +377,15 @@ Regularization requires the selection of a tuning parameter (lambda) that determ
 Furthermore, a ROC curve is plotted to visualize the performance measurement of the model.  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_lasso <- sigident::signature(traininglist = training_list,
-                                         type = "lasso",
-                                         nfolds = nfolds,
-                                         seed = seed)
+diagnostic_lasso <- sigident::signature(
+  traininglist = training_list,
+  type = "lasso",
+  nfolds = nfolds,
+  seed = seed
+)
 filename <- paste0(plotdir, "CV_lasso.png")
 sigident::plot_cvplot(cv_obj = diagnostic_lasso$fit_cv,
-                        filename = filename)
+                      filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -645,7 +394,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_Lasso.min.png")
 sigident::plot_rocplot(roc = diagnostic_lasso$roc_min,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -654,7 +403,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_Lasso.1se.png")
 sigident::plot_rocplot(roc = diagnostic_lasso$roc_1se,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -665,14 +414,16 @@ knitr::include_graphics(filename)
 The elastic net is a mixture of lasso and ridge regularization to shrink coefficients (like in ridge regression) and to set some coefficients to zero (as in lasso). Therefore, the mixing parameter alpha needs to be determined as value between 1 (for lasso) and 0 (for ridge). A grid search for calculating optimal alpha and lambda can be conducted (as it is done next) but might take much computing capacity, hence we propose setting alpha manually to 0.9. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_elasticnet <- sigident::signature(traininglist = training_list,
-                                              type = "elastic",
-                                              alpha = 0.9,
-                                              nfolds = nfolds,
-                                              seed = seed)
+diagnostic_elasticnet <- sigident::signature(
+  traininglist = training_list,
+  type = "elastic",
+  alpha = 0.9,
+  nfolds = nfolds,
+  seed = seed
+)
 filename <- paste0(plotdir, "CV_elasticNet.png")
 sigident::plot_cvplot(cv_obj = diagnostic_elasticnet$fit_cv,
-                        filename = filename)
+                      filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -681,7 +432,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_elasticNet.min.png")
 sigident::plot_rocplot(roc = diagnostic_elasticnet$roc_min,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -690,7 +441,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_elasticNet.1se.png")
 sigident::plot_rocplot(roc = diagnostic_elasticnet$roc_1se,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -698,13 +449,15 @@ knitr::include_graphics(filename)
 
 ## Gridsearch to find alpha and lambda
 
-Setting `type = "grid"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).  
+Setting `type = "elasitnet_grid"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_glmgrid <- sigident::signature(traininglist = training_list,
-                                           type = "grid",
-                                           nfolds = nfolds,
-                                           seed = seed)
+diagnostic_glmgrid <- sigident::signature(
+  traininglist = training_list,
+  type = "elasitnet_grid",
+  nfolds = nfolds,
+  seed = seed
+)
 # plot model of gridsearch
 filename <- paste0(plotdir, "Gridsearch_model.png")
 sigident::plot_grid_model_plot(model = diagnostic_glmgrid$caret_train,
@@ -716,7 +469,7 @@ knitr::include_graphics(filename)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # plot variable importance of gridsearch
-filename <- paste0(plotdir, "Gridsearch_variable_importance.png")
+filename <- paste0(plotdir, "Elasticnet_Gridsearch_var_imp.png")
 sigident::plot_grid_varimp_plot(model = diagnostic_glmgrid$caret_train,
                                 filename = filename)
 ```
@@ -728,7 +481,7 @@ knitr::include_graphics(filename)
 # create roc plot
 filename <- paste0(plotdir, "ROC_elasticNet.grid.png")
 sigident::plot_rocplot(roc = diagnostic_glmgrid$roc_elasticnet,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -742,31 +495,39 @@ These models can be included into a list and the performance metrices for classi
 
 ```{r}
 diagnostic_models <- list(
-  "lasso" = list("CV" = diagnostic_lasso$fit_cv,
-                 "min" = list("model" = diagnostic_lasso$lambda_min,
-                              "confmat" = diagnostic_lasso$confmat_min,
-                              "prediction" = diagnostic_lasso$predicted_min,
-                              "auc" = as.numeric(diagnostic_lasso$roc_min$auc)),
-                 "1se" = list("model" = diagnostic_lasso$lambda_1se,
-                              "confmat" = diagnostic_lasso$confmat_1se,
-                              "prediction" = diagnostic_lasso$predicted_1se,
-                              "auc" = as.numeric(diagnostic_lasso$roc_1se$auc))
+  "lasso" = list(
+    "CV" = diagnostic_lasso$fit_cv,
+    "min" = list("model" = diagnostic_lasso$lambda_min,
+                 "confmat" = diagnostic_lasso$confmat_min,
+                 "prediction" = diagnostic_lasso$predicted_min,
+                 "auc" = as.numeric(diagnostic_lasso$roc_min$auc)
+                 ),
+    "1se" = list("model" = diagnostic_lasso$lambda_1se,
+                 "confmat" = diagnostic_lasso$confmat_1se,
+                 "prediction" = diagnostic_lasso$predicted_1se,
+                 "auc" = as.numeric(diagnostic_lasso$roc_1se$auc)
+                 )
   ),
-  "elasticnet" = list("CV" = diagnostic_elasticnet$fit_cv,
-                      "min" = list("model" = diagnostic_elasticnet$lambda_min,
-                                   "confmat" = diagnostic_elasticnet$confmat_min,
-                                   "prediction" = diagnostic_elasticnet$predicted_min,
-                                   "auc" = as.numeric(diagnostic_elasticnet$roc_min$auc)),
-                      "1se" = list("model" = diagnostic_elasticnet$lambda_1se,
-                                   "confmat" = diagnostic_elasticnet$confmat_1se,
-                                   "prediction" = diagnostic_elasticnet$predicted_1se,
-                                   "auc" = as.numeric(diagnostic_elasticnet$roc_1se$auc))
+  "elasticnet" = list(
+    "CV" = diagnostic_elasticnet$fit_cv,
+    "min" = list("model" = diagnostic_elasticnet$lambda_min,
+                 "confmat" = diagnostic_elasticnet$confmat_min,
+                 "prediction" = diagnostic_elasticnet$predicted_min,
+                 "auc" = as.numeric(diagnostic_elasticnet$roc_min$auc)
+                 ),
+    "1se" = list("model" = diagnostic_elasticnet$lambda_1se,
+                 "confmat" = diagnostic_elasticnet$confmat_1se,
+                 "prediction" = diagnostic_elasticnet$predicted_1se,
+                 "auc" = as.numeric(diagnostic_elasticnet$roc_1se$auc)
+                 )
   ),
-  "grid" = list("CV" = diagnostic_glmgrid$caret_train,
-                "model" = diagnostic_glmgrid$elasticnet_auto,
-                "confmat" = diagnostic_glmgrid$confmat_elasticnet,
-                "prediction" = diagnostic_elasticnet$predicted_elasticnet,
-                "auc" = as.numeric(diagnostic_glmgrid$roc_elasticnet$auc))
+  "elasitnet_grid" = list(
+    "CV" = diagnostic_glmgrid$caret_train,
+    "model" = diagnostic_glmgrid$elasticnet_auto,
+    "confmat" = diagnostic_glmgrid$confmat_elasticnet,
+    "prediction" = diagnostic_elasticnet$predicted_elasticnet,
+    "auc" = as.numeric(diagnostic_glmgrid$roc_elasticnet$auc)
+    )
 )
 ```
 
@@ -774,6 +535,12 @@ diagnostic_models <- list(
 knitr::kable(
   sigident::compare_diagnostic_models(diagnostic_models)
 )
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(diagnostic_glmgrid, diagnostic_elasticnet, diagnostic_lasso,
+   training_list)
+gc()
 ```
 
 ### Extract lambda values 
@@ -814,7 +581,7 @@ diagnostic_models$elasticnet$min$confmat
 diagnostic_models$elasticnet[["1se"]]$confmat
 ```
 
-##### Elastic net (grid search)
+#### Elastic net (grid search)
 
 ```{r}
 diagnostic_models$grid$confmat
@@ -825,25 +592,45 @@ diagnostic_models$grid$confmat
 The following function enables the extraction of the selected genes (Affy-IDs) for each model as csv file.
 
 ```{r}
-signaturegenes <- sigident::gene_map_sig(mergeset = mergeset, model = diagnostic_models$lasso$min$model)
-data.table::fwrite(signaturegenes, paste0(csvdir, "signaturegenes_lasso_min.csv"))
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$lasso$min$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_lasso_min.csv"))
 ```
 
 ```{r}
-signaturegenes <- sigident::gene_map_sig(mergeset = mergeset, model = diagnostic_models$lasso[["1se"]]$model)
-data.table::fwrite(signaturegenes, paste0(csvdir, "signaturegenes_lasso_1se.csv"))
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$lasso[["1se"]]$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_lasso_1se.csv"))
 ```
 
 ```{r}
-signaturegenes <- sigident::gene_map_sig(mergeset = mergeset, model = diagnostic_models$elasticnet$min$model)
-data.table::fwrite(signaturegenes, paste0(csvdir, "signaturegenes_elasticnet_min.csv"))
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$elasticnet$min$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_elasticnet_min.csv"))
 ```
 
 ```{r}
-signaturegenes <- sigident::gene_map_sig(mergeset = mergeset, model = diagnostic_models$elasticnet[["1se"]]$model)
-data.table::fwrite(signaturegenes, paste0(csvdir, "signaturegenes_elasticnet_1se.csv"))
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$elasticnet[["1se"]]$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_elasticnet_1se.csv"))
 ```
 
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(signaturegenes)
+gc()
+```
 
 ## Validation of diagnostic signatures 
 
@@ -868,15 +655,12 @@ validationstudylist <- list(studyname = "GSE30219",
                             targetlevelname = "Lung Tumour")
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 GSE30219_validation <- sigident::validate_diagnostic_signature(
   validationstudylist = validationstudylist,
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  targetname = targetname,
-  controlname = controlname,
-  targetcol = targetcol,
   datadir = datadir
 )
 ```
@@ -891,7 +675,7 @@ GSE30219_validation$lasso$min$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE30219_lasso_min.png")
 sigident::plot_rocplot(roc = GSE30219_validation$lasso$min$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -907,7 +691,7 @@ GSE30219_validation$lasso[["1se"]]$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE30219_lasso_1se.png")
 sigident::plot_rocplot(roc = GSE30219_validation$lasso[["1se"]]$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -923,7 +707,7 @@ GSE30219_validation$elasticnet$min$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_min.png")
 sigident::plot_rocplot(roc = GSE30219_validation$elasticnet$min$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -939,10 +723,15 @@ GSE30219_validation$elasticnet[["1se"]]$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_1se.png")
 sigident::plot_rocplot(roc = GSE30219_validation$elasticnet[["1se"]]$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(GSE30219_validation)
+gc()
 ```
 
 ### GSE33356 
@@ -955,15 +744,12 @@ validationstudylist <- list(studyname = "GSE33356",
                             targetlevelname = "lung cancer")
 ```
 
-```{r}
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 GSE33356_validation <- sigident::validate_diagnostic_signature(
   validationstudylist = validationstudylist,
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  targetname = targetname,
-  controlname = controlname,
-  targetcol = targetcol,
   datadir = datadir
 )
 ```
@@ -978,7 +764,7 @@ GSE33356_validation$lasso$min$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE33356_lasso_min.png")
 sigident::plot_rocplot(roc = GSE33356_validation$lasso$min$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -994,7 +780,7 @@ GSE33356_validation$lasso[["1se"]]$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE33356_lasso_1se.png")
 sigident::plot_rocplot(roc = GSE33356_validation$lasso[["1se"]]$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -1010,7 +796,7 @@ GSE33356_validation$elasticnet$min$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_min.png")
 sigident::plot_rocplot(roc = GSE33356_validation$elasticnet$min$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -1026,10 +812,15 @@ GSE33356_validation$elasticnet[["1se"]]$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_1se.png")
 sigident::plot_rocplot(roc = GSE33356_validation$elasticnet[["1se"]]$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(GSE33356_validation)
+gc()
 ```
 
 ### GSE102287 
@@ -1048,9 +839,6 @@ GSE102287_validation <- sigident::validate_diagnostic_signature(
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  targetname = targetname,
-  controlname = controlname,
-  targetcol = targetcol,
   datadir = datadir
 )
 ```
@@ -1065,7 +853,7 @@ GSE102287_validation$lasso$min$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_lasso_min.png")
 sigident::plot_rocplot(roc = GSE102287_validation$lasso$min$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -1081,7 +869,7 @@ GSE102287_validation$lasso[["1se"]]$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_lasso_1se.png")
 sigident::plot_rocplot(roc = GSE102287_validation$lasso[["1se"]]$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -1097,7 +885,7 @@ GSE102287_validation$elasticnet$min$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_min.png")
 sigident::plot_rocplot(roc = GSE102287_validation$elasticnet$min$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -1113,10 +901,16 @@ GSE102287_validation$elasticnet[["1se"]]$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_1se.png")
 sigident::plot_rocplot(roc = GSE102287_validation$elasticnet[["1se"]]$roc,
-                         filename = filename)
+                       filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(GSE102287_validation, validationstudylist, diagnostic_models,
+   GSE102287, GSE33356)
+gc()
 ```
 
 # Identification of prognostic signatures 
@@ -1138,16 +932,19 @@ Since we already used the raw data above to load the study 'GSE19188' for the an
 
 ```{r eval = TRUE}
 discoverystudies_w_timedata <- list(
-  "GSE19188" = list(setid = 1,
-                    timecol = "characteristics_ch1.2",
-                    status = list(statuscol = "characteristics_ch1.3",
-                                  levels = list(alive = "status: alive",
-                                                deceased = "status: deceased",
-                                                na = "status: Not available")),
-                    targetcolname = "characteristics_ch1",
-                    controllevelname = "tissue type: healthy",
-                    targetlevelname = "tissue type: tumor",
-                    use_rawdata = TRUE))
+  "GSE19188" = list(
+    setid = 1,
+    timecol = "characteristics_ch1.2",
+    status = list(
+      statuscol = "characteristics_ch1.3",
+      levels = list(alive = "status: alive",
+                    deceased = "status: deceased",
+                    na = "status: Not available")),
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue type: healthy",
+    targetlevelname = "tissue type: tumor",
+    use_rawdata = TRUE)
+)
 ```
 
 
@@ -1160,15 +957,13 @@ Next, the survival data needs to be extracted. `get_survival_time` results in a 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 
 ### Identification of survival correlated genes
-survival_data <- sigident::get_survival_time(study_metadata = study_metadata,
-                                           sample_metadata = sample_metadata,
-                                           genes = genes,
-                                           idtype = idtype,
-                                           discoverystudies_w_timedata = discoverystudies_w_timedata,
-                                           targetname = targetname,
-                                           controlname = controlname,
-                                           targetcol = targetcol,
-                                           datadir = datadir)
+survival_data <- sigident::get_survival_time(
+  sample_metadata = sample_metadata,
+  genes = genes,
+  idtype = idtype,
+  discoverystudies_w_timedata = discoverystudies_w_timedata,
+  datadir = datadir
+)
 survival_table <- survival_data[["GSE19188"]]
 ```
 
@@ -1185,7 +980,8 @@ Subsequently, an univariate Cox regression is conducted to identify survival cor
 surv_correlated <- sigident::univ_cox(survtable = survival_table,
                                       genes = genes)
 # export table with survival correlated genes
-data.table::fwrite(surv_correlated, paste0(csvdir, "survival_correlated_genes.csv"))
+data.table::fwrite(surv_correlated,
+                   paste0(csvdir, "survival_correlated_genes.csv"))
 ```
 
 ```{r}
@@ -1203,14 +999,12 @@ The classifier takes the expression profiles of the identified survival correlat
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 classifier_studies <- c("GSE18842", "GSE19804")
-expr_pattern <- sigident::generate_expression_pattern(classifier_studies = classifier_studies,
-                                                    sig_cov = surv_correlated,
-                                                    mergeset = mergeset,
-                                                    study_metadata = study_metadata,
-                                                    sample_metadata = sample_metadata,
-                                                    controlname = controlname,
-                                                    targetname = targetname,
-                                                    targetcol = targetcol)
+expr_pattern <- sigident::generate_expression_pattern(
+  classifier_studies = classifier_studies,
+  sig_cov = surv_correlated,
+  mergeset = mergeset,
+  sample_metadata = sample_metadata
+)
 ```
 
 ```{r}
@@ -1227,37 +1021,44 @@ However, the element `use_rawdata` is not allowed here. Furthermore, is allowed 
 
 ```{r eval = TRUE}
 validationstudiesinfo <- list(
-  "GSE30219" = list(setid = 1,
-                    timecol = "characteristics_ch1.9",
-                    status = list(statuscol = "characteristics_ch1.8",
-                                  levels = list(alive = "status: ALIVE",
-                                                deceased = "status: DEAD",
-                                                na = "status: NTL")),
-                    targetcolname = "source_name_ch1",
-                    controllevelname = "Non Tumoral Lung",
-                    targetlevelname = "Lung Tumour"),
+  "GSE30219" = list(
+    setid = 1,
+    timecol = "characteristics_ch1.9",
+    status = list(
+      statuscol = "characteristics_ch1.8",
+      levels = list(alive = "status: ALIVE",
+                    deceased = "status: DEAD",
+                    na = "status: NTL")
+    ),
+    targetcolname = "source_name_ch1",
+    controllevelname = "Non Tumoral Lung",
+    targetlevelname = "Lung Tumour"),
   
-  "GSE50081" = list(setid = 1, 
-                    timecol = "characteristics_ch1.8",
-                    status = list(statuscol = "characteristics_ch1.9",
-                                  levels = list(alive = "status: alive",
-                                                deceased = "status: dead",
-                                                na = NA)),
-                    targetcolname = "characteristics_ch1.1",
-                    targetlevelname = NULL,
-                    controllevelname = NULL))
+  "GSE50081" = list(
+    setid = 1,
+    timecol = "characteristics_ch1.8",
+    status = list(
+      statuscol = "characteristics_ch1.9",
+      levels = list(
+        alive = "status: alive",
+        deceased = "status: dead",
+        na = NA)
+    ),
+    targetcolname = "characteristics_ch1.1",
+    targetlevelname = NULL,
+    controllevelname = NULL)
+)
 # if targetlevelname == NULL, the expression set will not be filtered further
 # but instead, all samples will be used for calculations
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-p_c <- sigident::prognostic_classifier(pattern_com = expr_pattern,
-                                      validationstudiesinfo = validationstudiesinfo,
-                                      datadir = datadir,
-                                      idtype = idtype,
-                                      controlname = controlname,
-                                      targetname = targetname,
-                                      targetcol = targetcol)
+p_c <- sigident::prognostic_classifier(
+  pattern_com = expr_pattern,
+  validationstudiesinfo = validationstudiesinfo,
+  datadir = datadir,
+  idtype = idtype
+)
 ```
 
 ### Validation study: GSE30219  
@@ -1266,12 +1067,12 @@ Here we extract information on the study GSE30219.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 fit <- p_c[["GSE30219"]]$kaplan_estimator$fit
-RiskTable <- p_c[["GSE30219"]]$risktable
+risktable <- p_c[["GSE30219"]]$risktable
 ```
 
 ```{r}
-dim(RiskTable)
-head(RiskTable)
+dim(risktable)
+head(risktable)
 ```
 
 #### View proportional hazards regression models
@@ -1290,9 +1091,11 @@ fit
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "GSE30219_Prognostic_Kaplan-Meier_Plot.png")
-sigident::plot_survplot(fit = fit,
-                          risk_table = RiskTable,
-                          filename = filename)
+sigident::plot_survplot(
+  fit = fit,
+  risktable = risktable,
+  filename = filename
+)
 ```
 
 ```{r out.width='80%'}
@@ -1303,12 +1106,12 @@ knitr::include_graphics(filename)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 fit <- p_c[["GSE50081"]]$kaplan_estimator$fit
-RiskTable <- p_c[["GSE50081"]]$risktable
+risktable <- p_c[["GSE50081"]]$risktable
 ```
 
 ```{r}
-dim(RiskTable)
-head(RiskTable)
+dim(risktable)
+head(risktable)
 ```
 
 #### View proportional hazards regression models
@@ -1321,15 +1124,16 @@ p_c[["GSE50081"]]$kaplan_estimator$res_cox
 fit
 ```
 
-
 #### Plot prognostic Kaplan-Meier plot
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "GSE50081_Prognostic_Kaplan-Meier_Plot.png")
-sigident::plot_survplot(fit = fit,
-                          risk_table =RiskTable,
-                          filename = filename)
+sigident::plot_survplot(
+  fit = fit,
+  risktable =risktable,
+  filename = filename
+)
 ```
 
 ```{r out.width='80%'}
@@ -1342,7 +1146,7 @@ In order to simplify the workflow described above, we wrapped all these function
 
 ## Preprocessing: 
 
-The preprocessing of the data needs to conform with the above described approach. 
+The preprocessing of the data needs to be conform with the above described approach. Here, all necessary objects are created, including `mergeset`, `mergedset`, `batch`, `diagnosis`, `design`.
 
 ### Define Variables
 
@@ -1353,11 +1157,6 @@ maindir <- "./geodata/"
 datadir <- paste0(maindir, "data/")
 dir.create(maindir)
 dir.create(datadir)
-
-# initialize more infos on the study
-targetcol <- "target" # should be named "target"
-controlname <- "Control"
-targetname <- "Lung Cancer"
 
 # define more variables
 plotdir <- "./plots/"
@@ -1381,60 +1180,36 @@ idtype = "affy"
 fdr <- 0.05
 ```
 
-
-## Create Diagnosis, Design and Batch
-
-```{r eval = FALSE}
-dd <- sigident::createDiagnosisDesignBatch_(sample_metadata = sample_metadata,
-                                            study_metadata = study_metadata,
-                                            controlname = controlname,
-                                            targetname = targetname,
-                                            targetcol = targetcol)
-diagnosis <- dd$diagnosis
-design <- dd$design
-batch <- dd$batch
-```
-
-## Create `mergeset`
-
-```{r eval = FALSE}
-mergeset <- sigident::batch_correction(mergedset = mergedset,
-                                       batch = batch,
-                                       design = design,
-                                       idtype = idtype)
-```
-
-
-
 ## Run `sigidentDEG`-function
 
 ```{r eval = FALSE}
-genes <- sigident::sigidentDEG(mergeset = mergeset,
-                               mergedset = mergedset,
-                               study_metadata = study_metadata,
-                               sample_metadata = sample_metadata,
-                               targetcol = targetcol,
-                               controlname = controlname,
-                               design = design,
-                               idtype = idtype,
-                               fdr = fdr,
-                               plotdir = plotdir,
-                               csvdir = csvdir)
+genes <- sigident::sigidentDEG(
+  mergeset = mergeset,
+  mergedset = mergedset,
+  sample_metadata = sample_metadata,
+  design = design,
+  idtype = idtype,
+  fdr = fdr,
+  plotdir = plotdir,
+  csvdir = csvdir
+)
 ```
 
 ## Run `sigidentEnrichment`-function
 
 ```{r eval = FALSE}
-sigident::sigidentEnrichment(mergeset = mergeset,
-                             mergedset = mergedset,
-                             idtype = idtype,
-                             design = design,
-                             species = species,
-                             org_db = OrgDb,
-                             organism = organism,
-                             pathwayid = pathwayid,
-                             plotdir = plotdir,
-                             csvdir = csvdir)
+sigident::sigidentEnrichment(
+  mergeset = mergeset,
+  mergedset = mergedset,
+  idtype = idtype,
+  design = design,
+  species = species,
+  org_db = OrgDb,
+  organism = organism,
+  pathwayid = pathwayid,
+  plotdir = plotdir,
+  csvdir = csvdir
+)
 ```
 ```{r eval = FALSE}
 filename <- paste0(plotdir, "/", pathwayid, ".png")
@@ -1448,12 +1223,14 @@ knitr::include_graphics(filename)
 ## Run `sigidentDiagnostic`-function 
 
 ```{r eval = FALSE}
-diagnostic_models <- sigident::sigidentDiagnostic(mergeset = mergeset,
-                                                 diagnosis = diagnosis,
-                                                 seed = seed,
-                                                 nfolds = nfolds,
-                                                 split = split,
-                                                 plotdir = plotdir)
+diagnostic_models <- sigident::sigidentDiagnostic(
+  mergeset = mergeset,
+  diagnosis = diagnosis,
+  seed = seed,
+  nfolds = nfolds,
+  split = split,
+  plotdir = plotdir
+)
 ```
 
 ```{r eval = FALSE}
@@ -1473,11 +1250,13 @@ knitr::kable(
 Some users may validate the resulting models using new data sets. This can be conducted running the function `validate_diagnostic_signature`. First, a list containing meta information on the validation study must be created.
 
 ```{r eval = FALSE}
-validationstudylist <- list(studyname = "GSE30219",
-                            setid = 1, 
-                            targetcolname = "source_name_ch1",
-                            controllevelname = "Non Tumoral Lung",
-                            targetlevelname = "Lung Tumour")
+validationstudylist <- list(
+  studyname = "GSE30219",
+  setid = 1, 
+  targetcolname = "source_name_ch1",
+  controllevelname = "Non Tumoral Lung",
+  targetlevelname = "Lung Tumour"
+)
 ```
 
 ```{r eval = FALSE}
@@ -1486,9 +1265,6 @@ GSE30219_validation <- sigident::validate_diagnostic_signature(
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  targetname = targetname,
-  controlname = controlname,
-  targetcol = targetcol,
   datadir = datadir
 )
 ```
@@ -1499,37 +1275,52 @@ GSE30219_validation <- sigident::validate_diagnostic_signature(
 
 ```{r eval = FALSE}
 discoverystudies_w_timedata <- list(
-  "GSE19188" = list(setid = 1,
-                    timecol = "characteristics_ch1.2",
-                    status = list(statuscol = "characteristics_ch1.3",
-                                  levels = list(alive = "status: alive",
-                                                deceased = "status: deceased",
-                                                na = "status: Not available")),
-                    targetcolname = "characteristics_ch1",
-                    controllevelname = "tissue type: healthy",
-                    targetlevelname = "tissue type: tumor",
-                    use_rawdata = TRUE))
+  "GSE19188" = list(
+    setid = 1,
+    timecol = "characteristics_ch1.2",
+    status = list(
+      statuscol = "characteristics_ch1.3",
+      levels = list(
+        alive = "status: alive",
+        deceased = "status: deceased",
+        na = "status: Not available")
+    ),
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue type: healthy",
+    targetlevelname = "tissue type: tumor",
+    use_rawdata = TRUE)
+)
 
 validationstudiesinfo <- list(
-  "GSE30219" = list(setid = 1,
-                    timecol = "characteristics_ch1.9",
-                    status = list(statuscol = "characteristics_ch1.8",
-                                  levels = list(alive = "status: ALIVE",
-                                                deceased = "status: DEAD",
-                                                na = "status: NTL")),
-                    targetcolname = "source_name_ch1",
-                    controllevelname = "Non Tumoral Lung",
-                    targetlevelname = "Lung Tumour"),
+  "GSE30219" = list(
+    setid = 1,
+    timecol = "characteristics_ch1.9",
+    status = list(
+      statuscol = "characteristics_ch1.8",
+      levels = list(
+        alive = "status: ALIVE",
+        deceased = "status: DEAD",
+        na = "status: NTL")
+    ),
+    targetcolname = "source_name_ch1",
+    controllevelname = "Non Tumoral Lung",
+    targetlevelname = "Lung Tumour"
+  ),
   
-  "GSE50081" = list(setid = 1,
-                    timecol = "characteristics_ch1.8",
-                    status = list(statuscol = "characteristics_ch1.9",
-                                  levels = list(alive = "status: alive",
-                                                deceased = "status: dead",
-                                                na = NA)),
-                    targetcolname = "characteristics_ch1.1",
-                    targetlevelname = NULL,
-                    controllevelname = NULL))
+  "GSE50081" = list(
+    setid = 1,
+    timecol = "characteristics_ch1.8",
+    status = list(
+      statuscol = "characteristics_ch1.9",
+      levels = list(
+        alive = "status: alive",
+        deceased = "status: dead",
+        na = NA)
+    ),
+    targetcolname = "characteristics_ch1.1",
+    targetlevelname = NULL,
+    controllevelname = NULL)
+)
 # if targetlevelname == NULL, the expression set will not be filtered further
 # but instead, all samples will be used for calculations
 ```
@@ -1537,20 +1328,18 @@ validationstudiesinfo <- list(
 ### Then run the analysis 
 
 ```{r eval = FALSE}
-progn_results <- sigident::sigidentPrognostic(mergeset = mergeset,
-                                              study_metadata = study_metadata,
-                                              sample_metadata = sample_metadata,
-                                              idtype = idtype,
-                                              genes = genes,
-                                              discoverystudies_w_timedata = discoverystudies_w_timedata,
-                                              classifier_studies = c("GSE18842", "GSE19804"),
-                                              validationstudiesinfo = validationstudiesinfo,
-                                              targetname = targetname,
-                                              controlname = controlname,
-                                              datadir = datadir,
-                                              plotdir = plotdir,
-                                              csvdir = csvdir,
-                                              targetcol = targetcol)
+progn_results <- sigident::sigidentPrognostic(
+  mergeset = mergeset,
+  sample_metadata = sample_metadata,
+  idtype = idtype,
+  genes = genes,
+  discoverystudies_w_timedata = discoverystudies_w_timedata,
+  classifier_studies = c("GSE18842", "GSE19804"),
+  validationstudiesinfo = validationstudiesinfo,
+  datadir = datadir,
+  plotdir = plotdir,
+  csvdir = csvdir
+)
 ```
 
 ```{r eval = FALSE}

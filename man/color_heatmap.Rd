@@ -4,21 +4,11 @@
 \alias{color_heatmap}
 \title{color_heatmap}
 \usage{
-color_heatmap(sample_metadata, study_metadata, targetcol, controlname)
+color_heatmap(sample_metadata)
 }
 \arguments{
 \item{sample_metadata}{A data frame. The data frame holding the
 sample metadata.}
-
-\item{study_metadata}{A data frame. The data frame holding the study
-metadata.}
-
-\item{targetcol}{A character string. Columname of `sample_metadata`
-holding the targets. Default: "target". Caution: this should not
-be changed.}
-
-\item{controlname}{A character string. Name of the the controls,
-specified in the 'target' column of `sample_metadata`.}
 }
 \description{
 Helper function to color the heatmap

@@ -1,87 +1,3 @@
-#' @title plot_import_boxplot
-#'
-#' @description Helper function to create boxplot of mergeset
-#'
-#' @param filename A character string indicating the filename. If default
-#'   (\code{NULL}) a plot named `import_boxplot.png` will be created
-#'   inside the directory "./plots".
-#'
-#' @inheritParams sigidentDEG
-#'
-#' @export
-plot_import_boxplot <- function(mergeset,
-                                filename = NULL) {
-  if (is.null(filename)) {
-    filename <- "./plots/import_boxplot.png"
-    if (!dir.exists("./plots/")) {
-      dir.create("./plots/")
-    }
-  }
-
-  grDevices::png(
-    filename = filename,
-    res = 150,
-    height = 1000,
-    width = 2000
-  )
-  print({
-    graphics::boxplot(
-      mergeset,
-      main = "Merged microarray data",
-      xlab = "Samples",
-      ylab = "Expression"
-    )
-  })
-  grDevices::dev.off()
-}
-
-
-#' @title plot_batchplot
-#'
-#' @description Helper function to create batchplot
-#'
-#' @param filename A character string indicating the filename. If default
-#'   (\code{NULL}) a plot named `PCplot{time}.png` will be created
-#'   inside the directory "./plots".
-#' @param time A character string indicating if the plot is "before" or
-#'   "after" batch correction. This information is integrated
-#'   into the filename.
-#' @param correction_obj An object. The output of the function
-#'   `batch_detection()`.
-#'
-#' @export
-plot_batchplot <- function(correction_obj,
-                           filename = NULL,
-                           time) {
-
-  if (is.null(filename)) {
-    filename <- paste0("./plots/PCplot_", time, ".png")
-    if (!dir.exists("./plots/")) {
-      dir.create("./plots/")
-    }
-  }
-
-  grDevices::png(
-    filename = filename,
-    res = 150,
-    height = 1500,
-    width = 1500
-  )
-  print({
-    # time == "before" or "after"
-    gPCA::PCplot(
-      correction_obj,
-      ug = "guided",
-      type = "1v2",
-      main = paste("gPCA",
-                   time,
-                   "batch correction")
-    )
-  })
-  grDevices::dev.off()
-}
-
-
 #' @title plot_deg_heatmap
 #'
 #' @description Helper function to create DEG heatmap
@@ -185,18 +101,12 @@ plot_enriched_barplot <- function(enrichmentobj,
 #'
 #' @export
 color_heatmap <-
-  function(sample_metadata,
-           study_metadata,
-           targetcol,
-           controlname) {
-    discovery <- discovery_func(
-      sample_metadata = sample_metadata,
-      study_metadata = study_metadata
-    )
+  function(sample_metadata) {
 
-    discoverydata <- sample_metadata[which(
-      sample_metadata$study %in% discovery
-    ), ][[targetcol]]
+    targetcol <- "target"
+    controlname <- "Control"
+
+    discoverydata <- sample_metadata[[targetcol]]
 
     return(
       unlist(
@@ -326,14 +236,14 @@ plot_grid_varimp_plot <- function(model,
 #'
 #' @param fit A cox proportional hazards model. The output of the
 #'   function `fit_kaplan_estimator()` or `prognostic_classifier()`.
-#' @param risk_table A data.frame. The output of the function
+#' @param risktable A data.frame. The output of the function
 #'   `prognostic_classifier()`.
 #'
 #' @inheritParams plot_grid_model_plot
 #'
 #' @export
 plot_survplot <- function(fit,
-                          risk_table,
+                          risktable,
                           filename) {
 
   grDevices::png(
@@ -345,7 +255,7 @@ plot_survplot <- function(fit,
   print({
     survminer::ggsurvplot(
       fit,
-      risk_table,
+      risktable,
       conf.int = TRUE,
       legend.labs = c("Low-Risk", "High-Risk")
     )
