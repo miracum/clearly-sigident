@@ -1,3 +1,119 @@
+---
+title: "sigident - SVM Example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sigident-SVM_example}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Prerequisites and installation 
+
+Make sure, that both R packages, sigidnet.preproc and sigident, are installed.
+
+## Initialization of important variables
+
+```{r setup}
+library(sigident)
+library(sigident.preproc)
+library(knitr)
+
+# initialize filePath:
+filePath <- tempdir()
+
+# define datadir
+maindir <- "./geodata/"
+datadir <- paste0(maindir, "data/")
+dir.create(maindir)
+dir.create(datadir)
+
+# define plotdir
+plotdir <- "./plots/"
+dir.create(plotdir)
+
+# define idtype
+idtype = "affy"
+
+# general
+csvdir <- "./csv/"
+dir.create(csvdir)
+
+# diagnostic signature
+seed <- 111
+split <- 0.8
+nfolds <- 10
+```
+
+## Define list that contains a representation of the studies metadata
+
+```{r}
+studiesinfo <- list(
+  "GSE18842" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "Human Lung Tumor",
+    controllevelname = "Human Lung Control"
+    ),
+  
+  "GSE19804" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "frozen tissue of primary tumor",
+    controllevelname = "frozen tissue of adjacent normal"
+  ),
+  
+  "GSE19188" = list(
+    setid = 1,
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue type: healthy",
+    targetlevelname = "tissue type: tumor",
+    use_rawdata = TRUE
+  )
+)
+```
+
+## Load GEO datasets
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+sigident.preproc::load_geo_data(
+  studiesinfo = studiesinfo,
+  datadir = datadir,
+  plotdir = plotdir,
+  idtype = idtype
+) 
+```
+
+# Apply SVM Classifier
+
+```{r}
+# Create training list
+training_list <- sigident::create_training_test_split(
+  diagnosis = diagnosis,
+  mergeset = mergeset,
+  split = split,
+  seed = seed
+)
+                                               
+# SVM
+diagnostic_svm <- sigident::signature(
+  traininglist = training_list,
+  type = "svm",
+  nfolds = nfolds,
+  seed = seed
+)
+```
+
+
+```{r eval=FALSE}
 # Set variables
 rm(list=ls())
 pathDiagnosis = "vignettes/diagnosis.csv"
@@ -32,4 +148,5 @@ diagnostic_svm <- sigident::signature(traininglist = training_list,
 
 # knitr::include_graphics(filename)
 
+```
 
