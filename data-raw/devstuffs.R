@@ -103,6 +103,7 @@ usethis::use_package("lintr", type = "Suggests")
 # Development package
 mytag <- "v0.0.1"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = mytag, upgrade = "always")
+usethis::use_dev_package("sigident.preproc", type = "Imports")
 #usethis::use_dev_package("DQAstats", type = "Imports")
 # https://cran.r-project.org/web/packages/devtools/vignettes/dependencies.html
 desc::desc_set_remotes(c(
