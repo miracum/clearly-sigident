@@ -27,7 +27,7 @@ svm_classifier <- function(traininglist, seed) {
 
   # go parallel
   ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 4, 4, ncores)
+  cores <- ifelse(ncores > 2, 2, ncores)
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
