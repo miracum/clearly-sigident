@@ -29,9 +29,9 @@ svm_classifier <- function(traininglist, seed) {
 
   print("step1")
 
-  outlist$svm_train <- caret::train(
+  svm_model <- caret::train(
                x = traininglist$train$x,
-               y = as.factor(traininglist$train$y),
+               y = as.factor(as.factor(traininglist$train$y)),
                method = "svmLinear",
                #family = "binomial",
                #tuneGrid = gr_init$srchGrd,
@@ -40,22 +40,27 @@ svm_classifier <- function(traininglist, seed) {
                tuneLength = 10,
                allowParallel = T)
 
+  print(svm_model)
 
-  # importance.svm <- varImp(svm, scale = FALSE)
-  # print(importance.svm)
-  # plot(importance.svm, top = 20)
+  print("step2")
 
-  # svm.pred <- predict(svm, test)
+  importance.svm <- caret::varImp(svm_model, scale = FALSE)
+  print(importance.svm)
+  plot(importance.svm, top = 20)
 
-  # confusion.svm <- confusionMatrix(svm.pred, test$Therapy)
-  # confusion.svm
+  print("step3")
 
-  # svm.outcome <- test$Therapy
+  svm.pred <- predict(svm_model, traininglist$test$x)
 
+  print("predictions:")
+  print(svm.pred)
+  print("test:")
+  print(as.factor(traininglist$test$y))
+
+ confusion.svm <- caret::confusionMatrix(svm.pred, as.factor(traininglist$test$y))
+ print(confusion.svm)
 
   # stop parallel computation
   parallel::stopCluster(cl)
   gc()
-
-  ########################################
 }

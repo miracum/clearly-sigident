@@ -1,7 +1,7 @@
 # Set variables
 rm(list=ls())
-pathDiagnosis = "vignettes/data-prepared/diagnosis.csv"
-pathMergeset = "vignettes/data-prepared/mergeset_small.csv"
+pathDiagnosis = "vignettes/diagnosis.csv"
+pathMergeset = "vignettes/mergeset_100.csv"
 seed <- 111
 split <- 0.8
 nfolds <- 10
@@ -21,14 +21,15 @@ training_list <- sigident::create_training_test_split(diagnosis = diagnosis,
                                                split = split,
                                                seed = seed)
                                                
-# Lasso
-diagnostic_lasso <- sigident::signature(traininglist = training_list,
+# SVM
+diagnostic_svm <- sigident::signature(traininglist = training_list,
                                          type = "svm",
                                          nfolds = nfolds,
                                          seed = seed)
-filename <- paste0(plotdir, "CV_lasso.png")
-sigident::plot_cvplot(cv_obj = diagnostic_lasso$fit_cv,
-                        filename = filename)
+# filename <- paste0(plotdir, "CV_lasso.png")
+# sigident::plot_cvplot(cv_obj = diagnostic_lasso$fit_cv,
+#                         filename = filename)
 
-knitr::include_graphics(filename)
+# knitr::include_graphics(filename)
+
 
