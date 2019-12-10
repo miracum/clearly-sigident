@@ -101,7 +101,7 @@ usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
 
 # Development package
-mytag <- "development"
+mytag <- "v0.0.1"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = mytag, upgrade = "always")
 usethis::use_dev_package("sigident.preproc", type = "Imports")
 #usethis::use_dev_package("DQAstats", type = "Imports")
@@ -111,7 +111,6 @@ desc::desc_set_remotes(c(
     "url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/", mytag, "/clearly/sigident.preproc-", mytag, ".zip")
 ),
 file = usethis::proj_get())
-
 
 # buildignore and gitignore
 usethis::use_build_ignore("docker")

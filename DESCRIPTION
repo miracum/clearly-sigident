@@ -23,7 +23,7 @@ URL: https://gitlab.miracum.org/clearly/sigident
 BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
-Date/Publication: 2019-12-10 10:16:26 UTC
+Date/Publication: 2019-12-10 11:31:25 UTC
 biocViews: 
 Imports: 
     data.table,
@@ -62,4 +62,4 @@ Suggests:
     qpdf,
     lintr
 Remotes:  
-    url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/development/clearly/sigident.preproc-development.zip
+    url::https://gitlab.miracum.org/clearly/sigident-preproc/-/archive/install/clearly/sigident-preproc-install.zip
