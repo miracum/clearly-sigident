@@ -21,3 +21,5 @@
 /vignettes/*
 !/vignettes/*.Rmd
 .Rproj.user
+tests/testthat/testdata
+tests/testthat/plots
