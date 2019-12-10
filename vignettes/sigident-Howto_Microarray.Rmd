@@ -100,30 +100,15 @@ sigident.preproc::load_geo_data(
   studiesinfo = studiesinfo,
   datadir = datadir,
   plotdir = plotdir,
-  idtype = idtype
+  idtype = idtype,
+  visualize_batches = FALSE
 ) 
 ```
 
-## Visualize batch effect
+### Visualize batch effect
 
-These plots are created when executing the function `sigident.preproc::load_geo_data` and stored in the directory specified in `plotdir`.
-
-### Before batch correction
-
-```{r out.width='80%'}
-knitr::include_graphics(paste0(plotdir, "GSE18842_batch_effect_boxplot.jpg"))
-knitr::include_graphics(paste0(plotdir, "GSE19804_batch_effect_boxplot.jpg"))
-knitr::include_graphics(paste0(plotdir, "GSE19188_batch_effect_boxplot.jpg"))
-knitr::include_graphics(paste0(plotdir, "Merged_before_batch_effect_boxplot.jpg"))
-knitr::include_graphics(paste0(plotdir, "PCplot_before.png"))
-```
-
-### After batch correction
-
-```{r out.width='80%'}
-knitr::include_graphics(paste0(plotdir, "Merged_after_batch_effect_boxplot.jpg"))
-knitr::include_graphics(paste0(plotdir, "PCplot_after.png"))
-```
+By using the argument `visualize_batches = TRUE`, one can visualize batch effects before and after correction with two methods: boxplots and gPCA and store them in the directory specified in `plotdir`. For further details please view the package vignette of the `sigident.preproc` R package. 
+Due to the ressource intensive calculations of the plots, this argument is set to FALSE here. 
 
 # Preparations for utilizing the sigident package 
 
