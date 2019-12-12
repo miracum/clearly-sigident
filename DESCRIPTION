@@ -61,6 +61,5 @@ Suggests:
     rmarkdown,
     qpdf,
     lintr
-Remotes: 
+Remotes:  
     url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/development/clearly/sigident.preproc-development.zip
-RoxygenNote: 7.0.2
