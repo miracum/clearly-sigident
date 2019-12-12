@@ -4,14 +4,14 @@
 \alias{limma_top_table}
 \title{limma_top_table}
 \usage{
-limma_top_table(mergeset, design, q_value)
+limma_top_table(mergeset, diagnosis, q_value)
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
 columns = samples).}
 
-\item{design}{A object. The output of the function
-`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
+\item{diagnosis}{A vector of integers, holding the binary outcome variable
+(0 = "Control", 1 = "Target").}
 
 \item{q_value}{A numeric value for the q-value (false discovery rate)
 (default=0.01).}

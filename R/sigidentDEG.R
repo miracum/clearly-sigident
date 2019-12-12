@@ -9,8 +9,8 @@
 #'   `merge_()`.
 #' @param sample_metadata A data frame. The data frame holding the
 #'   sample metadata.
-#' @param design A object. The output of the function
-#'   `sigident.preproc::geo_create_diagnosisdesignbatch()`.
+#' @param diagnosis A vector of integers, holding the binary outcome variable
+#'   (0 = "Control", 1 = "Target").
 #' @param idtype A character string. The type of ID used to name the
 #'   genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 #'   affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
@@ -31,7 +31,7 @@
 sigidentDEG <- function(mergeset,
                         mergedset,
                         sample_metadata,
-                        design,
+                        diagnosis,
                         idtype,
                         fdr,
                         plotdir = "./plots/",
@@ -59,7 +59,7 @@ sigidentDEG <- function(mergeset,
 
   # store other variables
   rv$deg_q <- fdr
-  rv$design <- design
+  rv$diagnosis <- diagnosis
   rv$idtype <- idtype
 
   # store dirs
@@ -73,7 +73,7 @@ sigidentDEG <- function(mergeset,
   ### DEG Analysis ###
   rv$genes <- identify_degs(
     mergeset = rv$mergeset,
-    design = rv$design,
+    diagnosis = rv$diagnosis,
     q_value = rv$deg_q
   )
 
@@ -102,7 +102,7 @@ sigidentDEG <- function(mergeset,
   # export table with differential expression parameters and annotations
   rv$deg_results <- limma_top_table(
     mergeset = rv$mergeset,
-    design = rv$design,
+    diagnosis = rv$diagnosis,
     q_value = rv$deg_q
   )
   data.table::fwrite(rv$deg_results, paste0(rv$csvdir, "DEG_results.csv"))

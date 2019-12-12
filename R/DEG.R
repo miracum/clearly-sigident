@@ -1,5 +1,5 @@
 deg_limma <- function(mergeset,
-                       design) {
+                      design) {
 
   fit <- limma_fitting(mergeset, design)
 
@@ -25,13 +25,15 @@ deg_limma <- function(mergeset,
 #'
 #' @export
 identify_degs <- function(mergeset,
-                          design,
+                          diagnosis,
                           q_value = 0.01) {
 
   stopifnot(
     q_value > 0 | q_value <= 0.05,
     is.numeric(q_value)
   )
+
+  design <- stats::model.matrix(~ diagnosis)
 
   fit <- limma_fitting(mergeset, design)
 
@@ -48,7 +50,7 @@ identify_degs <- function(mergeset,
 }
 
 limma_fitting <- function(mergeset,
-                      design) {
+                          design) {
 
   fit <- limma::eBayes(limma::lmFit(mergeset, design))
 
@@ -65,8 +67,10 @@ limma_fitting <- function(mergeset,
 #'
 #' @export
 limma_top_table <- function(mergeset,
-                           design,
-                           q_value) {
+                            diagnosis,
+                            q_value) {
+
+  design <- stats::model.matrix(~ diagnosis)
 
   fit <- limma_fitting(mergeset, design)
 
@@ -86,28 +90,3 @@ limma_top_table <- function(mergeset,
 
   return(t)
 }
-
-# #' @title qSelection_
-# #'
-# #' @description Helper function to select q_values
-# #'
-# #' @inheritParams sigidentDEG
-# #'
-# #' @export
-#% qSelection_ <- function(sample_metadata,
-#%                         study_metadata,
-#%                         deg.q.selection = NULL) {
-#%
-#%   if (is.null(deg.q.selection)) {
-#%     discovery <- discovery_func(
-#%       sample_metadata = sample_metadata,
-#%       study_metadata = study_metadata
-#%     )
-#%     deg_q <- 1/length(
-#%       sample_metadata[sample_metadata$study %in% discovery, "sample"]
-#%     )
-#%   } else {
-#%     deg_q <- as.numeric(deg.q.selection)
-#%   }
-#%   return(deg_q)
-#% }

@@ -25,7 +25,7 @@ my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
 my_desc$set(Description = "Identify diagnostic and prognostic signatures from gene expression datasets.")
 # The description of your package
-my_desc$set("Date/Publication" = paste(as.character(Sys.time()), "UTC"))
+my_desc$set("Date" = as.character(Sys.Date()))
 # The urls
 my_desc$set("URL", "https://gitlab.miracum.org/clearly/sigident")
 my_desc$set("BugReports", "https://gitlab.miracum.org/clearly/sigident/issues")
@@ -101,7 +101,7 @@ usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
 
 # Development package
-mytag <- "v0.0.1"
+mytag <- "development"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = mytag, upgrade = "always")
 usethis::use_dev_package("sigident.preproc", type = "Imports")
 #usethis::use_dev_package("DQAstats", type = "Imports")

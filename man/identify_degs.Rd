@@ -4,14 +4,14 @@
 \alias{identify_degs}
 \title{identify_degs}
 \usage{
-identify_degs(mergeset, design, q_value = 0.01)
+identify_degs(mergeset, diagnosis, q_value = 0.01)
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
 columns = samples).}
 
-\item{design}{A object. The output of the function
-`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
+\item{diagnosis}{A vector of integers, holding the binary outcome variable
+(0 = "Control", 1 = "Target").}
 
 \item{q_value}{A numeric value for the q-value (false discovery rate)
 (default=0.01).}

@@ -9,7 +9,7 @@ sigidentEnrichment(
   mergedset,
   mergeset,
   idtype,
-  design,
+  diagnosis,
   species,
   org_db,
   organism,
@@ -30,8 +30,8 @@ genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
 are being removed!}
 
-\item{design}{A object. The output of the function
-`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
+\item{diagnosis}{A vector of integers, holding the binary outcome variable
+(0 = "Control", 1 = "Target").}
 
 \item{species}{A character string indicating the sample's species.
 Currently supported: "Hs".}

@@ -4,14 +4,14 @@
 \alias{go_diff_reg}
 \title{go_diff_reg}
 \usage{
-go_diff_reg(mergeset, design, idtype, entrezids = NULL)
+go_diff_reg(mergeset, diagnosis, idtype, entrezids = NULL)
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
 columns = samples).}
 
-\item{design}{A object. The output of the function
-`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
+\item{diagnosis}{A vector of integers, holding the binary outcome variable
+(0 = "Control", 1 = "Target").}
 
 \item{idtype}{A character string. The type of ID used to name the
 genes. One of 'entrez' or 'affy' intended to use either entrez IDs or

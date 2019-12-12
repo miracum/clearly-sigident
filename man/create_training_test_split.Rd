@@ -7,8 +7,8 @@
 create_training_test_split(diagnosis, mergeset, split = 0.8, seed = 111)
 }
 \arguments{
-\item{diagnosis}{An object. The output of the function
-`create_diagnosisdesignbatch()`.}
+\item{diagnosis}{A vector of integers, holding the binary outcome variable
+(0 = "Control", 1 = "Target").}
 
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
 columns = samples).}

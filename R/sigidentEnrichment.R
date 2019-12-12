@@ -21,7 +21,7 @@
 sigidentEnrichment <- function(mergedset,
                                mergeset,
                                idtype,
-                               design,
+                               diagnosis,
                                species,
                                org_db,
                                organism,
@@ -51,7 +51,7 @@ sigidentEnrichment <- function(mergedset,
 
   # store other arguments
   rv$idtype <- idtype
-  rv$design <- design
+  rv$diagnosis <- diagnosis
 
   # store dirs
   rv$plotdir <- clean_path_name(plotdir)
@@ -84,7 +84,7 @@ sigidentEnrichment <- function(mergedset,
   rv$enr_fitlm <- go_diff_reg(
     mergeset = rv$mergeset,
     idtype = rv$idtype,
-    design = rv$design,
+    diagnosis = rv$diagnosis,
     entrezids = rv$mergedset@featureData@data$ENTREZ_GENE_ID
   )
 

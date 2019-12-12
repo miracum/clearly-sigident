@@ -240,7 +240,7 @@ generate_expression_pattern <- function(classifier_studies,
                                         mergeset,
                                         sample_metadata) {
 
-  dd <- sigident.preproc::geo_create_diagnosisdesignbatch(
+  dd <- sigident.preproc::geo_create_diagnosisbatch(
     sample_metadata =
       sample_metadata[sample_metadata$study %in% classifier_studies, ]
   )

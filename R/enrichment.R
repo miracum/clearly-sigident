@@ -49,7 +49,7 @@ extract_kegg_terms <- function(gene,
 #'
 #' @export
 go_diff_reg <- function(mergeset,
-                        design,
+                        diagnosis,
                         idtype,
                         entrezids = NULL) {
 
@@ -60,6 +60,8 @@ go_diff_reg <- function(mergeset,
     # map rownames to entrez-ids
     rownames(mergeset) <- entrezids
   }
+
+  design <- stats::model.matrix(~ diagnosis)
 
   # run limma analysis
   fit <- limma_fitting(mergeset, design)

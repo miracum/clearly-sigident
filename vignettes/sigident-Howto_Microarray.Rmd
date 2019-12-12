@@ -143,7 +143,7 @@ A heatmap based on the selected DEGs is created and clear differences regarding 
 fdr <- 0.05
 
 genes <- sigident::identify_degs(mergeset = mergeset,
-                                 design = design,
+                                 diagnosis = diagnosis,
                                  q_value = fdr)
 
 # heatmap creation
@@ -176,7 +176,7 @@ knitr::kable(head(deg_info))
 
 ```{r}
 deg_results <- sigident::limma_top_table(mergeset = mergeset,
-                                         design = design,
+                                         diagnosis = diagnosis,
                                          q_value = fdr)
 data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
@@ -246,7 +246,7 @@ The following test for over-representation is based on the same method, but also
 enr_fitlm <- sigident::go_diff_reg(
   mergeset = mergeset,
   idtype = idtype,
-  design = design,
+  diagnosis = diagnosis,
   entrezids = mergedset@featureData@data$ENTREZ_GENE_ID
 )
 
@@ -1131,7 +1131,7 @@ In order to simplify the workflow described above, we wrapped all these function
 
 ## Preprocessing: 
 
-The preprocessing of the data needs to be conform with the above described approach. Here, all necessary objects are created, including `mergeset`, `mergedset`, `batch`, `diagnosis`, `design`.
+The preprocessing of the data needs to be conform with the above described approach. Here, all necessary objects are created, including `mergeset`, `mergedset`, `batch` and `diagnosis`.
 
 ### Define Variables
 
@@ -1172,7 +1172,7 @@ genes <- sigident::sigidentDEG(
   mergeset = mergeset,
   mergedset = mergedset,
   sample_metadata = sample_metadata,
-  design = design,
+  diagnosis = diagnosis,
   idtype = idtype,
   fdr = fdr,
   plotdir = plotdir,
@@ -1187,7 +1187,7 @@ sigident::sigidentEnrichment(
   mergeset = mergeset,
   mergedset = mergedset,
   idtype = idtype,
-  design = design,
+  diagnosis = diagnosis,
   species = species,
   org_db = OrgDb,
   organism = organism,

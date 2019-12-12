@@ -9,7 +9,7 @@ sigidentDEG(
   mergeset,
   mergedset,
   sample_metadata,
-  design,
+  diagnosis,
   idtype,
   fdr,
   plotdir = "./plots/",
@@ -26,8 +26,8 @@ columns = samples).}
 \item{sample_metadata}{A data frame. The data frame holding the
 sample metadata.}
 
-\item{design}{A object. The output of the function
-`sigident.preproc::geo_create_diagnosisdesignbatch()`.}
+\item{diagnosis}{A vector of integers, holding the binary outcome variable
+(0 = "Control", 1 = "Target").}
 
 \item{idtype}{A character string. The type of ID used to name the
 genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
