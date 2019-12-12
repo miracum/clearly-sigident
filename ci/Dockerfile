@@ -13,6 +13,7 @@ RUN apt-get install -y --no-install-recommends \
 ADD ${PKG_NAME} ${PKG_NAME}
 
 # install package dependencies
+RUN R -e "devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = "development", upgrade = "always")
 RUN R -e "devtools::install_dev_deps(pkg = '${PKG_NAME}', upgrade = 'always')"
 
 # clean up
