@@ -19,7 +19,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.0.3.9000")
+my_desc$set_version("0.0.3.9001")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -40,7 +40,7 @@ my_desc$set("biocViews" = "")
 my_desc$write(file = "DESCRIPTION")
 
 # License
-usethis::use_gpl3_license(name="Universitätsklinikum Erlangen")
+#usethis::use_gpl3_license(name="Universitätsklinikum Erlangen")
 
 
 # add Imports and Depends
@@ -103,8 +103,6 @@ usethis::use_package("lintr", type = "Suggests")
 # Development package
 mytag <- "development"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = mytag, upgrade = "always")
-usethis::use_dev_package("sigident.preproc", type = "Imports")
-#usethis::use_dev_package("DQAstats", type = "Imports")
 # https://cran.r-project.org/web/packages/devtools/vignettes/dependencies.html
 desc::desc_set_remotes(c(
   paste0(

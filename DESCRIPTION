@@ -1,6 +1,6 @@
 Package: sigident
 Title: Signature Analyses in Genomic Expression Sets
-Version: 0.0.3.9000
+Version: 0.0.3.9001
 Authors@R: 
     c(person(given = "Lorenz A.",
              family = "Kapsner",
@@ -23,7 +23,7 @@ URL: https://gitlab.miracum.org/clearly/sigident
 BugReports: https://gitlab.miracum.org/clearly/sigident/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
-Date: 2019-12-12
+Date: 2020-01-20
 biocViews: 
 Imports: 
     data.table,
@@ -53,8 +53,7 @@ Imports:
     org.Hs.eg.db,
     clusterProfiler,
     pathfindR,
-    pathview,
-    sigident.preproc (>= 0.0.1.9002)
+    pathview
 Suggests: 
     testthat,
     devtools,
