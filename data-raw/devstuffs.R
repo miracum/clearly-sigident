@@ -81,6 +81,7 @@ usethis::use_package("survival", type="Imports")
 usethis::use_package("plyr", type="Imports")
 usethis::use_package("survminer", type="Imports")
 usethis::use_package("knitr", type="Imports")
+usethis::use_package("kknn", type="Imports")
 
 
 
