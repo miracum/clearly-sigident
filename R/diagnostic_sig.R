@@ -137,7 +137,7 @@ glm_prediction <- function(model,
 #'   of the function `create_training_test_split()`.
 #' @param type A character string. The algorihm used to perform calculations.
 #'   Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic",
-#'   "svm"}.
+#'   "svm", "knn"}.
 #'
 #' @param alpha A numeric between 0 and 1. The elastic net mixing parameter
 #'   passed to `glmnet::glmnet()`.
@@ -152,7 +152,7 @@ signature <- function(traininglist,
                       seed) {
 
   stopifnot(
-    type %in% c("elasticnet_grid", "lasso", "elastic", "svm"),
+    type %in% c("elasticnet_grid", "lasso", "elastic", "svm", "kknn"),
     is.numeric(nfolds),
     is.numeric(seed),
     is.list(traininglist)
@@ -162,6 +162,8 @@ signature <- function(traininglist,
     outlist <- glmnet_gridsearch(traininglist, seed)
   } else if (type == "svm") {
     outlist <- svm_classifier(traininglist, seed)
+  } else if (type == "kknn") {
+    outlist <- kknn_classifier(traininglist, seed)  
   } else {
     # use provided alpha only in elastic
     if (type == "lasso") {
