@@ -101,7 +101,8 @@ sigident.preproc::load_geo_data(
   datadir = datadir,
   plotdir = plotdir,
   idtype = idtype,
-  visualize_batches = FALSE
+  viz_batch_hist = F,
+  viz_batch_gpca = F
 ) 
 ```
 
