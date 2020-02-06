@@ -152,7 +152,7 @@ signature <- function(traininglist,
                       seed) {
 
   stopifnot(
-    type %in% c("elasticnet_grid", "lasso", "elastic", "svm", "kknn"),
+    type %in% c("elasticnet_grid", "lasso", "elastic", "svm", "knn", "random_forest"),
     is.numeric(nfolds),
     is.numeric(seed),
     is.list(traininglist)
@@ -162,8 +162,10 @@ signature <- function(traininglist,
     outlist <- glmnet_gridsearch(traininglist, seed)
   } else if (type == "svm") {
     outlist <- svm_classifier(traininglist, seed)
-  } else if (type == "kknn") {
-    outlist <- kknn_classifier(traininglist, seed)  
+  } else if (type == "knn") {
+    outlist <- kknn_classifier(traininglist, seed)
+  } else if (type == "random_forest") {
+    outlist <- random_forest(traininglist, seed)
   } else {
     # use provided alpha only in elastic
     if (type == "lasso") {

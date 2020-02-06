@@ -198,14 +198,15 @@ training_list <- sigident::create_training_test_split(diagnosis = diagnosisData,
                                                
 # KNN
 diagnostic_kknn <- sigident::signature(traininglist = training_list,
-                                         type = "kknn",
+                                         type = "knn",
                                          nfolds = nfolds,
                                          seed = seed)
-# filename <- paste0(plotdir, "CV_lasso.png")
-# sigident::plot_cvplot(cv_obj = diagnostic_lasso$fit_cv,
-#                         filename = filename)
 
-# knitr::include_graphics(filename)
+# Random Forest
+diagnostic_rf <- sigident::signature(traininglist = training_list,
+                                        type = "random_forest",
+                                        nfolds = nfolds,
+                                        seed = seed)
 
 ```
 

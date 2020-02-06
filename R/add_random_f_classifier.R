@@ -1,14 +1,16 @@
-kknn_classifier <- function(traininglist, seed) {
+random_forest <- function(traininglist, seed) {
   # initialize outlist
   outlist <- list()
 
-  train_kknn <- caret::trainControl(
+  train_rf <- caret::trainControl(
     method = "repeatedcv", number = 10,
-    repeats = 5, savePredictions = TRUE, search = "random"
+    repeats = 3
   )
 
   #TODO
-  library(kknn)
+  library(randomForest)
+
+  metric <- "Accuracy"
 
   # go parallel
   ncores <- parallel::detectCores()
@@ -18,11 +20,10 @@ kknn_classifier <- function(traininglist, seed) {
 
   outlist$model <- caret::train(
                x = traininglist$train$x,
-               y = as.factor(traininglist$train$y),
-               method = "kknn",
-               #family = "binomial",
-               #tuneGrid = gr_init$srchGrd,
-               trctrl = train_kknn,
+               y = traininglist$train$y,
+               method = "rf",
+               trControl = train_rf,
+               metric = metric,
                preProc = c("center", "scale"),
                tuneLength = 10,
                allowParallel = T)
@@ -31,13 +32,12 @@ kknn_classifier <- function(traininglist, seed) {
   gc()
 
   outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
+  outlist$predictons <- predict(outlist$model, traininglist$test$x)
+  outlist$confusion_matrix <- caret::confusionMatrix(
+   outlist$predictons, as.factor(traininglist$test$y)
+  )
+  #roc
 
-  outlist$pred <- predict(outlist$model, traininglist$test$x)
 
-
- outlist$confusion_kknn <- caret::confusionMatrix(
- outlist$pred, as.factor(traininglist$test$y)
- )
-
- return(outlist)
+  return(outlist)
 }
