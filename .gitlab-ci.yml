@@ -3,9 +3,7 @@
 stages:
   - dependencies
   - build
-  - test
   - deploy
-  - vignette
 
 variables:
   _R_CHECK_CRAN_INCOMING_: "false"
@@ -36,6 +34,9 @@ variables:
 
 default:
   image: ${CI_IMAGE_NAME}:${CI_IMAGE_TAG}
+  before_script:
+    - echo "options('repos' = 'https://ftp.fau.de/cran/')" >> /usr/local/lib/R/etc/Rprofile.site
+    - mkdir -p ci
 
 # https://gitlab.com/gitlab-org/gitlab/issues/22801
 build_base_image:
@@ -57,11 +58,12 @@ build_base_image:
     refs:
       - tags
 
-check_package:
+check:
   stage: build
-  allow_failure: true
+  allow_failure: true # necessary when having development-packages (in remotes-section of DESCRIPTION)
   script:
-    - R -e "devtools::check(pkg = '.', args = c('--no-tests'), build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
+    - R -e "devtools::install_dev_deps(pkg = '.', upgrade = 'always')"
+    - R -e "devtools::check(pkg = '.', args = c('--no-tests', '--no-vignettes'), build_args = c('--no-build-vignettes'), check_dir = '${CI_PROJECT_DIR}/ci')"
   artifacts:
     paths:
       - "${CI_PROJECT_DIR}/ci/*.Rcheck"
@@ -79,6 +81,7 @@ create_manual:
   stage: build
   allow_failure: true
   script:
+    - R -e "devtools::install_deps(pkg = '.', upgrade = 'always')"
     - R -e "devtools::build_manual(pkg = '.', path = '${CI_PROJECT_DIR}/ci')"
   artifacts:
     paths:
@@ -90,27 +93,12 @@ create_manual:
   only:
     refs:
       - master
-      - development
 
-build_source:
+build_source_and_binary:
   stage: build
   script:
+    - R -e "devtools::install_deps(pkg = '.', upgrade = 'always')"
     - R -e "devtools::build(pkg = '.', path = '${CI_PROJECT_DIR}/ci', binary = FALSE, vignettes = FALSE)"
-  artifacts:
-    paths:
-      - "${CI_PROJECT_DIR}/ci/*.tar.gz"
-    expire_in: 1 week
-  except:
-    refs:
-      - tags
-  only:
-    refs:
-      - master
-      - development
-
-build_binary:
-  stage: build
-  script:
     - R -e "devtools::build(pkg = '.', path = '${CI_PROJECT_DIR}/ci', binary = TRUE, vignettes = FALSE)"
   artifacts:
     paths:
@@ -122,31 +110,13 @@ build_binary:
   only:
     refs:
       - master
-      - development
 
 testing:
-  stage: test
+  stage: build
   allow_failure: true
   when: on_success
   script:
-    - R -e "install.packages('DT')"
-    - R -e "covr::gitlab(quiet = FALSE)"
-  artifacts:
-    paths:
-      - public
-  except:
-    refs:
-      - tags
-  only:
-    refs:
-      - master
-      - development
-
-testing:
-  stage: test
-  allow_failure: true
-  when: on_success
-  script:
+    - R -e "devtools::install_dev_deps(pkg = '.', upgrade = 'always')" # we only need dev_deps for the vignette and testing
     - R -e "devtools::test(pkg = '.')"
   except:
     refs:
@@ -156,36 +126,25 @@ testing:
       - master
       - development
 
-#check_errors:
-#  stage: check
-#  script:
-#    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes'))[['errors']], character(0))) stop('Check with Errors')"
-
-#check_warnings:
-#  stage: check
-#  script:
-#    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['warnings']], character(0))) stop('Check with Warnings')"
-
-#check_notes:
-#  stage: check
-#  script:
-#    - R -e "if (!identical(devtools::check(pkg = '.', document = FALSE, args = c('--no-tests', '--no-vignettes')))[['notes']], character(0))) stop('Check with Notes')"
+# To produce a code coverage report as a GitLab page see
+# https://about.gitlab.com/2016/11/03/publish-code-coverage-report-with-gitlab-pages/
 
 install:
   stage: deploy
   script:
-    - R -e "devtools::install(pkg = '.', upgrade = 'always')"
+    - R -e "devtools::install_deps(pkg = '.', upgrade = 'always')" # we only need dev_deps for the vignette and testing
+    - R -e "devtools::install(pkg = '.', upgrade = 'alway')"
   except:
     refs:
       - tags
   only:
     refs:
       - master
-      - development
 
-compile_vignette:
-  stage: vignette
+build_vignettes:
+  stage: deploy
   script:
+    - R -e "devtools::install_dev_deps(pkg = '.', upgrade = 'always')" # we only need dev_deps for the vignette and testing
     - R -e "devtools::build_vignettes(pkg = '.', clean = FALSE)"
   artifacts:
     paths:
@@ -194,11 +153,11 @@ compile_vignette:
       - "${CI_PROJECT_DIR}/doc"
     when: always
     expire_in: 1 week
-    expire_in: 1 month
   except:
     refs:
       - tags
   only:
     refs:
       - master
-      - development
+    changes:
+      - "vignettes/*.Rmd"
