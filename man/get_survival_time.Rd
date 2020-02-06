@@ -16,7 +16,8 @@ get_survival_time(
 \item{sample_metadata}{A data frame. The data frame holding the
 sample metadata.}
 
-\item{genes}{A object. The output of the function `identify_degs()`.}
+\item{genes}{A object. The output of the function
+`sigident.func::identify_degs()`}
 
 \item{idtype}{A character string. The type of ID used to name the
 genes. One of 'entrez' or 'affy' intended to use either entrez IDs or

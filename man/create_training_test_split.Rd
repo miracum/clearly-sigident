@@ -7,11 +7,12 @@
 create_training_test_split(diagnosis, mergeset, split = 0.8, seed = 111)
 }
 \arguments{
-\item{diagnosis}{A vector of integers, holding the binary outcome variable
-(0 = "Control", 1 = "Target").}
+\item{diagnosis}{An object. The output of the function
+`create_diagnosisdesignbatch()`.}
 
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
-columns = samples).}
+columns = samples). The output of the funtion
+`sigident.preproc::load_geo_data()`.}
 
 \item{split}{A numeric value between 0 and 1. The proportion of the data
 to be integrated into the training set for machine learning

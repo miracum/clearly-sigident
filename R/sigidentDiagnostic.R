@@ -13,7 +13,7 @@
 #'   to be integrated into the training set for machine learning
 #'   (default: 0.8).
 #'
-#' @inheritParams sigidentDEG
+#' @inheritParams sigidentPrognostic
 #'
 #'
 #' @export
@@ -37,7 +37,7 @@ sigidentDiagnostic <- function(mergeset,
   rv <- list()
 
   # store dirs
-  rv$plotdir <- clean_path_name(plotdir)
+  rv$plotdir <- sigident.preproc::clean_path_name(plotdir)
 
   # create output directories
   dir.create(rv$plotdir)

@@ -14,15 +14,10 @@ test_that(
     lintlist <- list(
       "R" = list(
         "compare_diagnostic_models.R" = NULL,
-        "DEG.R" = NULL,
         "diagnostic_sig.R" = NULL,
-        "enrichment.R" = NULL,
-        "otherfunctions.R" = NULL,
         "plotting.R" = NULL,
         "prognostic_sig.R" = NULL,
-        "sigidentDEG.R" = "snake_case",
         "sigidentDiagnostic.R" = "snake_case",
-        "sigidentEnrichment.R" = "snake_case",
         "sigidentPrognostic.R" = "snake_case",
         "utils.R" = NULL
       ),

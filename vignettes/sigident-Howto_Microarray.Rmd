@@ -27,6 +27,13 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.preproc.git",
                       upgrade = "always")
 ```
 
+## Install sigident.func package
+
+```{r eval = FALSE}
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.func.git",
+                      upgrade = "always")
+```
+
 ## Install sigident package
 
 ```{r eval = FALSE}
@@ -37,13 +44,14 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-For a detailed background on the following steps please view the `sigident.preproc` package's vignette.
+For a detailed background and description of the following steps please view the `sigident.preproc` package's vignette.
 
 ## Initialization of important variables
 
 ```{r setup}
 library(sigident)
 library(sigident.preproc)
+library(sigident.func)
 library(knitr)
 
 # initialize filePath:
@@ -101,19 +109,24 @@ sigident.preproc::load_geo_data(
   datadir = datadir,
   plotdir = plotdir,
   idtype = idtype,
-  visualize_batches = FALSE
+  viz_batch_boxp = F,
+  viz_batch_gpca = F
 ) 
 ```
 
 ### Visualize batch effect
 
-By using the argument `visualize_batches = TRUE`, one can visualize batch effects before and after correction with two methods: boxplots and gPCA and store them in the directory specified in `plotdir`. For further details please view the package vignette of the `sigident.preproc` R package. 
+By using the argument `viz_batch_boxp = TRUE` and `viz_batch_gpca = TRUE`, one can visualize batch effects before and after correction with two methods: boxplots and gPCA and store them in the directory specified in `plotdir`. For further details please view the package vignette of the `sigident.preproc` R package. 
 Due to the ressource intensive calculations of the plots, this argument is set to FALSE here. 
 
 # Preparations for utilizing the sigident package 
 
 Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. 
 `idtype` and `plotdir` have already been defined during the preprocessing steps.
+
+In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
+
+For a detailed background on the following steps please view the `sigident.preproc` package's vignette.
 
 ```{r}
 # general
@@ -135,37 +148,34 @@ nfolds <- 10
 
 # DEG analysis 
 
-A common task preceeding expression data analysis is to perform statistical analysis to discover quantitative changes in expression levels between experimental groups. For this reason we here offer the identification of differentially expressed genes (DEGs) based on the [limma](https://bioconductor.org/packages/release/bioc/html/limma.html) package. In order correct for multiple testing we considered the p-value adjustment by conducting the "BH" method, which controls the expected false discovery rate (FDR).  
-A heatmap based on the selected DEGs is created and clear differences regarding the expression profiles between the groups ("Controls" [blue] and "Lung Cancer" [red]) can be recognized. 
+For a detailed background and description of the following steps please view the `sigident.func` package's vignette.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # define the false discovery rate here
 fdr <- 0.05
 
-genes <- sigident::identify_degs(mergeset = mergeset,
-                                 diagnosis = diagnosis,
-                                 q_value = fdr)
+genes <- sigident.func::identify_degs(mergeset = mergeset,
+                                      diagnosis = diagnosis,
+                                      q_value = fdr)
 
 # heatmap creation
 filename <- paste0(plotdir, "DEG_heatmap.png")
 # create colors for map
-ht_colors <- sigident::color_heatmap(sample_metadata = sample_metadata)
-sigident::plot_deg_heatmap(mergeset = mergeset,
-                           genes = genes,
-                           patientcolors = ht_colors,
-                           filename = filename)
+ht_colors <- sigident.func::color_heatmap(sample_metadata = sample_metadata)
+sigident.func::plot_deg_heatmap(mergeset = mergeset,
+                                genes = genes,
+                                patientcolors = ht_colors,
+                                filename = filename)
 ```
 
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
-Some investigations may have been finished at this point yielding the DEGs. We provide two tables containing annotations, like gene symbols (DEG_info.csv) and the results from the limma analysis including log2 fold changes and the adjusted p-values (DEG_results.csv). 
-
 ```{r}
-deg_info <- sigident::export_deg_annotations(mergedset = mergedset,
-                                             genes = genes,
-                                             idtype = idtype)
+deg_info <- sigident.func::export_deg_annotations(mergedset = mergedset,
+                                                  genes = genes,
+                                                  idtype = idtype)
 data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
 ```
 
@@ -175,9 +185,9 @@ knitr::kable(head(deg_info))
 ```
 
 ```{r}
-deg_results <- sigident::limma_top_table(mergeset = mergeset,
-                                         diagnosis = diagnosis,
-                                         q_value = fdr)
+deg_results <- sigident.func::limma_top_table(mergeset = mergeset,
+                                              diagnosis = diagnosis,
+                                              q_value = fdr)
 data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
 ```
 
@@ -187,7 +197,7 @@ knitr::kable(head(deg_results))
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-rm(deg_info, deg_results, studiesinfo, affinity.spline.coefs)
+rm(deg_info, deg_results, studiesinfo)
 gc()
 ```
 
@@ -196,7 +206,7 @@ gc()
 
 ## Gene enrichment
 
-A common investigation regarding differentially expressed genes analysis is the functional annotation of the DEGs. Furthermore, it is useful to find out if the DEGs are associated with biological processes or molecular functions. The functional analysis supports GO annotation from OrgDb object. 
+For a detailed background and description of the following steps please view the `sigident.func` package's vignette.
 
 ```{r}
 deg_entrez <- unique(mergedset@featureData@data$ENTREZ_GENE_ID)
@@ -205,17 +215,9 @@ deg_entrez <- deg_entrez[deg_entrez != ""]
 
 ## Test for over-representation 
 
-For the identification of enriched GO terms and KEGG pathways an over-representation analysis is performed based on linear models. As input the Entrez-IDs and the definition of the species are needed. `extract_go_terms` and `extract_kegg_terms` output tables containing the most significant top GO terms and KEGG terms respectively. In either case, rows are sorted by the minimum p-value with   
-- Term: GO term   
-- (Pathway: KEGG pathway)  
-- Ont: ontology that GO term belongs to    
-- N: number of genes in the GO term    
-- DE: number of genes in the input Entrez Gene IDs (deg_entrez)    
-- P.DE: p-value for over-representation of the GO term in the set   
-
 ```{r}
-enr_topgo <- sigident::extract_go_terms(gene = deg_entrez,
-                                        species = species)
+enr_topgo <- sigident.func::extract_go_terms(gene = deg_entrez,
+                                             species = species)
 data.table::fwrite(enr_topgo, paste0(csvdir, "Top_GO.csv"))
 ```
 ```{r}
@@ -224,8 +226,8 @@ knitr::kable(head(enr_topgo))
 ```
 
 ```{r}
-enr_topkegg <- sigident::extract_kegg_terms(gene = deg_entrez,
-                                            species = species)
+enr_topkegg <- sigident.func::extract_kegg_terms(gene = deg_entrez,
+                                                 species = species)
 data.table::fwrite(enr_topkegg, paste0(csvdir, "Top_KEGG.csv"))
 ```
 ```{r}
@@ -233,24 +235,15 @@ dim(enr_topkegg)
 knitr::kable(head(enr_topkegg))
 ```
 
-The following test for over-representation is based on the same method, but also taking into account for over expression and under expression in enriched terms with  
-- Term: GO term  
-- Ont: ontology that GO term belongs to  
-- N: number of genes in the GO term  
-- Up: number of up-regulated DEGs  
-- Down: number of down-regulated DEGs  
-- P.Up: p-value for over-representation of GO term in up-regulated genes  
-- P.Down: p-value for over-representation of GO term in down-regulated genes  
-
 ```{r}
-enr_fitlm <- sigident::go_diff_reg(
+enr_fitlm <- sigident.func::go_diff_reg(
   mergeset = mergeset,
   idtype = idtype,
   diagnosis = diagnosis,
   entrezids = mergedset@featureData@data$ENTREZ_GENE_ID
 )
 
-enr_fitlm_topgo <- sigident::extract_go_terms(
+enr_fitlm_topgo <- sigident.func::extract_go_terms(
   gene = enr_fitlm,
   species = species,
   fdr = 0.01
@@ -263,7 +256,7 @@ knitr::kable(head(enr_fitlm_topgo))
 ```
 
 ```{r}
-enr_fitlm_topkegg <- sigident::extract_kegg_terms(
+enr_fitlm_topkegg <- sigident.func::extract_kegg_terms(
   gene = enr_fitlm,
   species = species
 )
@@ -276,11 +269,8 @@ knitr::kable(head(enr_fitlm_topkegg))
 
 ## GO enrichment analysis
 
-GO enrichment analysis of a given set of genes (`deg_entrez`) with the defined organism is based on the fitted linear models of the object `enr_fitlm` as output of the `go_diff_reg` function.  
-`goEnrichmentAnalysis` provides the presentation of the desired KEGG pathway ID (in this case `hsa04151` - PI3K-Akt-Pathway) including under expressed (red) and over expressed (green) genes inside the pathway as png images in the folder named 'plots' (object 'plotdir'). 
-
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-enr_analysis <- sigident::go_enrichment_analysis(
+enr_analysis <- sigident.func::go_enrichment_analysis(
   gene = deg_entrez,
   org_db = OrgDb,
   organism = organism,
@@ -303,11 +293,9 @@ filename <- paste0(plotdir, "/", pathwayid, ".pathview.png")
 knitr::include_graphics(filename)
 ```
 
-Using `plot_enriched_barplot`, a bar plot is created depicting the enrichment scores (adj. p-value) as bar color and gene count as bar height. The parameter `type` controls whether to depict enriched GO terms or enriched KEGG terms. 
-
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_GO.png")
-sigident::plot_enriched_barplot(
+sigident.func::plot_enriched_barplot(
   enrichmentobj = enr_analysis$go,
   type = "GO",
   filename = filename
@@ -317,10 +305,9 @@ sigident::plot_enriched_barplot(
 knitr::include_graphics(filename)
 ```
 
-
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "Enriched_KEGG.png")
-sigident::plot_enriched_barplot(
+sigident.func::plot_enriched_barplot(
   enrichmentobj = enr_analysis$kegg,
   type = "KEGG",
   filename = filename
@@ -1174,10 +1161,10 @@ idtype = "affy"
 fdr <- 0.05
 ```
 
-## Run `sigidentDEG`-function
+## Run `sigident.func::sigidentDEG`-function
 
 ```{r eval = FALSE}
-genes <- sigident::sigidentDEG(
+genes <- sigident.func::sigidentDEG(
   mergeset = mergeset,
   mergedset = mergedset,
   sample_metadata = sample_metadata,
@@ -1189,10 +1176,10 @@ genes <- sigident::sigidentDEG(
 )
 ```
 
-## Run `sigidentEnrichment`-function
+## Run `sigident.func::sigidentEnrichment`-function
 
 ```{r eval = FALSE}
-sigident::sigidentEnrichment(
+sigident.func::sigidentEnrichment(
   mergeset = mergeset,
   mergedset = mergedset,
   idtype = idtype,
@@ -1268,38 +1255,19 @@ GSE30219_validation <- sigident::validate_diagnostic_signature(
 ### First, define meta information lists
 
 ```{r eval = FALSE}
-discoverystudies_w_timedata <- list(
-  "GSE19188" = list(
-    setid = 1,
-    timecol = "characteristics_ch1.2",
-    status = list(
-      statuscol = "characteristics_ch1.3",
-      levels = list(
-        alive = "status: alive",
-        deceased = "status: deceased",
-        na = "status: Not available")
-    ),
-    targetcolname = "characteristics_ch1",
-    controllevelname = "tissue type: healthy",
-    targetlevelname = "tissue type: tumor",
-    use_rawdata = TRUE)
-)
-
 validationstudiesinfo <- list(
   "GSE30219" = list(
     setid = 1,
     timecol = "characteristics_ch1.9",
     status = list(
       statuscol = "characteristics_ch1.8",
-      levels = list(
-        alive = "status: ALIVE",
-        deceased = "status: DEAD",
-        na = "status: NTL")
+      levels = list(alive = "status: ALIVE",
+                    deceased = "status: DEAD",
+                    na = "status: NTL")
     ),
     targetcolname = "source_name_ch1",
     controllevelname = "Non Tumoral Lung",
-    targetlevelname = "Lung Tumour"
-  ),
+    targetlevelname = "Lung Tumour"),
   
   "GSE50081" = list(
     setid = 1,
@@ -1312,7 +1280,16 @@ validationstudiesinfo <- list(
         na = NA)
     ),
     targetcolname = "characteristics_ch1.1",
-    targetlevelname = NULL,
+    targetlevelname = paste(
+      "histology: adenocarcinoma",
+      "histology: adenosquamous carcinoma",
+      "histology: large cell carcinoma",
+      "histology: NSClarge cell carcinoma-mixed",
+      "histology: NSCLC-favor adenocarcinoma",
+      "histology: squamous cell carcinoma",
+      "histology: squamous cell carcinoma X2",
+      sep = "|||"
+    ),
     controllevelname = NULL)
 )
 # if targetlevelname == NULL, the expression set will not be filtered further
@@ -1353,7 +1330,3 @@ filename <- paste0(plotdir, "GSE50081_Prognostic_Kaplan-Meier_Plot.png")
 ```{r eval = FALSE}
 knitr::include_graphics(filename)
 ```
-
-# References 
-
-[1] W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.

@@ -20,7 +20,8 @@ sigidentPrognostic(
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
-columns = samples).}
+columns = samples). The output of the funtion
+`sigident.preproc::load_geo_data()`.}
 
 \item{sample_metadata}{A data frame. The data frame holding the
 sample metadata.}
@@ -30,7 +31,8 @@ genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
 affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
 are being removed!}
 
-\item{genes}{A object. The output of the function `identify_degs()`.}
+\item{genes}{A object. The output of the function
+`sigident.func::identify_degs()`}
 
 \item{discoverystudies_w_timedata}{A list that contains specifications
 on the study/studies that contain(s) survival time information.}

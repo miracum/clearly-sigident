@@ -7,8 +7,7 @@
 #' @param datadir A character string. Path to the data-folder inside the
 #'   metadata folder.
 #'
-#' @inheritParams sigidentDEG
-#' @inheritParams plot_deg_heatmap
+#' @inheritParams sigidentPrognostic
 #'
 #' @export
 get_survival_time <- function(sample_metadata,
@@ -134,7 +133,7 @@ get_survival_time <- function(sample_metadata,
 #'
 #' @param survtable A data.frame. Output of the function `get_survival_time()`.
 #'
-#' @inheritParams plot_deg_heatmap
+#' @inheritParams sigidentPrognostic
 #'
 #' @export
 univ_cox <- function(survtable, genes) {
@@ -232,7 +231,7 @@ exprs_vector <- function(deg) {
 #'   used to train the classifier.
 #' @param sig_cov A data.frame. Output of the function `univ_cox()`.
 #'
-#' @inheritParams sigidentDEG
+#' @inheritParams sigidentPrognostic
 #'
 #' @export
 generate_expression_pattern <- function(classifier_studies,
@@ -337,7 +336,6 @@ expression_pattern <- function(mergeset, ids, tumor, control) {
 #' @param pattern_com A data.frame. The output of the function
 #'   `generate_expression_pattern()`.
 #'
-#' @inheritParams sigidentDEG
 #' @inheritParams get_survival_time
 #'
 #' @export

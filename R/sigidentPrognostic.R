@@ -2,9 +2,25 @@
 #'   Datasets Derived from MicroArrays
 #'
 #' @description One function to perform prognostic signature analysis.
+#' @param sample_metadata A data frame. The data frame holding the
+#'   sample metadata.
+#' @param idtype A character string. The type of ID used to name the
+#'   genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
+#'   affy IDs. Caution: when using entrez IDs, missing and duplicated IDs
+#'   are being removed!
+#' @param datadir A character string. Path to the data-folder inside the
+#'   metadata folder.
+#' @param mergeset A matrix of merged expression sets (rows = genes,
+#'   columns = samples). The output of the funtion
+#'   `sigident.preproc::load_geo_data()`.
+#' @param genes A object. The output of the function
+#'   `sigident.func::identify_degs()`
+#' @param csvdir A character string. Path to the folder to store output
+#'   tables. Default: "./tables/".
+#' @param plotdir A character string. Path to the folder to store resulting
+#'   plots. Default: "./plots/".
 #'
 #' @inheritParams get_survival_time
-#' @inheritParams sigidentDEG
 #' @inheritParams generate_expression_pattern
 #' @inheritParams prognostic_classifier
 #'
@@ -52,9 +68,9 @@ sigidentPrognostic <- function(mergeset,
   rv$genes <- genes
 
   # store dirs
-  rv$plotdir <- clean_path_name(plotdir)
-  rv$csvdir <- clean_path_name(csvdir)
-  rv$datadir <- clean_path_name(datadir)
+  rv$plotdir <- sigident.preproc::clean_path_name(plotdir)
+  rv$csvdir <- sigident.preproc::clean_path_name(csvdir)
+  rv$datadir <- sigident.preproc::clean_path_name(datadir)
 
   # create output directories
   dir.create(rv$plotdir)

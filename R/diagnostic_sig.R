@@ -2,7 +2,7 @@
 #'
 #' @description Helper function to split data into training and test set
 #'
-#' @inheritParams sigidentDEG
+#' @inheritParams sigidentPrognostic
 #' @inheritParams sigidentDiagnostic
 #'
 #' @export
@@ -158,7 +158,7 @@ signature <- function(traininglist,
   )
 
   if (type == "elasitnet_grid") {
-    outlist <- glmnet_gridsearch(traininglist, seed)
+    outlist <- glmnet_gridsearch(traininglist, seed, nfolds)
   } else {
     # use provided alpha only in elastic
     if (type == "lasso") {
@@ -234,29 +234,27 @@ signature <- function(traininglist,
 }
 
 
-init_grid_search <- function() {
+
+glmnet_gridsearch <- function(traininglist, seed, nfolds) {
+  # initialize outlist
+  outlist <- list()
+
+
+  # set up search grid for alpha and lambda parameters
+  # initialize gridserach parameters
   # set up alpha and lambda grid to search for pair that minimizes CV erros
   lambda_grid <- 10 ^ seq(0, -4, length = 100)
   alpha_grid <- seq(0.1, 1, length = 10)
 
   # set up cross validation method for train function
   trn_ctrl <- caret::trainControl(method = "repeatedcv",
-                                  number = 10)
+                                  repeats = 5,
+                                  number = nfolds)
 
   srch_grd <- expand.grid(.alpha = alpha_grid,
                           .lambda = lambda_grid)
 
-  # set up search grid for alpha and lambda parameters
-  return(list(srchGrd = srch_grd, trnCtrl = trn_ctrl))
-}
-
-
-glmnet_gridsearch <- function(traininglist, seed) {
-  # initialize outlist
-  outlist <- list()
-
-  # initialize gridserach parameters
-  gr_init <- init_grid_search()
+  gr_init <- list(srchGrd = srch_grd, trnCtrl = trn_ctrl)
 
   # go parallel
   ncores <- parallel::detectCores()
@@ -309,7 +307,7 @@ glmnet_gridsearch <- function(traininglist, seed) {
 #'   model to corresponding IDs.
 #'
 #' @inheritParams plot_grid_model_plot
-#' @inheritParams sigidentDEG
+#' @inheritParams sigidentPrognostic
 #'
 #' @export
 gene_map_sig <- function(mergeset, model) {
@@ -329,11 +327,8 @@ gene_map_sig <- function(mergeset, model) {
 #'   study used for validation of the diagnostic signature.
 #' @param models A list of prediction models. Usually the output of the
 #'   function `sigidentDiagnostic`.
-#' @param datadir A character string. Path to the data-folder inside the
-#'   metadata folder.
 #'
-#' @inheritParams sigidentDEG
-#' @inheritParams plot_deg_heatmap
+#' @inheritParams sigidentPrognostic
 #'
 #' @export
 validate_diagnostic_signature <- function(validationstudylist,

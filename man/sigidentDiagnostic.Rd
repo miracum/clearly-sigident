@@ -16,7 +16,8 @@ sigidentDiagnostic(
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
-columns = samples).}
+columns = samples). The output of the funtion
+`sigident.preproc::load_geo_data()`.}
 
 \item{diagnosis}{An object. The output of the function
 `create_diagnosisdesignbatch()`.}

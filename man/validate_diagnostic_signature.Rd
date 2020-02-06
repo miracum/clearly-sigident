@@ -19,7 +19,8 @@ study used for validation of the diagnostic signature.}
 \item{models}{A list of prediction models. Usually the output of the
 function `sigidentDiagnostic`.}
 
-\item{genes}{A object. The output of the function `identify_degs()`.}
+\item{genes}{A object. The output of the function
+`sigident.func::identify_degs()`}
 
 \item{idtype}{A character string. The type of ID used to name the
 genes. One of 'entrez' or 'affy' intended to use either entrez IDs or
