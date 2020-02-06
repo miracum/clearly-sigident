@@ -155,17 +155,18 @@ diagnostic_svm <- sigident::signature(traininglist = training_list,
 
 ```{r}
 # Create training list
-training_list <- sigident::create_training_test_split(
-  diagnosis = diagnosis,
-  mergeset = mergeset,
-  split = split,
-  seed = seed
-)
-                                               
+# training_list <- sigident::create_training_test_split(
+#   diagnosis = diagnosis,
+#   mergeset = mergeset,
+#   split = split,
+#   seed = seed
+# )
+
+
 # KKNN
 diagnostic_kknn <- sigident::signature(
   traininglist = training_list,
-  type = "kknn",
+  type = "knn",
   nfolds = nfolds,
   seed = seed
 )

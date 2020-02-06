@@ -12,7 +12,7 @@ of the function `create_training_test_split()`.}
 
 \item{type}{A character string. The algorihm used to perform calculations.
 Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic",
-"svm"}.}
+"svm", "knn"}.}
 
 \item{alpha}{A numeric between 0 and 1. The elastic net mixing parameter
 passed to `glmnet::glmnet()`.}
