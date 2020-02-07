@@ -98,6 +98,7 @@ devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.func", 
 desc::desc_set_remotes(c(
   paste0(
     "url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/", mytag, "/clearly/sigident.preproc-", mytag, ".zip"),
+  # sigident.func is only required for the vignettes (therefore a "suggests"-package)
   paste0(
     "url::https://gitlab.miracum.org/clearly/sigident.func/-/archive/", mytag2, "/clearly/sigident.func-", mytag2, ".zip")
 ),

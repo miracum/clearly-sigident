@@ -47,7 +47,7 @@ get_survival_time <- function(sample_metadata,
     use_raw <- ifelse(
       is.null(discoverystudies_w_timedata[[st]]$use_rawdata),
       FALSE,
-      TRUE
+      discoverystudies_w_timedata[[st]]$use_rawdata
     )
 
     eset <- tryCatch(
@@ -356,7 +356,7 @@ prognostic_classifier <- function(pattern_com,
     use_raw <- ifelse(
       is.null(validationstudiesinfo[[st]]$use_rawdata),
       FALSE,
-      TRUE
+      validationstudiesinfo[[st]]$use_rawdata
     )
 
     eset <- tryCatch(

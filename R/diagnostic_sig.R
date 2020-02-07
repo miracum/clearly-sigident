@@ -319,7 +319,7 @@ gene_map_sig <- function(mergeset, model) {
   return(as.data.frame(x = cbind("ID" = id[index])))
 }
 
-#' @title validate_diagnostic_signature
+#' @title validate_diagnostic_signatures
 #'
 #' @description Helper function to validate diagnostic signatures
 #'
@@ -331,18 +331,13 @@ gene_map_sig <- function(mergeset, model) {
 #' @inheritParams sigidentPrognostic
 #'
 #' @export
-validate_diagnostic_signature <- function(validationstudylist,
+validate_diagnostic_signatures <- function(validationstudylist,
                                           models,
                                           genes,
                                           idtype,
                                           datadir) {
   stopifnot(
-    is.list(validationstudylist),
-    is.character(validationstudylist$studyname),
-    is.character(validationstudylist$targetcolname),
-    is.character(validationstudylist$targetlevelname),
-    is.character(validationstudylist$controllevelname),
-    is.numeric(validationstudylist$setid)
+    is.list(validationstudylist)
   )
 
   targetcol <- "target"
@@ -351,36 +346,46 @@ validate_diagnostic_signature <- function(validationstudylist,
 
   outlist <- list()
 
+  for (st in names(validationstudylist)) {
+
+
+    stopifnot(
+      is.character(validationstudylist[[st]]$targetcolname),
+      is.character(validationstudylist[[st]]$targetlevelname),
+      is.character(validationstudylist[[st]]$controllevelname),
+      is.numeric(validationstudylist[[st]]$setid)
+    )
+
   # setd use_raw, if not provided with function arguments
   use_raw <- ifelse(
-    is.null(validationstudylist$use_rawdata),
+    is.null(validationstudylist[[st]]$use_rawdata),
     FALSE,
-    TRUE
+    validationstudylist[[st]]$use_rawdata
   )
 
   eset <- tryCatch(
     expr = {
-      eset <- eval(parse(text = validationstudylist$studyname),
+      eset <- eval(parse(text = st),
                    envir = 1L)
       cat(paste0("\nLoaded ",
-                 validationstudylist$studyname,
+                 st,
                  " from .Globalenv...\n"))
       eset
     }, error = function(e) {
       eset <- sigident.preproc::geo_load_eset(
-        name = validationstudylist$studyname,
+        name = st,
         datadir = datadir,
-        targetcolname = validationstudylist$targetcolname,
+        targetcolname = validationstudylist[[st]]$targetcolname,
         targetcol = targetcol,
         targetname = targetname,
         controlname = controlname,
-        targetlevelname = validationstudylist$targetlevelname,
-        controllevelname = validationstudylist$controllevelname,
+        targetlevelname = validationstudylist[[st]]$targetlevelname,
+        controllevelname = validationstudylist[[st]]$controllevelname,
         use_rawdata = use_raw,
-        setid = validationstudylist$setid
+        setid = validationstudylist[[st]]$setid
       )
       cat(paste0("\nLoaded ",
-                 validationstudylist$studyname,
+                 st,
                  " from URL\n"))
       eset
     }, finally = function(f) {
@@ -426,12 +431,14 @@ validate_diagnostic_signature <- function(validationstudylist,
         roc <- calc_roc(test_y = diagnosis,
                         prediction = predicted)
 
-        outlist[[i]][[j]] <-
-          list(predicted = predicted,
-               confmat = confmat,
-               roc = roc)
+        outlist[[st]][[i]][[j]] <- list(
+          predicted = predicted,
+          confmat = confmat,
+          roc = roc
+        )
       }
     }
+  }
   }
   return(outlist)
 }

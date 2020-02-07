@@ -606,29 +606,45 @@ gc()
 
 ## Validation of diagnostic signatures 
 
-The validation of diagnostic signatures is conducted using expression data of the studies "GSE30219", "GSE33356" and "GSE102287". We therefore need to create a list, holding meta information about the respective studies. 
+The validation of diagnostic signatures is conducted using the independent expression datasets of the studies "GSE30219", "GSE33356" and "GSE102287". We therefore need to create a list, holding meta information about the respective studies. 
 
-All models can be provided via the argument 'model' to the function `validate_diagnostic_signature` using the previously created list `diagnostic_models`.
+You have to create a list that contains specifications of the validation studeis. The object must be named. The list structure is as follows:  
+* `studyname`: the GEO id of the validation study  
+  + `setid`: the index of the provided GEO set to be used    
+  + `targetcolname`: the name of the phenoData column containing the target-variable  
+  + `controllevelname`: the level name of the controls of the column, specified in `targetcolname`  
+  + `targetlevelname`: the level name of the subjects of interest in `targetcolname` 
 
-You have to create a list for each validation data that contains specifications of the validation study. The object must be named The list structure is as follows:  
-- `studyname`: the GEO id of the validation study  
-- `setid`: the index of the provided GEO set to be used    
-- `targetcolname`: the name of the phenoData column containing the target-variable
-- `controllevelname`: the level name of the controls of the column, specified in `targetcolname`
-- `targetlevelname`: the level name of the subjects of interest in `targetcolname`
-
-### GSE302019 
 
 ```{r}
-validationstudylist <- list(studyname = "GSE30219",
-                            setid = 1, 
-                            targetcolname = "source_name_ch1",
-                            controllevelname = "Non Tumoral Lung",
-                            targetlevelname = "Lung Tumour")
+validationstudylist <- list(
+  "GSE30219" = list(
+    setid = 1, 
+    targetcolname = "source_name_ch1",
+    controllevelname = "Non Tumoral Lung",
+    targetlevelname = "Lung Tumour"
+  ),
+  "GSE33356" = list(
+    setid = 1, 
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue: paired normal adjacent",
+    targetlevelname = "tissue: lung cancer"
+  ),
+  "GSE102287" = list(
+    setid = 2, 
+    targetcolname = "characteristics_ch1.6",
+    controllevelname = "tumor_normal status: N",
+    targetlevelname = "tumor_normal status: T"
+  )
+)
 ```
 
+All models can be provided via the argument 'model' to the function `sigident::validate_diagnostic_signatures` using the previously created list `diagnostic_models`.
+
+To perform the validation of the diagnostic signatures, simply run the function `sigident::validate_diagnostic_signatures` with the specified `validationstudylist`.
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-GSE30219_validation <- sigident::validate_diagnostic_signature(
+validation_results <- sigident::validate_diagnostic_signatures(
   validationstudylist = validationstudylist,
   models = diagnostic_models,
   genes = genes,
@@ -637,16 +653,18 @@ GSE30219_validation <- sigident::validate_diagnostic_signature(
 )
 ```
 
+### GSE302019 
+
 #### Lasso (min) 
 
 ```{r}
-GSE30219_validation$lasso$min$confmat
+validation_results[["GSE30219"]]$lasso$min$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE30219_lasso_min.png")
-sigident::plot_rocplot(roc = GSE30219_validation$lasso$min$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$lasso$min$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -656,13 +674,13 @@ knitr::include_graphics(filename)
 #### Lasso (1se) 
 
 ```{r}
-GSE30219_validation$lasso[["1se"]]$confmat
+validation_results[["GSE30219"]]$lasso[["1se"]]$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE30219_lasso_1se.png")
-sigident::plot_rocplot(roc = GSE30219_validation$lasso[["1se"]]$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$lasso[["1se"]]$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -672,13 +690,13 @@ knitr::include_graphics(filename)
 #### Elastic (min) 
 
 ```{r}
-GSE30219_validation$elasticnet$min$confmat
+validation_results[["GSE30219"]]$elasticnet$min$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_min.png")
-sigident::plot_rocplot(roc = GSE30219_validation$elasticnet$min$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$elasticnet$min$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -688,13 +706,13 @@ knitr::include_graphics(filename)
 #### Elastic (1se) 
 
 ```{r}
-GSE30219_validation$elasticnet[["1se"]]$confmat
+validation_results[["GSE30219"]]$elasticnet[["1se"]]$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_1se.png")
-sigident::plot_rocplot(roc = GSE30219_validation$elasticnet[["1se"]]$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$elasticnet[["1se"]]$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -702,40 +720,22 @@ knitr::include_graphics(filename)
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-rm(GSE30219_validation)
+validation_results[["GSE30219"]] <- NULL
 gc()
 ```
 
 ### GSE33356 
 
-```{r}
-validationstudylist <- list(studyname = "GSE33356",
-                            setid = 1, 
-                            targetcolname = "characteristics_ch1",
-                            controllevelname = "tissue: paired normal adjacent",
-                            targetlevelname = "tissue: lung cancer")
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-GSE33356_validation <- sigident::validate_diagnostic_signature(
-  validationstudylist = validationstudylist,
-  models = diagnostic_models,
-  genes = genes,
-  idtype = idtype,
-  datadir = datadir
-)
-```
-
 #### Lasso (min) 
 
 ```{r}
-GSE33356_validation$lasso$min$confmat
+validation_results[["GSE33356"]]$lasso$min$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE33356_lasso_min.png")
-sigident::plot_rocplot(roc = GSE33356_validation$lasso$min$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$lasso$min$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -745,13 +745,13 @@ knitr::include_graphics(filename)
 #### Lasso (1se) 
 
 ```{r}
-GSE33356_validation$lasso[["1se"]]$confmat
+validation_results[["GSE33356"]]$lasso[["1se"]]$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE33356_lasso_1se.png")
-sigident::plot_rocplot(roc = GSE33356_validation$lasso[["1se"]]$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$lasso[["1se"]]$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -761,13 +761,13 @@ knitr::include_graphics(filename)
 #### Elastic (min) 
 
 ```{r}
-GSE33356_validation$elasticnet$min$confmat
+validation_results[["GSE33356"]]$elasticnet$min$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_min.png")
-sigident::plot_rocplot(roc = GSE33356_validation$elasticnet$min$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$elasticnet$min$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -777,13 +777,13 @@ knitr::include_graphics(filename)
 #### Elastic (1se) 
 
 ```{r}
-GSE33356_validation$elasticnet[["1se"]]$confmat
+validation_results[["GSE33356"]]$elasticnet[["1se"]]$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_1se.png")
-sigident::plot_rocplot(roc = GSE33356_validation$elasticnet[["1se"]]$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$elasticnet[["1se"]]$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -791,40 +791,22 @@ knitr::include_graphics(filename)
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-rm(GSE33356_validation)
+validation_results[["GSE33356"]] <- NULL
 gc()
 ```
 
 ### GSE102287 
 
-```{r}
-validationstudylist <- list(studyname = "GSE102287",
-                            setid = 2, 
-                            targetcolname = "characteristics_ch1.6",
-                            controllevelname = "tumor_normal status: N",
-                            targetlevelname = "tumor_normal status: T")
-```
-
-```{r}
-GSE102287_validation <- sigident::validate_diagnostic_signature(
-  validationstudylist = validationstudylist,
-  models = diagnostic_models,
-  genes = genes,
-  idtype = idtype,
-  datadir = datadir
-)
-```
-
 #### Lasso (min) 
 
 ```{r}
-GSE102287_validation$lasso$min$confmat
+validation_results[["GSE102287"]]$lasso$min$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_lasso_min.png")
-sigident::plot_rocplot(roc = GSE102287_validation$lasso$min$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$lasso$min$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -834,13 +816,13 @@ knitr::include_graphics(filename)
 #### Lasso (1se) 
 
 ```{r}
-GSE102287_validation$lasso[["1se"]]$confmat
+validation_results[["GSE102287"]]$lasso[["1se"]]$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_lasso_1se.png")
-sigident::plot_rocplot(roc = GSE102287_validation$lasso[["1se"]]$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$lasso[["1se"]]$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -850,13 +832,13 @@ knitr::include_graphics(filename)
 #### Elastic (min) 
 
 ```{r}
-GSE102287_validation$elasticnet$min$confmat
+validation_results[["GSE102287"]]$elasticnet$min$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_min.png")
-sigident::plot_rocplot(roc = GSE102287_validation$elasticnet$min$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$elasticnet$min$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -866,13 +848,13 @@ knitr::include_graphics(filename)
 #### Elastic (1se) 
 
 ```{r}
-GSE102287_validation$elasticnet[["1se"]]$confmat
+validation_results[["GSE102287"]]$elasticnet[["1se"]]$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_1se.png")
-sigident::plot_rocplot(roc = GSE102287_validation$elasticnet[["1se"]]$roc,
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$elasticnet[["1se"]]$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -880,8 +862,8 @@ knitr::include_graphics(filename)
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-rm(GSE102287_validation, validationstudylist, diagnostic_models,
-   GSE102287, GSE33356)
+validation_results[["GSE102287"]] <- NULL
+rm(validationstudylist, diagnostic_models, GSE102287, GSE33356)
 gc()
 ```
 
@@ -1228,20 +1210,33 @@ knitr::kable(
 
 ### Validation of the diagnostic signatures 
 
-Some users may validate the resulting models using new data sets. This can be conducted running the function `validate_diagnostic_signature`. First, a list containing meta information on the validation study must be created.
+Some users may validate the resulting models using new independent data sets. This can be conducted running the function `validate_diagnostic_signatures`. First, a list containing meta information on the validation study must be created.
 
 ```{r eval = FALSE}
 validationstudylist <- list(
-  studyname = "GSE30219",
-  setid = 1, 
-  targetcolname = "source_name_ch1",
-  controllevelname = "Non Tumoral Lung",
-  targetlevelname = "Lung Tumour"
+  "GSE30219" = list(
+    setid = 1, 
+    targetcolname = "source_name_ch1",
+    controllevelname = "Non Tumoral Lung",
+    targetlevelname = "Lung Tumour"
+  ),
+  "GSE33356" = list(
+    setid = 1, 
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue: paired normal adjacent",
+    targetlevelname = "tissue: lung cancer"
+  ),
+  "GSE102287" = list(
+    setid = 2, 
+    targetcolname = "characteristics_ch1.6",
+    controllevelname = "tumor_normal status: N",
+    targetlevelname = "tumor_normal status: T"
+  )
 )
 ```
 
-```{r eval = FALSE}
-GSE30219_validation <- sigident::validate_diagnostic_signature(
+```{r eval=FALSE}
+validation_results <- sigident::validate_diagnostic_signatures(
   validationstudylist = validationstudylist,
   models = diagnostic_models,
   genes = genes,
