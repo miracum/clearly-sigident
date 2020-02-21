@@ -90,9 +90,9 @@ usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
 
 # Development package
-mytag <- "v0.0.2"
+mytag <- "development"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = mytag, upgrade = "always")
-mytag2 <- "v0.0.1"
+mytag2 <- "master"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.func", ref = mytag2, upgrade = "always")
 # https://cran.r-project.org/web/packages/devtools/vignettes/dependencies.html
 desc::desc_set_remotes(c(
