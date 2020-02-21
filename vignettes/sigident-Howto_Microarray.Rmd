@@ -873,7 +873,7 @@ gc()
 
 For the calculation of a prognostic signature it is first required to transform the phenoData containing the relevant survival data. In our example, only the study GSE19188 contains information on a subjects survival.  
 In order to make the subsequent analyses possible, the list `discoverystudies_w_timedata`, containing metainformation about the validation study needs to be created. This nested list needs to contain the following elements:  
-- the studyname, which is the key for a list containing  
+* the studyname, which is the key for a list containing  
   + `setid`: the index of the provided GEO set to be used   
   + `timecol`: the phenoData columm name of the survival time  
   + `status`: a list, containing the elements `statuscol` (name of phenoData column containing the survival status), `levels` (a list containing the originally used level-names of `statuscol`, namely `alive`, `deceased`, `na`)  
