@@ -107,6 +107,66 @@ sigidentDiagnostic <- function(mergeset,
     filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png")
   )
 
+  
+  # SVM regression
+  rv$diagnostic_svm <- signature(
+    traininglist = rv$training_list,
+    type = "svm",
+    nfolds = rv$nfolds,
+    seed = rv$seed
+  )
+  plot_cvplot(
+    cv_obj = rv$diagnostic_svm$fit_cv,
+    filename = paste0(rv$plotdir, "CV_SVM.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_svm$roc_min,
+    filename = paste0(rv$plotdir, "ROC_SVM.min.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_svm$roc_1se,
+    filename = paste0(rv$plotdir, "ROC_SVM.1se.png")
+  )
+  
+  # KNN regression
+  rv$diagnostic_knn <- signature(
+    traininglist = rv$training_list,
+    type = "knn",
+    nfolds = rv$nfolds,
+    seed = rv$seed
+  )
+  plot_cvplot(
+    cv_obj = rv$diagnostic_knn$fit_cv,
+    filename = paste0(rv$plotdir, "CV_KNN.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_knn$roc_min,
+    filename = paste0(rv$plotdir, "ROC_KNN.min.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_knn$roc_1se,
+    filename = paste0(rv$plotdir, "ROC_KNN.1se.png")
+  )
+  
+  # RF regression
+  rv$diagnostic_rf <- signature(
+    traininglist = rv$training_list,
+    type = "random_forest",
+    nfolds = rv$nfolds,
+    seed = rv$seed
+  )
+  plot_cvplot(
+    cv_obj = rv$diagnostic_rf$fit_cv,
+    filename = paste0(rv$plotdir, "CV_RF.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_rf$roc_min,
+    filename = paste0(rv$plotdir, "ROC_RF.min.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_rf$roc_1se,
+    filename = paste0(rv$plotdir, "ROC_RF.1se.png")
+  )
   # with both calculated hyperparameters alpha and
   # lambda applying grid search
   rv$diagnostic_glmgrid <-
@@ -165,6 +225,55 @@ sigidentDiagnostic <- function(mergeset,
         "auc" = as.numeric(rv$diagnostic_elasticnet$roc_1se$auc)
       )
     ),
+    
+    "svm" = list(
+      "CV" = rv$diagnostic_svm$fit_cv,
+      "min" = list(
+        "model" = rv$diagnostic_svm$lambda_min,
+        "confmat" = rv$diagnostic_svm$confmat_min,
+        "prediction" = rv$diagnostic_svm$predicted_min,
+        "auc" = as.numeric(rv$diagnostic_svm$roc_min$auc)
+      ),
+      "1se" = list(
+        "model" = rv$diagnostic_svm$lambda_1se,
+        "confmat" = rv$diagnostic_svm$confmat_1se,
+        "prediction" = rv$diagnostic_svm$predicted_1se,
+        "auc" = as.numeric(rv$diagnostic_svm$roc_1se$auc)
+      )
+    ),
+    
+    "knn" = list(
+      "CV" = rv$diagnostic_knn$fit_cv,
+      "min" = list(
+        "model" = rv$diagnostic_knn$lambda_min,
+        "confmat" = rv$diagnostic_knn$confmat_min,
+        "prediction" = rv$diagnostic_knn$predicted_min,
+        "auc" = as.numeric(rv$diagnostic_knn$roc_min$auc)
+      ),
+      "1se" = list(
+        "model" = rv$diagnostic_knn$lambda_1se,
+        "confmat" = rv$diagnostic_knn$confmat_1se,
+        "prediction" = rv$diagnostic_knn$predicted_1se,
+        "auc" = as.numeric(rv$diagnostic_knn$roc_1se$auc)
+      )
+    ),  
+    
+    "rf" = list(
+      "CV" = rv$diagnostic_rf$fit_cv,
+      "min" = list(
+        "model" = rv$diagnostic_rf$lambda_min,
+        "confmat" = rv$diagnostic_rf$confmat_min,
+        "prediction" = rv$diagnostic_rf$predicted_min,
+        "auc" = as.numeric(rv$diagnostic_rf$roc_min$auc)
+      ),
+      "1se" = list(
+        "model" = rv$diagnostic_rf$lambda_1se,
+        "confmat" = rv$diagnostic_rf$confmat_1se,
+        "prediction" = rv$diagnostic_rf$predicted_1se,
+        "auc" = as.numeric(rv$diagnostic_rf$roc_1se$auc)
+      )
+    ), 
+    
     "elasticnet_grid" = list(
       "CV" = rv$diagnostic_glmgrid$caret_train,
       "model" = rv$diagnostic_glmgrid$elasticnet_auto,
