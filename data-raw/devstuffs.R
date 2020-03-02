@@ -97,10 +97,10 @@ devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.func", 
 # https://cran.r-project.org/web/packages/devtools/vignettes/dependencies.html
 desc::desc_set_remotes(c(
   paste0(
-    "url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/", mytag, "/clearly/sigident.preproc-", mytag, ".zip"),
+    "url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/", mytag, "/sigident.preproc-", mytag, ".zip"),
   # sigident.func is only required for the vignettes (therefore a "suggests"-package)
   paste0(
-    "url::https://gitlab.miracum.org/clearly/sigident.func/-/archive/", mytag2, "/clearly/sigident.func-", mytag2, ".zip")
+    "url::https://gitlab.miracum.org/clearly/sigident.func/-/archive/", mytag2, "/sigident.func-", mytag2, ".zip")
 ),
 file = usethis::proj_get())
 
