@@ -198,7 +198,7 @@ training_list <- sigident::create_training_test_split(diagnosis = diagnosisData,
                                                seed = seed)
                                                
 # KNN
-diagnostic_kknn <- sigident::signature(traininglist = training_list,
+diagnostic_knn <- sigident::signature(traininglist = training_list,
                                          type = "knn",
                                          nfolds = nfolds,
                                          seed = seed)

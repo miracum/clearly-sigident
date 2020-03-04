@@ -1,12 +1,55 @@
-kknn_classifier <- function(traininglist, seed) {
+#' @title knn_classifier
+#'
+#' @description Helper function to create a knn classifier model
+#'
+#' @param traininglist A list object containing the training data. The output
+#'   of the function `create_training_test_split()`.
+#'
+#' @param seed Intilization state of random number generator
+#'
+#' @export
+knn_classifier <- function(traininglist, seed) {
   # initialize outlist
   outlist <- list()
 
-  train_kknn <- caret::trainControl(
+  train_knn <- caret::trainControl(
     method = "repeatedcv", number = 10
   )
-  #   repeats = 5, savePredictions = TRUE, search = "random"
-  # )
+
+
+  outlist$model = build_predictive_knn(traininglist$train$x,
+                                       traininglist$train$y,
+                                       train_knn,
+                                       3)
+
+  #outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
+  outlist$prediction <- predict_knn(outlist$model, traininglist$test$x)
+  outlist$confusion_matrix <- caret::confusionMatrix(
+    outlist$prediction, as.factor(traininglist$test$y)
+  )
+  #outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
+
+ return(outlist)
+}
+
+
+#' @title build_predictive_knn
+#'
+#' @description Function builds a knn classifier model based on the given data.
+#'
+#' @param train_x The learning data values.
+#'
+#' @param train_y The learning data classes.
+#'
+#' @param fit_cv Options for the cross validation
+#'
+#' @param neighbors Compared neighbors for knn
+#'
+#' @export
+build_predictive_knn <- function(train_x,
+                                 train_y,
+                                 fit_cv,
+                                 neighbors) {
 
   # go parallel
   ncores <- parallel::detectCores()
@@ -15,39 +58,35 @@ kknn_classifier <- function(traininglist, seed) {
   doParallel::registerDoParallel(cl)
 
   # https://daviddalpiaz.github.io/stat432sp18/supp/knn_class_r.html
-  # outlist$model <- caret::knn3(
-  #   x = traininglist$train$x,
-  #   y = as.factor(traininglist$train$y),
-  #   k = 25
-  # )
-
-  outlist$model <- caret::train(
-    x = traininglist$train$x,
-    y = as.factor(traininglist$train$y),
-    method = "kknn",
-    #family = "binomial",
-    #tuneGrid = gr_init$srchGrd,
-    trControl = train_kknn,
-    preProcess = c("center", "scale"),
-    tuneLength = 10
+  model <- caret::knn3(
+    x = train_x,
+    y = as.factor(train_y),
+    k = neighbors
   )
 
   # stop parallel computation
   parallel::stopCluster(cl)
   gc()
 
-  outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
 
-  outlist$pred <- predict(outlist$model, traininglist$test$x)
+  return(model)
+}
 
+#' @title predict_knn
+#'
+#' @description Function to classify given data based on the created
+#'   model.
+#'
+#' @param model A list object containing the training data. The output
+#'   of the function `build_predictive_knn()`.
+#'
+#' @param test_x The data to be classified.
+#'
+#' @export
+predict_knn <- function(model,
+                        test_x) {
 
-# prediction for knn3
- # outlist$confusion_kknn <- caret::confusionMatrix(
- # as.factor(ifelse(outlist$pred[,1] > 0.5, 1, 0)), as.factor(traininglist$test$y)
- # )
-  outlist$confusion_kknn <- caret::confusionMatrix(
-    outlist$pred, as.factor(traininglist$test$y)
-  )
+  outdat <- as.factor(predict(model, test_x, type = "class"))
 
- return(outlist)
+  return(outdat)
 }
