@@ -1,0 +1,184 @@
+---
+title: "sigident - Howto Microarray"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sigident-Howto_Microarray}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Prerequisites and installation 
+
+## Install sigident.preproc package
+
+```{r eval = FALSE}
+options('repos' = 'https://ftp.fau.de/cran/')
+install.packages("devtools")
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.preproc.git",
+                      upgrade = "always")
+```
+
+## Install sigident package
+
+```{r eval = FALSE}
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
+```
+
+# Preprocessing 
+
+In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
+
+For a detailed background on the following steps please view the `sigident.preproc` package's vignette.
+
+## Initialization of important variables
+
+```{r setup}
+library(sigident)
+library(sigident.preproc)
+library(knitr)
+
+# initialize filePath:
+filePath <- tempdir()
+
+# define datadir
+maindir <- "./geodata/"
+datadir <- paste0(maindir, "data/")
+dir.create(maindir)
+dir.create(datadir)
+
+# define plotdir
+plotdir <- "./plots/"
+dir.create(plotdir)
+
+# define idtype
+idtype = "affy"
+```
+
+## Define list that contains a representation of the studies metadata
+
+```{r}
+studiesinfo <- list(
+  "GSE18842" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "Human Lung Tumor",
+    controllevelname = "Human Lung Control"
+    ),
+  
+  "GSE19804" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "frozen tissue of primary tumor",
+    controllevelname = "frozen tissue of adjacent normal"
+  ),
+  
+  "GSE19188" = list(
+    setid = 1,
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue type: healthy",
+    targetlevelname = "tissue type: tumor",
+    use_rawdata = TRUE
+  )
+)
+```
+
+## Load GEO datasets
+
+All downloaded datasets will be assigned to the global environment.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+sigident.preproc::load_geo_data(
+  studiesinfo = studiesinfo,
+  datadir = datadir,
+  plotdir = plotdir,
+  idtype = idtype
+) 
+```
+
+## Visualize batch effect
+
+These plots are created when executing the function `sigident.preproc::load_geo_data` and stored in the directory specified in `plotdir`.
+
+### Before batch correction
+
+```{r out.width='80%'}
+knitr::include_graphics(paste0(plotdir, "GSE18842_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "GSE19804_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "GSE19188_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "Merged_before_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "PCplot_before.png"))
+```
+
+### After batch correction
+
+```{r out.width='80%'}
+knitr::include_graphics(paste0(plotdir, "Merged_after_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "PCplot_after.png"))
+```
+
+# Preparations for utilizing the sigident package 
+
+Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. 
+`idtype` and `plotdir` have already been defined during the preprocessing steps.
+
+```{r}
+# general
+csvdir <- "./csv/"
+dir.create(csvdir)
+
+# enrichment analysis
+species <- "Hs"
+OrgDb <- "org.Hs.eg.db"
+organism <- "hsa"
+#pathwayid <- "hsa04110" # Cell Cycle
+pathwayid <- "hsa04151" # PI3K-Akt
+
+# diagnostic signature
+seed <- 111
+split <- 0.8
+nfolds <- 10
+```
+
+# Identification of diagnostic signatures 
+
+<!-- A common task regarding gene expression data is to distinguish between different groups or subtypes. In order to train a multi-gene classifier, a large amount of expression data is required. Due to the imbalance of features (p) versus observations (n), the application of an appropriate method is needed.   -->
+<!-- The lasso regression and elastic net regularization are generalized linear models which are powerful and versatile methods for feature selection and are well suited in order to analyse genomic data with p >> n.   -->
+<!-- Therefore, we implemented the elastic net regularization method for the identification of a diagnostic multi-gene signature.   -->
+
+## Split data into training and test dataset
+
+A statistical prediction model is usually trained on 70%-80% percent of the present data. `create_training_test_split` randomly splits the merged dataset into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). For reproducibility, a seed must be set.  
+
+```{r}
+training_list <- sigident::create_training_test_split(
+  diagnosis = diagnosis,
+  mergeset = mergeset,
+  split = split,
+  seed = seed
+)
+```
+
+Regularization requires the selection of a tuning parameter (lambda) that determines the strength of regularization. The function `signature` performs an `nfolds` cross-validation to select the best lambda and additionally builds the predictive model. `seed` is again set for reproducibility. The plot depicts the mean squared error as the criteron for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features (genes) above the plot. The left dashed vertical line represents the log of the optimal value of lambda ('lambda min'), which results in the lowest prediction error and giving the most accurate model. The right dashed vertical line indicates the log of the lambda value resulting in a model with the smallest number of included variables but also lies within one standard error of the optimal value of lambda ('lambda 1se').
+Furthermore, a ROC curve is plotted to visualize the performance measurement of the model.
+
+## k-nearest neighbors regression 
+
+The k-nearest neighbors algorithm, or kNN, is one of the simplest machine learning algorithms. Usually, k is a small, odd number - sometimes only 1. The larger k is, the more accurate the classification will be, but the longer it takes to perform the classification. It classifies an object into one of several classes by looking at the k elements of the training set that are closest to the one you want to classify, and letting them vote by majority on what that object’s class should be.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_knn <- sigident::signature(
+  traininglist = training_list,
+  type = "knn",
+  nfolds = nfolds,
+  seed = seed
+)
+

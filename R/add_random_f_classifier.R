@@ -15,15 +15,14 @@ random_forest <- function(traininglist, seed) {
                                        )
 
   outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
-  outlist$predictons <- predict(outlist$model, traininglist$test$x)
+  outlist$prediction <- predict(outlist$model, traininglist$test$x)
   outlist$confusion_matrix <- caret::confusionMatrix(
-   outlist$predictons, as.factor(traininglist$test$y)
+   outlist$prediction, as.factor(traininglist$test$y)
   )
-  #outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
-
+  outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
 
   return(outlist)
-}
+ }
 
 
 #' @title build_predictive_rf

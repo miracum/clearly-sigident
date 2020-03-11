@@ -116,18 +116,14 @@ sigidentDiagnostic <- function(mergeset,
     seed = rv$seed
   )
   plot_cvplot(
-    cv_obj = rv$diagnostic_svm$fit_cv,
-    filename = paste0(rv$plotdir, "CV_SVM.png")
+    cv_obj = rv$diagnostic_svm$model,
+    filename = paste0(rv$plotdir, "Model_SVM.png")
   )
   plot_rocplot(
-    roc = rv$diagnostic_svm$roc_min,
-    filename = paste0(rv$plotdir, "ROC_SVM.min.png")
+    roc = rv$diagnostic_svm$roc,
+    filename = paste0(rv$plotdir, "ROC_SVM.png")
   )
-  plot_rocplot(
-    roc = rv$diagnostic_svm$roc_1se,
-    filename = paste0(rv$plotdir, "ROC_SVM.1se.png")
-  )
-  
+
   # KNN regression
   rv$diagnostic_knn <- signature(
     traininglist = rv$training_list,

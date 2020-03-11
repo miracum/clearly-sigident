@@ -27,9 +27,9 @@ svm_classifier <- function(traininglist, seed) {
   outlist$confusion_matrix <- caret::confusionMatrix(
    outlist$prediction, as.factor(traininglist$test$y)
   )
+  outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
 
 
- # outlist$confusion_matrix <- calc_roc
 
  return(outlist)
 }

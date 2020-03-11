@@ -20,14 +20,14 @@ knn_classifier <- function(traininglist, seed) {
   outlist$model = build_predictive_knn(traininglist$train$x,
                                        traininglist$train$y,
                                        train_knn,
-                                       3)
+                                       4)
 
   #outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
   outlist$prediction <- predict_knn(outlist$model, traininglist$test$x)
   outlist$confusion_matrix <- caret::confusionMatrix(
     outlist$prediction, as.factor(traininglist$test$y)
   )
-  #outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
+  outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
 
  return(outlist)
 }
