@@ -27,6 +27,8 @@ library(sigident)
 library(sigident.preproc)
 library(knitr)
 
+rm(list=ls())
+
 # initialize filePath:
 filePath <- tempdir()
 
@@ -88,12 +90,12 @@ diagnostic_knn <- sigident::signature(traininglist = training_list,
                                          type = "knn",
                                          nfolds = nfolds,
                                          seed = seed)
-
 # Random Forest
 diagnostic_rf <- sigident::signature(traininglist = training_list,
                                         type = "random_forest",
                                         nfolds = nfolds,
                                         seed = seed)
+
 
 ```
 
