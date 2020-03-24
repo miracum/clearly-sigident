@@ -19,7 +19,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.0.3.9002")
+my_desc$set_version("0.0.4")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -90,9 +90,9 @@ usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
 
 # Development package
-mytag <- "development"
+mytag <- "v0.0.3"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = mytag, upgrade = "always")
-mytag2 <- "master"
+mytag2 <- "v0.0.2"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.func", ref = mytag2, upgrade = "always")
 # https://cran.r-project.org/web/packages/devtools/vignettes/dependencies.html
 desc::desc_set_remotes(c(
@@ -129,6 +129,7 @@ usethis::use_build_ignore("Readme.md")
 usethis::use_build_ignore("infos.R")
 usethis::use_build_ignore(".gitlab-ci.yml")
 usethis::use_build_ignore("ci")
+usethis::use_build_ignore(".vscode")
 usethis::use_git_ignore("inst/application/data")
 usethis::use_git_ignore("data")
 usethis::use_git_ignore("vignettes/geodata")
@@ -140,7 +141,7 @@ usethis::use_git_ignore("!/.gitlab-ci.yml")
 usethis::use_git_ignore("geodata")
 usethis::use_git_ignore("csv")
 usethis::use_git_ignore("plots")
-usethis::use_git_ignore("*.Rproj")
+usethis::use_git_ignore("!/*.Rproj")
 usethis::use_git_ignore(".Rproj*")
 usethis::use_git_ignore(".Rhistory")
 usethis::use_git_ignore(".RData")
@@ -155,3 +156,4 @@ usethis::use_git_ignore("vignettes/figure")
 usethis::use_git_ignore("vignettes/tables")
 usethis::use_git_ignore("tables")
 usethis::use_git_ignore("vignettes/.build.timestamp")
+usethis::use_git_ignore("/.vscode")

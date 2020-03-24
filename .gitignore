@@ -31,3 +31,5 @@ vignettes/.build.timestamp
 doc
 Meta
 !/.gitlab-ci.yml
+!/*.Rproj
+/.vscode
