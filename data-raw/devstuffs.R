@@ -19,7 +19,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.0.4")
+my_desc$set_version("0.0.4.9001")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -90,9 +90,9 @@ usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
 
 # Development package
-mytag <- "v0.0.3"
+mytag <- "development"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = mytag, upgrade = "always")
-mytag2 <- "v0.0.2"
+mytag2 <- "development"
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.func", ref = mytag2, upgrade = "always")
 # https://cran.r-project.org/web/packages/devtools/vignettes/dependencies.html
 desc::desc_set_remotes(c(
