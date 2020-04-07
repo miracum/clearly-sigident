@@ -17,7 +17,7 @@
 #'
 #'
 #' @export
-sigidentDiagnostic <- function(mergeset,
+sigidentDiagnostic <- function(mergeset, # nolint
                                diagnosis,
                                seed = 111,
                                nfolds = 10,

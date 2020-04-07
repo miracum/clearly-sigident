@@ -29,7 +29,7 @@
 #'
 #'
 #' @export
-sigidentPrognostic <- function(mergeset,
+sigidentPrognostic <- function(mergeset, # nolint
                                sample_metadata,
                                idtype,
                                genes,

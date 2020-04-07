@@ -33,3 +33,4 @@ Meta
 !/.gitlab-ci.yml
 !/*.Rproj
 /.vscode
+!/.lintr

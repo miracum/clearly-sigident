@@ -19,7 +19,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.0.4.9001")
+my_desc$set_version("0.0.4.9002")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -59,27 +59,22 @@ my_desc$write(file = "DESCRIPTION")
 
 # Imports (CRAN packages)
 usethis::use_package("data.table", type="Imports")
-usethis::use_package("ggplot2", type="Imports")
 usethis::use_package("grDevices", type="Imports")
 usethis::use_package("magrittr", type="Imports")
-usethis::use_package("methods", type="Imports")
 usethis::use_package("stats", type="Imports")
 usethis::use_package("graphics", type="Imports")
-usethis::use_package("jsonlite", type="Imports")
 usethis::use_package("caret", type="Imports")
 usethis::use_package("glmnet", type="Imports")
 usethis::use_package("pROC", type="Imports")
-usethis::use_package("utils", type="Imports")
 usethis::use_package("doParallel", type="Imports")
-usethis::use_package("e1071", type="Imports")
 usethis::use_package("survival", type="Imports")
 usethis::use_package("plyr", type="Imports")
 usethis::use_package("survminer", type="Imports")
-usethis::use_package("knitr", type = "Imports")
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700
-usethis::use_package("Biobase", type="Import")
+usethis::use_package("knitr", type = "Suggests")
+usethis::use_package("e1071", type="Suggests")
 
 # Suggests
 usethis::use_package("testthat", type = "Suggests")
@@ -130,6 +125,8 @@ usethis::use_build_ignore("infos.R")
 usethis::use_build_ignore(".gitlab-ci.yml")
 usethis::use_build_ignore("ci")
 usethis::use_build_ignore(".vscode")
+usethis::use_build_ignore(".lintr")
+
 usethis::use_git_ignore("inst/application/data")
 usethis::use_git_ignore("data")
 usethis::use_git_ignore("vignettes/geodata")
@@ -157,3 +154,4 @@ usethis::use_git_ignore("vignettes/tables")
 usethis::use_git_ignore("tables")
 usethis::use_git_ignore("vignettes/.build.timestamp")
 usethis::use_git_ignore("/.vscode")
+usethis::use_git_ignore("!/.lintr")
