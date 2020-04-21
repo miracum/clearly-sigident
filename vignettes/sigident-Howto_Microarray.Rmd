@@ -16,6 +16,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+The R package `sigident` is the core package of the `sigident` package framework. This framework consists of several packages which can be used to perform analyses of gene signatures. The following packages are included in the framework: 
+* Core package: [sigident](https://gitlab.miracum.org/clearly/sigident) 
+* Data preprocessing: [sigident.preproc](https://gitlab.miracum.org/clearly/sigident.preproc) 
+* Functional analyses: [sigident.func](https://gitlab.miracum.org/clearly/sigident.func)  
+
 # Prerequisites and installation 
 
 ## Install sigident.preproc package
@@ -44,7 +49,7 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-For a detailed background and description of the following steps please view the `sigident.preproc` package's vignette.
+For a more detailed background and description of the following steps please view the `sigident.preproc` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
 
 ## Initialization of important variables
 
@@ -126,7 +131,7 @@ Before using the `sigident` package, these variables need to be defined properly
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-For a detailed background on the following steps please view the `sigident.preproc` package's vignette.
+For a detailed background on the following steps please view the `sigident.preproc` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
 
 ```{r}
 # general
@@ -206,7 +211,7 @@ gc()
 
 ## Gene enrichment
 
-For a detailed background and description of the following steps please view the `sigident.func` package's vignette.
+For a detailed background and description of the following steps please view the `sigident.func` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
 
 ```{r}
 deg_entrez <- unique(mergedset@featureData@data$ENTREZ_GENE_ID)
@@ -527,7 +532,7 @@ knitr::kable(
 
 ### Model performance measurements
 
-Additionally, the confusion matrix and the calculated performance metrices can be printed out for each model. 
+Additionally, the confusion matrix and the calculated performance metrics can be printed out for each model. 
 
 #### Lasso (min)
 
