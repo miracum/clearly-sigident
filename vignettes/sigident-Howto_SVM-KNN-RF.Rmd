@@ -1,0 +1,567 @@
+---
+title: "sigident - Howto Microarray"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sigident-Howto_Microarray}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Prerequisites and installation 
+
+## Install sigident.preproc package
+
+```{r eval = FALSE}
+options('repos' = 'https://ftp.fau.de/cran/')
+install.packages("devtools")
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.preproc.git",
+                      upgrade = "always")
+```
+
+## Install sigident package
+
+```{r eval = FALSE}
+devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
+```
+
+# Preprocessing 
+
+In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
+
+For a detailed background on the following steps please view the `sigident.preproc` package's vignette.
+
+## Initialization of important variables
+
+```{r setup}
+library(sigident)
+library(sigident.preproc)
+library(knitr)
+
+# initialize filePath:
+filePath <- tempdir()
+
+# define datadir
+maindir <- "./geodata/"
+datadir <- paste0(maindir, "data/")
+dir.create(maindir)
+dir.create(datadir)
+
+# define plotdir
+plotdir <- "./plots/"
+dir.create(plotdir)
+
+# define idtype
+idtype = "affy"
+```
+
+## Define list that contains a representation of the studies metadata
+
+```{r}
+studiesinfo <- list(
+  "GSE18842" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "Human Lung Tumor",
+    controllevelname = "Human Lung Control"
+    ),
+  
+  "GSE19804" = list(
+    setid = 1,
+    targetcolname = "source_name_ch1",
+    targetlevelname = "frozen tissue of primary tumor",
+    controllevelname = "frozen tissue of adjacent normal"
+  ),
+  
+  "GSE19188" = list(
+    setid = 1,
+    targetcolname = "characteristics_ch1",
+    controllevelname = "tissue type: healthy",
+    targetlevelname = "tissue type: tumor",
+    use_rawdata = TRUE
+  )
+)
+```
+
+## Load GEO datasets
+
+All downloaded datasets will be assigned to the global environment.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+sigident.preproc::load_geo_data(
+  studiesinfo = studiesinfo,
+  datadir = datadir,
+  plotdir = plotdir,
+  idtype = idtype
+) 
+```
+
+## Visualize batch effect
+
+These plots are created when executing the function `sigident.preproc::load_geo_data` and stored in the directory specified in `plotdir`.
+
+### Before batch correction
+
+```{r out.width='80%'}
+knitr::include_graphics(paste0(plotdir, "GSE18842_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "GSE19804_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "GSE19188_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "Merged_before_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "PCplot_before.png"))
+```
+
+### After batch correction
+
+```{r out.width='80%'}
+knitr::include_graphics(paste0(plotdir, "Merged_after_batch_effect_boxplot.jpg"))
+knitr::include_graphics(paste0(plotdir, "PCplot_after.png"))
+```
+
+# Preparations for utilizing the sigident package 
+
+Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. 
+`idtype` and `plotdir` have already been defined during the preprocessing steps.
+
+```{r}
+# general
+csvdir <- "./csv/"
+dir.create(csvdir)
+
+# enrichment analysis
+species <- "Hs"
+OrgDb <- "org.Hs.eg.db"
+organism <- "hsa"
+#pathwayid <- "hsa04110" # Cell Cycle
+pathwayid <- "hsa04151" # PI3K-Akt
+
+# diagnostic signature
+seed <- 111
+split <- 0.8
+nfolds <- 10
+```
+
+# Identification of diagnostic signatures 
+
+A common task regarding gene expression data is to distinguish between different groups or subtypes. In order to train a multi-gene classifier, a large amount of expression data is required. Due to the imbalance of features (p) versus observations (n), the application of an appropriate method is needed.
+
+
+## Split data into training and test dataset
+
+A statistical prediction model is usually trained on 70%-80% percent of the present data. `create_training_test_split` randomly splits the merged dataset into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). For reproducibility, a seed must be set.  
+
+```{r}
+training_list <- sigident::create_training_test_split(
+  diagnosis = diagnosis,
+  mergeset = mergeset,
+  split = split,
+  seed = seed
+)
+```
+
+Regularization requires the selection of a tuning parameter (lambda) that determines the strength of regularization. The function `signature` performs an `nfolds` cross-validation to select the best lambda and additionally builds the predictive model. `seed` is again set for reproducibility. The plot depicts the mean squared error as the criteron for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features (genes) above the plot. The left dashed vertical line represents the log of the optimal value of lambda ('lambda min'), which results in the lowest prediction error and giving the most accurate model. The right dashed vertical line indicates the log of the lambda value resulting in a model with the smallest number of included variables but also lies within one standard error of the optimal value of lambda ('lambda 1se').
+Furthermore, a ROC curve is plotted to visualize the performance measurement of the model.
+
+## SVM 
+
+A support vector machine is a collection of supervised learning algorithms that use hyperplane graphing to analyze new, unlabeled data. In Support Vector Machine incoming data is categorized into one of two classes. For SVM models, each data point is interpreted as a p-dimensional vector, which the machine attempts to create a linear classifier by fitting the data point inside a hyperplane (p-1 dimension). 
+So for classification, every input is turned into a point in n-dimensional space (n being the number of features), and the value of each feature defined as the value of a unique coordinate on the hyperplane. Classification is determined by finding the hyperplane that most clearly separates the two classes.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_svm <- sigident::signature(
+  traininglist = training_list,
+  type = "svm",
+  nfolds = nfolds,
+  seed = seed
+)
+
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_SVM.png")
+sigident::plot_rocplot(roc = diagnostic_svm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+## k-nearest neighbors regression 
+
+The k-nearest neighbors algorithm, or kNN, is one of the simplest machine learning algorithms. Usually, k is a small, odd number - sometimes only 1. The larger k is, the more accurate the classification will be, but the longer it takes to perform the classification. It classifies an object into one of several classes by looking at the k elements of the training set that are closest to the one you want to classify, and letting them vote by majority on what that object’s class should be.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_knn <- sigident::signature(
+  traininglist = training_list,
+  type = "knn",
+  nfolds = nfolds,
+  seed = seed
+)
+
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_KNN.png")
+sigident::plot_rocplot(roc = diagnostic_knn$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+## random forest regression 
+
+The random forest regression is a supervised learning algorithm that randomly creates and merges multiple decision trees into one forest. The goal is not to rely on a single learning model, but rather a collection of decision models to improve accuracy. The primary difference between this approach and the standard decision tree algorithms is that the root nodes feature splitting nodes are generated randomly.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_rf <- sigident::signature(
+  traininglist = training_list,
+  type = "random_forest",
+  nfolds = nfolds,
+  seed = seed
+)
+
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_RF.png")
+sigident::plot_rocplot(roc = diagnostic_rf$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+
+## Analysis of diagnostic models 
+
+### Comparing model performance  
+
+These models can be included into a list and the performance metrices for classification can then be printed using the function `compare_diagnostic_models()`. This list includes all information of the respective models, which can be accessed by the following structure.  
+
+```{r}
+diagnostic_models <- list(
+  "svm" = list(
+        "model" = diagnostic_svm$model,
+        "confmat" = diagnostic_svm$confusion_matrix,
+        "prediction" = diagnostic_svm$prediction,
+        "auc" = as.numeric(diagnostic_svm$roc$auc)
+    ),
+  "knn" = list(
+        "model" = diagnostic_knn$model,
+        "confmat" = diagnostic_knn$confusion_matrix,
+        "prediction" = diagnostic_knn$prediction,
+        "auc" = as.numeric(diagnostic_knn$roc$auc)
+    ),
+ "random_forest" = list(
+        "model" = diagnostic_rf$model,
+        "confmat" = diagnostic_rf$confusion_matrix,
+        "prediction" = diagnostic_rf$prediction,
+        "auc" = as.numeric(diagnostic_rf$roc$auc)
+    )
+)
+```
+
+```{r}
+knitr::kable(
+  sigident::compare_diagnostic_models(diagnostic_models)
+)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(diagnostic_svm, diagnostic_knn, diagnostic_rf,
+   training_list)
+gc()
+```
+
+### Model performance measurements
+
+Additionally, the confusion matrix and the calculated performance metrices can be printed out for each model. 
+
+#### SVM
+
+```{r}
+diagnostic_models$svm$confmat
+```
+
+#### KNN
+
+```{r}
+diagnostic_models$knn$confmat
+```
+
+#### RF
+
+```{r}
+diagnostic_models$rf$confmat
+```
+
+### Export selected IDs for each model 
+
+The following function enables the extraction of the selected genes (Affy-IDs) for each model as csv file.
+
+```{r}
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$svm$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_svm.csv"))
+```
+
+```{r}
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$knn$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_knn.csv"))
+```
+
+```{r}
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$rf$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_rf.csv"))
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(signaturegenes)
+gc()
+```
+
+## Validation of diagnostic signatures 
+
+The validation of diagnostic signatures is conducted using expression data of the studies "GSE30219", "GSE33356" and "GSE102287". We therefore need to create a list, holding meta information about the respective studies. 
+
+All models can be provided via the argument 'model' to the function `validate_diagnostic_signature` using the previously created list `diagnostic_models`.
+
+You have to create a list for each validation data that contains specifications of the validation study. The object must be named The list structure is as follows:  
+- `studyname`: the GEO id of the validation study  
+- `setid`: the index of the provided GEO set to be used    
+- `targetcolname`: the name of the phenoData column containing the target-variable
+- `controllevelname`: the level name of the controls of the column, specified in `targetcolname`
+- `targetlevelname`: the level name of the subjects of interest in `targetcolname`
+
+### GSE302019 
+
+```{r}
+validationstudylist <- list(studyname = "GSE30219",
+                            setid = 1, 
+                            targetcolname = "source_name_ch1",
+                            controllevelname = "Non Tumoral Lung",
+                            targetlevelname = "Lung Tumour")
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+GSE30219_validation <- sigident::validate_diagnostic_signature(
+  validationstudylist = validationstudylist,
+  models = diagnostic_models,
+  genes = genes,
+  idtype = idtype,
+  datadir = datadir
+)
+```
+
+#### SVM 
+
+```{r}
+GSE30219_validation$svm$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_svm.png")
+sigident::plot_rocplot(roc = GSE30219_validation$svm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### KNN 
+
+```{r}
+GSE30219_validation$knn$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_knn.png")
+sigident::plot_rocplot(roc = GSE30219_validation$knn$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### RF 
+
+```{r}
+GSE30219_validation$rf$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_rf.png")
+sigident::plot_rocplot(roc = GSE30219_validation$rf$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+### GSE33356 
+
+```{r}
+validationstudylist <- list(studyname = "GSE33356",
+                            setid = 1, 
+                            targetcolname = "tissue:ch1",
+                            controllevelname = "paired normal adjacent",
+                            targetlevelname = "lung cancer")
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+GSE33356_validation <- sigident::validate_diagnostic_signature(
+  validationstudylist = validationstudylist,
+  models = diagnostic_models,
+  genes = genes,
+  idtype = idtype,
+  datadir = datadir
+)
+```
+
+#### SVM
+
+```{r}
+GSE33356_validation$svm$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_svm.png")
+sigident::plot_rocplot(roc = GSE33356_validation$svm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### KNN
+
+```{r}
+GSE33356_validation$knn$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_knn.png")
+sigident::plot_rocplot(roc = GSE33356_validation$knn$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### RF
+
+```{r}
+GSE33356_validation$rf$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_rf.png")
+sigident::plot_rocplot(roc = GSE33356_validation$rf$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+### GSE102287 
+
+```{r}
+validationstudylist <- list(studyname = "GSE102287",
+                            setid = 2, 
+                            targetcolname = "tumor_normal status:ch1",
+                            controllevelname = "N",
+                            targetlevelname = "T")
+```
+
+```{r}
+GSE102287_validation <- sigident::validate_diagnostic_signature(
+  validationstudylist = validationstudylist,
+  models = diagnostic_models,
+  genes = genes,
+  idtype = idtype,
+  datadir = datadir
+)
+```
+
+#### SVM 
+
+```{r}
+GSE102287_validation$svm$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_svm.png")
+sigident::plot_rocplot(roc = GSE102287_validation$svm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### KNN
+
+```{r}
+GSE102287_validation$knn$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_knn.png")
+sigident::plot_rocplot(roc = GSE102287_validation$knn$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### RF 
+
+```{r}
+GSE102287_validation$rf$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_rf.png")
+sigident::plot_rocplot(roc = GSE102287_validation$rf$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+rm(GSE102287_validation, validationstudylist, diagnostic_models,
+   GSE102287, GSE33356)
+gc()
+```
+
+# References 
+
+[1] W.E. Johnson, C. Li, and A. Rabinovic. Adjusting batch effects in microarray data using empirical bayes methods. Biostatistics, 8(1):118–127, 2007.

@@ -107,6 +107,55 @@ sigidentDiagnostic <- function(mergeset, # nolint
     filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png")
   )
 
+  
+  # SVM 
+  rv$diagnostic_svm <- signature(
+    traininglist = rv$training_list,
+    type = "svm",
+    nfolds = rv$nfolds,
+    seed = rv$seed
+  )
+  plot_cvplot(
+    cv_obj = rv$diagnostic_svm$model,
+    filename = paste0(rv$plotdir, "Model_SVM.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_svm$roc,
+    filename = paste0(rv$plotdir, "ROC_SVM.png")
+  )
+
+  # KNN 
+  rv$diagnostic_knn <- signature(
+    traininglist = rv$training_list,
+    type = "knn",
+    nfolds = rv$nfolds,
+    seed = rv$seed
+  )
+  plot_cvplot(
+    cv_obj = rv$diagnostic_knn$model,
+    filename = paste0(rv$plotdir, "Model_KNN.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_knn$roc,
+    filename = paste0(rv$plotdir, "ROC_KNN.png")
+  )
+
+  # RF 
+  rv$diagnostic_rf <- signature(
+    traininglist = rv$training_list,
+    type = "random_forest",
+    nfolds = rv$nfolds,
+    seed = rv$seed
+  )
+  plot_cvplot(
+    cv_obj = rv$diagnostic_rf$model,
+    filename = paste0(rv$plotdir, "Model_RF.png")
+  )
+  plot_rocplot(
+    roc = rv$diagnostic_rf$roc,
+    filename = paste0(rv$plotdir, "ROC_RF.png")
+  )
+  
   # with both calculated hyperparameters alpha and
   # lambda applying grid search
   rv$diagnostic_glmgrid <-
@@ -165,6 +214,28 @@ sigidentDiagnostic <- function(mergeset, # nolint
         "auc" = as.numeric(rv$diagnostic_elasticnet$roc_1se$auc)
       )
     ),
+    
+    "svm" = list(
+        "model" = rv$diagnostic_svm$model,
+        "confmat" = rv$diagnostic_svm$confusion_matrix,
+        "prediction" = rv$diagnostic_svm$prediction,
+        "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
+    ),
+    
+    "knn" = list(
+      "model" = rv$diagnostic_svm$model,
+      "confmat" = rv$diagnostic_svm$confusion_matrix,
+      "prediction" = rv$diagnostic_svm$prediction,
+      "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
+    ),  
+    
+    "random_forest" = list(
+      "model" = rv$diagnostic_svm$model,
+      "confmat" = rv$diagnostic_svm$confusion_matrix,
+      "prediction" = rv$diagnostic_svm$prediction,
+      "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
+    ), 
+    
     "elasticnet_grid" = list(
       "CV" = rv$diagnostic_glmgrid$caret_train,
       "model" = rv$diagnostic_glmgrid$elasticnet_auto,

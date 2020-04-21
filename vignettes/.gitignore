@@ -1,11 +1,7 @@
-<<<<<<< HEAD
 *.html
 *.R
 sigident-Howto_Microarray-Dateien/
 *.csv
-=======
 /*/
 /*
-!/*.html
 !/*.Rmd
->>>>>>> master

@@ -169,7 +169,7 @@ signature <- function(traininglist,
   } else if (type == "svm") {
     outlist <- svm_classifier(traininglist, seed, nfolds)
   } else if (type == "knn") {
-    outlist <- kknn_classifier(traininglist, seed, nfolds)
+    outlist <- knn_classifier(traininglist, seed, nfolds)
   } else if (type == "random_forest") {
     outlist <- random_forest(traininglist, seed, nfolds)
   } else {
@@ -425,7 +425,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
   v_data_all <- t(expr)
 
   for (i in names(models)) {
-    if (i %in% c("lasso", "elasticnet")) {
+    if (i %in% c("lasso", "elasticnet", "lasso", "elastic", "svm", "knn", "random_forest")) {
       for (j in c("min", "1se")) {
         predicted <- predict_glm(model = models[[i]][[j]]$model,
                                  test_x = v_data_all,

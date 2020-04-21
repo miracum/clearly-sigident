@@ -30,3 +30,5 @@ plots
 /.vscode
 !/.lintr
 .Rproj.user
+doc
+Meta
