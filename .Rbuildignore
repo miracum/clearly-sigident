@@ -30,3 +30,5 @@
 ^ci$
 ^doc$
 ^Meta$
+^\.vscode$
+^\.lintr$

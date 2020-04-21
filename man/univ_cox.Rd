@@ -9,7 +9,8 @@ univ_cox(survtable, genes)
 \arguments{
 \item{survtable}{A data.frame. Output of the function `get_survival_time()`.}
 
-\item{genes}{A object. The output of the function `identify_degs()`.}
+\item{genes}{A object. The output of the function
+`sigident.func::identify_degs()`}
 }
 \description{
 Helper function to compute univariate cox regression and

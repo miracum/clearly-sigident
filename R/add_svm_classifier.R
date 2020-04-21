@@ -1,9 +1,9 @@
-svm_classifier <- function(traininglist, seed) {
+svm_classifier <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
   train_svm <- caret::trainControl(
-    method = "repeatedcv", number = 10,
+    method = "repeatedcv", number = nfolds,
     repeats = 5, savePredictions = TRUE, search = "random"
   )
 

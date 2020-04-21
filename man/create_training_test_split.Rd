@@ -11,7 +11,8 @@ create_training_test_split(diagnosis, mergeset, split = 0.8, seed = 111)
 `create_diagnosisdesignbatch()`.}
 
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
-columns = samples).}
+columns = samples). The output of the funtion
+`sigident.preproc::load_geo_data()`.}
 
 \item{split}{A numeric value between 0 and 1. The proportion of the data
 to be integrated into the training set for machine learning

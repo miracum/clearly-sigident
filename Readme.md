@@ -1,4 +1,4 @@
-# sigident (!!! currently under development !!!)
+# sigident (!!! under development !!!)
 
 <!-- badges: start -->
 [![pipeline status](https://gitlab.miracum.org/clearly/sigident/badges/master/pipeline.svg)](https://gitlab.miracum.org/clearly/sigident/commits/master)
@@ -9,10 +9,9 @@ This is the repository of the R package 'sigident'. It provides core functionali
 
 Currently implemented features are:
 
-- merging of microarray datasets (via the R package `sigident.preproc`)
-- DEG analysis
-- functional analysis (gene enrichment)
-- Identification of diagnostic signatures, using
+- merging of microarray datasets (via the R package [`sigident.preproc`](https://gitlab.miracum.org/clearly/sigident.preproc.git))
+- DEG analysis and functional analysis (via the R package [`sigident.func`](https://gitlab.miracum.org/clearly/sigident.func.git))
+- Identification and validation of diagnostic signatures, using
   + Lasso regression
   + Elastic net regression
   + glmnet (grid search for best alpha and lambda)
@@ -22,7 +21,7 @@ Currently implemented features are:
 
 You can install *sigident* with the following commands in R:
 
-``` r
+```r
 options('repos' = 'https://ftp.fau.de/cran/')
 install.packages("devtools")
 devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
@@ -30,9 +29,7 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 The version of the package, which was used for the publication [A Toolbox for Functional Analysis and the Systematic Identification of Diagnostic and Prognostic Gene Expression Signatures Combining Meta-Analysis and Machine Learning](https://www.mdpi.com/2072-6694/11/10/1606) can anytime be reproduced using the version tag *v0.0.2* during the installation process:
 
-``` r
-options('repos' = 'https://ftp.fau.de/cran/')
-install.packages("devtools")
+```r
 devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git", ref = "v0.0.2")
 ```
 

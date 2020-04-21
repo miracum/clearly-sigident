@@ -1,9 +1,9 @@
-random_forest <- function(traininglist, seed) {
+random_forest <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
   train_rf <- caret::trainControl(
-    method = "repeatedcv", number = 10,
+    method = "repeatedcv", number = nfolds,
     repeats = 3
   )
 

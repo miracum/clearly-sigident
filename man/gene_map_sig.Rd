@@ -8,7 +8,8 @@ gene_map_sig(mergeset, model)
 }
 \arguments{
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
-columns = samples).}
+columns = samples). The output of the funtion
+`sigident.preproc::load_geo_data()`.}
 
 \item{model}{An object containing the model information. The
 ouput of the function `glmnetSignature_()` with \code{type = "grid"}.}

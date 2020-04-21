@@ -18,7 +18,8 @@ used to train the classifier.}
 \item{sig_cov}{A data.frame. Output of the function `univ_cox()`.}
 
 \item{mergeset}{A matrix of merged expression sets (rows = genes,
-columns = samples).}
+columns = samples). The output of the funtion
+`sigident.preproc::load_geo_data()`.}
 
 \item{sample_metadata}{A data frame. The data frame holding the
 sample metadata.}

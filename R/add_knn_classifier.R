@@ -1,9 +1,9 @@
-kknn_classifier <- function(traininglist, seed) {
+kknn_classifier <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
   train_kknn <- caret::trainControl(
-    method = "repeatedcv", number = 10
+    method = "repeatedcv", number = nfolds
   )
   #   repeats = 5, savePredictions = TRUE, search = "random"
   # )
