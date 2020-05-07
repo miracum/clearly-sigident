@@ -2,7 +2,7 @@ random_forest <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
-  train_rf <- caret::trainControl(
+  outlist$fit_cv <- caret::trainControl(
     method = "repeatedcv", number = nfolds,
     repeats = 3
   )
@@ -10,7 +10,7 @@ random_forest <- function(traininglist, seed, nfolds) {
 
   outlist$model <- build_predictive_rf(traininglist$train$x,
                                        traininglist$train$y,
-                                       train_rf,
+                                       outlist$fit_cv,
                                        metric
                                        )
 
@@ -39,7 +39,7 @@ random_forest <- function(traininglist, seed, nfolds) {
 #' @export
 build_predictive_rf <- function(train_x,
                                 train_y,
-                                train_rf,
+                                fit_cv,
                                 metric) {
 
   # go parallel
@@ -52,7 +52,7 @@ build_predictive_rf <- function(train_x,
     x = train_x,
     y = train_y,
     method = "rf",
-    trControl = train_rf,
+    trControl = fit_cv,
     metric = metric,
     preProc = c("center", "scale"),
     tuneLength = 10,

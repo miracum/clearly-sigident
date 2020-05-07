@@ -55,7 +55,7 @@ split <- 0.8
 nfolds <- 10
 ```
 
-# Apply SVM, KNN and RF Classifier
+# Pre
 
 ```{r eval=FALSE}
 # Set variables
@@ -80,6 +80,11 @@ training_list <- sigident::create_training_test_split(diagnosis = diagnosisData,
                                                split = split,
                                                seed = seed)
 
+```
+
+# Apply SVM, KNN and RF Classifier
+
+```{r eval=FALSE}
 # SVM
 diagnostic_svm <- sigident::signature(traininglist = training_list,
                                          type = "svm",

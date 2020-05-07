@@ -12,14 +12,14 @@ svm_classifier <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
-  train_svm <- caret::trainControl(
+  outlist$fit_cv <- caret::trainControl(
     method = "repeatedcv", number = nfolds,
     repeats = 5, savePredictions = TRUE, search = "random"
   )
 
   outlist$model = build_predictive_svm(traininglist$train$x,
                                traininglist$train$y,
-                               train_svm)
+                               outlist$fit_cv)
 
 
   outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
@@ -28,8 +28,6 @@ svm_classifier <- function(traininglist, seed, nfolds) {
    outlist$prediction, as.factor(traininglist$test$y)
   )
   outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
-
-
 
  return(outlist)
 }

@@ -12,26 +12,23 @@ knn_classifier <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
-  train_knn <- caret::trainControl(
-    method = "repeatedcv", number = nfolds
-  )
-
+  outlist$fit_cv <- caret::trainControl(method="repeatedcv",repeats = 3)
 
   outlist$model = build_predictive_knn(traininglist$train$x,
                                        traininglist$train$y,
-                                       train_knn,
-                                       4)
+                                       outlist$fit_cv
+                                       )
 
-  #outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
+
+  outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
   outlist$prediction <- predict_knn(outlist$model, traininglist$test$x)
   outlist$confusion_matrix <- caret::confusionMatrix(
-    outlist$prediction, as.factor(traininglist$test$y)
+   outlist$prediction, as.factor(traininglist$test$y)
   )
   outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
 
  return(outlist)
 }
-
 
 #' @title build_predictive_knn
 #'
@@ -43,13 +40,11 @@ knn_classifier <- function(traininglist, seed, nfolds) {
 #'
 #' @param fit_cv Options for the cross validation
 #'
-#' @param neighbors Compared neighbors for knn
-#'
 #' @export
 build_predictive_knn <- function(train_x,
                                  train_y,
-                                 fit_cv,
-                                 neighbors) {
+                                 fit_cv
+                                 ) {
 
   # go parallel
   ncores <- parallel::detectCores()
@@ -57,12 +52,15 @@ build_predictive_knn <- function(train_x,
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
-  # https://daviddalpiaz.github.io/stat432sp18/supp/knn_class_r.html
-  model <- caret::knn3(
+  model <- caret::train(
     x = train_x,
-    y = as.factor(train_y),
-    k = neighbors
+    y = as.factor(as.factor(train_y)),
+    method = "knn",
+    trControl = fit_cv,
+    preProc = c("center", "scale"),
+    tuneLength = 10
   )
+
 
   # stop parallel computation
   parallel::stopCluster(cl)
@@ -86,7 +84,7 @@ build_predictive_knn <- function(train_x,
 predict_knn <- function(model,
                         test_x) {
 
-  outdat <- as.factor(predict(model, test_x, type = "class"))
+  outdat <- as.factor(predict(model, test_x))
 
   return(outdat)
 }

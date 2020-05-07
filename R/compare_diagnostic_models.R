@@ -23,7 +23,7 @@ compare_diagnostic_models <- function(modellist) {
                   ))
         }
       }
-    } else if (n %in% c("elasticnet_grid", "svm", "knn", "random_forest")) {
+    } else if (n %in% c("elasticnet_grid", "svm", "knn", "rf")) {
       outdat <-
         rbind(outdat,
               data.table::data.table(
