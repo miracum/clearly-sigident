@@ -85,8 +85,8 @@ usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
 
 # Development package
-preproc_tag <- "v0.0.4"
-func_tag <- "v0.0.3"
+preproc_tag <- "development"
+func_tag <- "development"
 
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = preproc_tag, upgrade = "always")
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.func", ref = func_tag, upgrade = "always")
