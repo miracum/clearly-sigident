@@ -73,10 +73,9 @@ usethis::use_package("survminer", type="Imports")
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700
-usethis::use_package("knitr", type = "Suggests")
-usethis::use_package("e1071", type="Suggests")
 
 # Suggests
+usethis::use_package("e1071", type="Suggests")
 usethis::use_package("testthat", type = "Suggests")
 usethis::use_package("devtools", type = "Suggests")
 usethis::use_package("rmarkdown", type = "Suggests")

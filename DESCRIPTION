@@ -39,13 +39,14 @@ Imports:
     plyr,
     survminer
 Suggests: 
-    knitr,
     e1071,
     testthat,
     devtools,
     rmarkdown,
     qpdf,
+    knitr,
     lintr
-Remotes:  
+Remotes: 
     url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/development/sigident.preproc-development.zip,
     url::https://gitlab.miracum.org/clearly/sigident.func/-/archive/development/sigident.func-development.zip
+RoxygenNote: 7.1.0
