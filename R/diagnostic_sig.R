@@ -136,7 +136,7 @@ glm_prediction <- function(model,
 #' @param traininglist A list object containing the training data. The output
 #'   of the function `create_training_test_split()`.
 #' @param type A character string. The algorihm used to perform calculations.
-#'   Currently implemented are \emph{"elasitnet_grid", "lasso", "elastic"}.
+#'   Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic"}.
 #'
 #' @param alpha A numeric between 0 and 1. The elastic net mixing parameter
 #'   passed to `glmnet::glmnet()`.
@@ -151,13 +151,13 @@ signature <- function(traininglist,
                       seed) {
 
   stopifnot(
-    type %in% c("elasitnet_grid", "lasso", "elastic"),
+    type %in% c("elasticnet_grid", "lasso", "elastic"),
     is.numeric(nfolds),
     is.numeric(seed),
     is.list(traininglist)
   )
 
-  if (type == "elasitnet_grid") {
+  if (type == "elasticnet_grid") {
     outlist <- glmnet_gridsearch(traininglist, seed, nfolds)
   } else {
     # use provided alpha only in elastic
@@ -437,6 +437,30 @@ validate_diagnostic_signatures <- function(validationstudylist,
           roc = roc
         )
       }
+    } else if (i %in% "elasticnet_grid") {
+      # TODO add other caret-baased models here
+      predicted <- predict_glm(model = models[[i]]$model,
+                               test_x = v_data_all,
+                               type = "response")
+
+      confmat <-
+        caret::confusionMatrix(
+          data = factor(ifelse(
+            as.numeric(as.character(predicted)) < 0.5, 0, 1
+          )),
+          reference = factor(diagnosis),
+          positive = "1"
+        ) # determine the true case with the 'positive' argument
+
+      # Calculate Roc
+      roc <- calc_roc(test_y = diagnosis,
+                      prediction = predicted)
+
+      outlist[[st]][[i]] <- list(
+        predicted = predicted,
+        confmat = confmat,
+        roc = roc
+      )
     }
   }
   }
