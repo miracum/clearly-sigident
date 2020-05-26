@@ -26,6 +26,7 @@ Make sure, that both R packages, sigidnet.preproc and sigident, are installed.
 library(sigident)
 library(sigident.preproc)
 library(knitr)
+library(caret)
 
 rm(list=ls())
 
@@ -97,10 +98,104 @@ diagnostic_knn <- sigident::signature(traininglist = training_list,
                                          seed = seed)
 # Random Forest
 diagnostic_rf <- sigident::signature(traininglist = training_list,
-                                        type = "random_forest",
+                                        type = "rf",
                                         nfolds = nfolds,
                                         seed = seed)
 
 
 ```
+
+
+# KNN testing
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(sigident)
+library(sigident.preproc)
+library(knitr)
+library(caret)
+
+rm(list=ls())
+
+# initialize filePath:
+filePath <- tempdir()
+
+# define datadir
+maindir <- "./geodata/"
+datadir <- paste0(maindir, "data/")
+dir.create(maindir)
+dir.create(datadir)
+
+# define plotdir
+plotdir <- "./plots/"
+dir.create(plotdir)
+
+# define idtype
+idtype = "affy"
+
+# general
+csvdir <- "./csv/"
+dir.create(csvdir)
+
+# diagnostic signature
+seed <- 111
+split <- 0.8
+nfolds <- 10
+
+# Set variables
+pathDiagnosis = "vignettes/diagnosis.csv"
+pathMergeset = "vignettes/mergeset_100.csv"
+seed <- 111
+split <- 0.8
+nfolds <- 10
+plotdir <- "./plots/"
+dir.create(plotdir)
+
+# Read in small mergeset file (1 000 features instead of 54 000)
+mergesetData <- read.csv(pathMergeset, header=TRUE, row.names=1)
+
+# Read in diagnosis file
+diagnosisData <- read.csv(pathDiagnosis, header=TRUE, row.names=1)
+# diagnosis <- subset(diagnosis, select=c("a"))
+
+# Create training list
+training_list <- sigident::create_training_test_split(diagnosis = diagnosisData,
+                                               mergeset = mergesetData,
+                                               split = split,
+                                               seed = seed)
+
+
+   
+# KNN
+diagnostic_knn <- sigident::signature(traininglist = training_list,
+                                         type = "knn",
+                                         nfolds = nfolds,
+                                         seed = seed)
+
+```
+library(ISLR)
+library(caret)
+
+ctrl <- trainControl(method="repeatedcv",repeats = 3)
+
+knnFit <- caret::train(
+    x = training_list$train$x,
+    y = training_list$train$y,
+    method = "knn",
+    trControl = ctrl,
+    preProc = c("center", "scale"),
+    tuneLength = 10
+    )
+
+
+plot(diagnostic_svm$model)
+plot(diagnostic_knn$model)
+plot(diagnostic_rf$model)
+
+plot(diagnostic_svm$fit_cv)
+plot(diagnostic_knn$fit_cv)
+plot(diagnostic_rf$fit_cv)
 

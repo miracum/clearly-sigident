@@ -1,4 +1,14 @@
-random_forest <- function(traininglist, seed, nfolds) {
+#' @title rf_classifier
+#'
+#' @description Helper function to create a rf classifier model
+#'
+#' @param traininglist A list object containing the training data. The output
+#'   of the function `create_training_test_split()`.
+#'
+#' @param seed Intilization state of random number generator
+#'
+#' @export
+rf_classifier <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
@@ -12,17 +22,17 @@ random_forest <- function(traininglist, seed, nfolds) {
                                        traininglist$train$y,
                                        outlist$fit_cv,
                                        metric
-                                       )
+  )
 
   outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
   outlist$prediction <- predict(outlist$model, traininglist$test$x)
   outlist$confusion_matrix <- caret::confusionMatrix(
-   outlist$prediction, as.factor(traininglist$test$y)
+    outlist$prediction, as.factor(traininglist$test$y)
   )
   outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
 
   return(outlist)
- }
+}
 
 
 #' @title build_predictive_rf
@@ -77,7 +87,7 @@ build_predictive_rf <- function(train_x,
 #'
 #' @export
 predict_rf <- function(model,
-                        test_x) {
+                       test_x) {
 
   outdat <- as.factor(predict(model, test_x, type = "class"))
 

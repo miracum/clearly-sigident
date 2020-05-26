@@ -143,7 +143,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
   # RF
   rv$diagnostic_rf <- signature(
     traininglist = rv$training_list,
-    type = "random_forest",
+    type = "rf",
     nfolds = rv$nfolds,
     seed = rv$seed
   )

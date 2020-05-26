@@ -157,7 +157,7 @@ signature <- function(traininglist,
                 "elastic",
                 "svm",
                 "knn",
-                "random_forest"),
+                "rf"),
     is.numeric(nfolds),
     is.numeric(seed),
     is.list(traininglist)
@@ -170,8 +170,8 @@ signature <- function(traininglist,
     outlist <- svm_classifier(traininglist, seed, nfolds)
   } else if (type == "knn") {
     outlist <- knn_classifier(traininglist, seed, nfolds)
-  } else if (type == "random_forest") {
-    outlist <- random_forest(traininglist, seed, nfolds)
+  } else if (type == "rf") {
+    outlist <- rf_classifier(traininglist, seed, nfolds)
   } else {
     # use provided alpha only in elastic
     if (type == "lasso") {
@@ -425,7 +425,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
   v_data_all <- t(expr)
 
   for (i in names(models)) {
-    if (i %in% c("lasso", "elasticnet", "lasso", "elastic", "svm", "knn", "random_forest")) {
+    if (i %in% c("lasso", "elasticnet", "elastic")) {
       for (j in c("min", "1se")) {
         predicted <- predict_glm(model = models[[i]][[j]]$model,
                                  test_x = v_data_all,
@@ -450,6 +450,33 @@ validate_diagnostic_signatures <- function(validationstudylist,
           roc = roc
         )
       }
+    }
+  }
+  for (i in names(models)) {
+    if (i %in% c("svm", "knn", "rf")) {
+
+        predicted <- predict(object = models[[i]]$model,
+                                 test_x = v_data_all)
+
+        confmat <-
+          caret::confusionMatrix(
+            data = factor(ifelse(
+              as.numeric(as.character(predicted)) < 0.5, 0, 1
+            )),
+            reference = factor(diagnosis),
+            positive = "1"
+          ) # determine the true case with the 'positive' argument
+
+        # Calculate Roc
+        roc <- calc_roc(test_y = diagnosis,
+                        prediction = predicted)
+
+        outlist[[st]][[i]] <- list(
+          predicted = predicted,
+          confmat = confmat,
+          roc = roc
+        )
+
     }
   }
   }
