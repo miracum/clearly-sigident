@@ -561,7 +561,7 @@ diagnostic_models$elasticnet[["1se"]]$confmat
 #### Elastic net (grid search)
 
 ```{r}
-diagnostic_models$grid$confmat
+diagnostic_models$elasticnet_grid$confmat
 ```
 
 ### Export selected IDs for each model 
@@ -602,6 +602,15 @@ signaturegenes <- sigident::gene_map_sig(
 )
 data.table::fwrite(signaturegenes,
                    paste0(csvdir, "signaturegenes_elasticnet_1se.csv"))
+```
+
+```{r}
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$elasticnet_grid$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_elasticnet_grid.csv"))
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
