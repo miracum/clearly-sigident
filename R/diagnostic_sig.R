@@ -106,7 +106,7 @@ glm_prediction <- function(model,
   outlist <- list()
 
   # Calculate prediction
-  outlist$predicted <- predict_glm(
+  outlist$prediction <- predict_glm(
     model = model,
     test_x = test_x,
     s = s,
