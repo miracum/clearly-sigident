@@ -163,7 +163,6 @@ signature <- function(traininglist,
     is.list(traininglist)
   )
 
-
   if (type == "elasticnet_grid") {
     outlist <- glmnet_gridsearch(traininglist, seed, nfolds)
   } else if (type == "svm") {
@@ -425,7 +424,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
   v_data_all <- t(expr)
 
   for (i in names(models)) {
-    if (i %in% c("lasso", "elasticnet", "elastic")) {
+    if (i %in% c("lasso", "elasticnet")) {
       for (j in c("min", "1se")) {
         predicted <- predict_glm(model = models[[i]][[j]]$model,
                                  test_x = v_data_all,
@@ -450,6 +449,30 @@ validate_diagnostic_signatures <- function(validationstudylist,
           roc = roc
         )
       }
+    } else if (i %in% "elasticnet_grid") {
+      # TODO add other caret-baased models here
+      predicted <- predict_glm(model = models[[i]]$model,
+                               test_x = v_data_all,
+                               type = "response")
+
+      confmat <-
+        caret::confusionMatrix(
+          data = factor(ifelse(
+            as.numeric(as.character(predicted)) < 0.5, 0, 1
+          )),
+          reference = factor(diagnosis),
+          positive = "1"
+        ) # determine the true case with the 'positive' argument
+
+      # Calculate Roc
+      roc <- calc_roc(test_y = diagnosis,
+                      prediction = predicted)
+
+      outlist[[st]][[i]] <- list(
+        predicted = predicted,
+        confmat = confmat,
+        roc = roc
+      )
     }
   }
   for (i in names(models)) {

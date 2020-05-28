@@ -350,7 +350,7 @@ training_list <- sigident::create_training_test_split(
 
 ## Lasso regression
 
-Regularization requires the selection of a tuning parameter (lambda) that determines the strength of regularization. The function `signature` performs an `nfolds` cross-validation to select the best lambda and additionally builds the predictive model. `seed` is again set for reproducibility. The plot depicts the mean squared error as the criteron for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features (genes) above the plot. The left dashed vertical line represents the log of the optimal value of lambda ('lambda min'), which results in the lowest prediction error and giving the most accurate model. The right dashed vertical line indicates the log of the lambda value resulting in a model with the smallest number of included variables but also lies within one standard error of the optimal value of lambda ('lambda 1se').   
+Regularization requires the selection of a tuning parameter (lambda) that determines the strength of regularization. The function `signature` performs an `nfolds` cross-validation to select the best lambda and additionally builds the predictive model. `seed` is again set for reproducibility. The plot depicts the mean squared error as the criterion for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features (genes) above the plot. The left dashed vertical line represents the log of the optimal value of lambda ('lambda min'), which results in the lowest prediction error and giving the most accurate model. The right dashed vertical line indicates the log of the lambda value resulting in a model with the smallest number of included variables but also lies within one standard error of the optimal value of lambda ('lambda 1se').   
 Furthermore, a ROC curve is plotted to visualize the performance measurement of the model.  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -426,12 +426,12 @@ knitr::include_graphics(filename)
 
 ## Gridsearch to find alpha and lambda
 
-Setting `type = "elasitnet_grid"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).  
+Setting `type = "elasticnet_grid"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_glmgrid <- sigident::signature(
   traininglist = training_list,
-  type = "elasitnet_grid",
+  type = "elasticnet_grid",
   nfolds = nfolds,
   seed = seed
 )
@@ -498,11 +498,11 @@ diagnostic_models <- list(
                  "auc" = as.numeric(diagnostic_elasticnet$roc_1se$auc)
                  )
   ),
-  "elasitnet_grid" = list(
+  "elasticnet_grid" = list(
     "CV" = diagnostic_glmgrid$caret_train,
     "model" = diagnostic_glmgrid$elasticnet_auto,
     "confmat" = diagnostic_glmgrid$confmat_elasticnet,
-    "prediction" = diagnostic_elasticnet$predicted_elasticnet,
+    "prediction" = diagnostic_glmgrid$predicted_elasticnet,
     "auc" = as.numeric(diagnostic_glmgrid$roc_elasticnet$auc)
     )
 )
@@ -561,7 +561,7 @@ diagnostic_models$elasticnet[["1se"]]$confmat
 #### Elastic net (grid search)
 
 ```{r}
-diagnostic_models$grid$confmat
+diagnostic_models$elasticnet_grid$confmat
 ```
 
 ### Export selected IDs for each model 
@@ -602,6 +602,15 @@ signaturegenes <- sigident::gene_map_sig(
 )
 data.table::fwrite(signaturegenes,
                    paste0(csvdir, "signaturegenes_elasticnet_1se.csv"))
+```
+
+```{r}
+signaturegenes <- sigident::gene_map_sig(
+  mergeset = mergeset,
+  model = diagnostic_models$elasticnet_grid$model
+)
+data.table::fwrite(signaturegenes,
+                   paste0(csvdir, "signaturegenes_elasticnet_grid.csv"))
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -724,6 +733,22 @@ sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$elasticnet[["1se"]
 knitr::include_graphics(filename)
 ```
 
+#### Elasticnet gridsearch (best model) 
+
+```{r}
+validation_results[["GSE30219"]]$elasticnet_grid$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_grid.png")
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$elasticnet_grid$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 validation_results[["GSE30219"]] <- NULL
 gc()
@@ -795,6 +820,27 @@ sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$elasticnet[["1se"]
 knitr::include_graphics(filename)
 ```
 
+#### Elasticnet gridsearch (best model) 
+
+```{r}
+validation_results[["GSE33356"]]$elasticnet_grid$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_grid.png")
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$elasticnet_grid$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+validation_results[["GSE33356"]] <- NULL
+gc()
+```
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 validation_results[["GSE33356"]] <- NULL
 gc()
@@ -864,6 +910,27 @@ sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$elasticnet[["1se"
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
+```
+
+#### Elasticnet gridsearch (best model) 
+
+```{r}
+validation_results[["GSE102287"]]$elasticnet_grid$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_grid.png")
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$elasticnet_grid$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+validation_results[["GSE102287"]] <- NULL
+gc()
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}

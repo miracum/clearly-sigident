@@ -21,7 +21,11 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
+<<<<<<< HEAD
 my_desc$set_version("0.0.5.9001")
+=======
+my_desc$set_version("0.0.5.9002")
+>>>>>>> development
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -77,10 +81,9 @@ usethis::use_package("randomForest", type="Imports")
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700
-usethis::use_package("knitr", type = "Suggests")
-usethis::use_package("e1071", type="Suggests")
 
 # Suggests
+usethis::use_package("e1071", type="Suggests")
 usethis::use_package("testthat", type = "Suggests")
 usethis::use_package("devtools", type = "Suggests")
 usethis::use_package("rmarkdown", type = "Suggests")
@@ -89,8 +92,8 @@ usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
 
 # Development package
-preproc_tag <- "v0.0.4"
-func_tag <- "v0.0.3"
+preproc_tag <- "development"
+func_tag <- "development"
 
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = preproc_tag, upgrade = "always")
 devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.func", ref = func_tag, upgrade = "always")
