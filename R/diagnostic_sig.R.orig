@@ -106,7 +106,7 @@ glm_prediction <- function(model,
   outlist <- list()
 
   # Calculate prediction
-  outlist$prediction <- predict_glm(
+  outlist$predicted <- predict_glm(
     model = model,
     test_x = test_x,
     s = s,
@@ -136,8 +136,12 @@ glm_prediction <- function(model,
 #' @param traininglist A list object containing the training data. The output
 #'   of the function `create_training_test_split()`.
 #' @param type A character string. The algorihm used to perform calculations.
+<<<<<<< HEAD
 #'   Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic",
 #'   "svm", "knn"}.
+=======
+#'   Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic"}.
+>>>>>>> development
 #'
 #' @param alpha A numeric between 0 and 1. The elastic net mixing parameter
 #'   passed to `glmnet::glmnet()`.
@@ -152,17 +156,25 @@ signature <- function(traininglist,
                       seed) {
 
   stopifnot(
+<<<<<<< HEAD
     type %in% c("elasticnet_grid",
                 "lasso",
                 "elastic",
                 "svm",
                 "knn",
                 "rf"),
+=======
+    type %in% c("elasticnet_grid", "lasso", "elastic"),
+>>>>>>> development
     is.numeric(nfolds),
     is.numeric(seed),
     is.list(traininglist)
   )
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> development
   if (type == "elasticnet_grid") {
     outlist <- glmnet_gridsearch(traininglist, seed, nfolds)
   } else if (type == "svm") {
@@ -424,7 +436,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
   v_data_all <- t(expr)
 
   for (i in names(models)) {
-    if (i %in% c("lasso", "elasticnet")) {
+    if (i %in% c("lasso", "elasticnet", "elastic")) {
       for (j in c("min", "1se")) {
         predicted <- predict_glm(model = models[[i]][[j]]$model,
                                  test_x = v_data_all,
