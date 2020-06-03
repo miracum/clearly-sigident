@@ -106,7 +106,7 @@ glm_prediction <- function(model,
   outlist <- list()
 
   # Calculate prediction
-  outlist$prediction <- predict_glm(
+  outlist$predicted <- predict_glm(
     model = model,
     test_x = test_x,
     s = s,
@@ -306,7 +306,7 @@ glmnet_gridsearch <- function(traininglist, seed, nfolds) {
     s = NULL
   )
 
-  outlist$predicted_elasticnet <- pred_elasticnet$prediction
+  outlist$predicted_elasticnet <- pred_elasticnet$predicted
   outlist$confmat_elasticnet <- pred_elasticnet$confmat
   outlist$roc_elasticnet <- pred_elasticnet$roc
 
