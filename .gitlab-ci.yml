@@ -11,7 +11,7 @@ variables:
   DOCKER_REGISTRY: "docker.miracum.org"
   IMAGE_PATH: "r_package_ci"
   CI_IMAGE_NAME: "${DOCKER_REGISTRY}/${IMAGE_PATH}/${CI_PROJECT_NAME}_base_image"
-  CI_IMAGE_TAG: "0.0.2"
+  CI_IMAGE_TAG: "0.0.3"
   R_PKG_NAME: "sigident"
 
 # set DOCKER_AUTH_CONFIG in settings CI/CD
