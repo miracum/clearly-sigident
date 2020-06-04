@@ -34,3 +34,4 @@ Meta
 !/*.Rproj
 /.vscode
 !/.lintr
+docs/
