@@ -9,7 +9,8 @@ Authors@R:
              comment = c(ORCID = "0000-0003-1866-860X")),
       person(given = "Johannes",
              family = "Vey",
-             role = "aut"),
+             role = "aut",
+             comment = c(ORCID = "0000-0002-2610-9667")),
       person(given = "Meik",
              family = "Kunz",
              role = "ctb"),
@@ -19,11 +20,11 @@ Authors@R:
 Description: Identify diagnostic and prognostic signatures from gene expression datasets.
 License: GPL-3
 LazyData: true
-URL: https://gitlab.miracum.org/clearly/sigident
-BugReports: https://gitlab.miracum.org/clearly/sigident/issues
+URL: https://github.com/miracum/clearly-sigident
+BugReports: https://github.com/miracum/clearly-sigident/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
-Date: 2020-05-26
+Date: 2020-06-04
 biocViews: 
 Imports: 
     data.table,
@@ -47,6 +48,6 @@ Suggests:
     knitr,
     lintr
 Remotes: 
-    url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/development/sigident.preproc-development.zip,
-    url::https://gitlab.miracum.org/clearly/sigident.func/-/archive/development/sigident.func-development.zip
+    github::miracum/clearly-sigident.preproc@development,
+    github::miracum/clearly-sigident.func@development
 RoxygenNote: 7.1.0

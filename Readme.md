@@ -24,7 +24,7 @@ You can install *sigident* with the following commands in R:
 ```r
 options('repos' = 'https://ftp.fau.de/cran/')
 install.packages("devtools")
-devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
+devtools::install_github("miracum/clearly-sigident")
 ```
 
 The version of the package, which was used for the publication [A Toolbox for Functional Analysis and the Systematic Identification of Diagnostic and Prognostic Gene Expression Signatures Combining Meta-Analysis and Machine Learning](https://www.mdpi.com/2072-6694/11/10/1606) can anytime be reproduced using the version tag *v0.0.2* during the installation process:
