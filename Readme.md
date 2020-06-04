@@ -1,6 +1,7 @@
 # sigident (!!! under development !!!)
 
 <!-- badges: start -->
+[![R CMD Check via {tic}](https://github.com/miracum/clearly-sigident/workflows/R%20CMD%20Check%20via%20{tic}/badge.svg?branch=master)](https://github.com/miracum/clearly-sigident/actions)
 [![pipeline status](https://gitlab.miracum.org/clearly/sigident/badges/master/pipeline.svg)](https://gitlab.miracum.org/clearly/sigident/commits/master)
 [![coverage report](https://gitlab.miracum.org/clearly/sigident/badges/master/coverage.svg)](https://gitlab.miracum.org/clearly/sigident/commits/master)
 <!-- badges: end -->
