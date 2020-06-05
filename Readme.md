@@ -26,7 +26,6 @@ Currently implemented features are:
 You can install *sigident* with the following commands in R:
 
 ```r
-options('repos' = 'https://ftp.fau.de/cran/')
 install.packages("devtools")
 devtools::install_github("miracum/clearly-sigident")
 ```
