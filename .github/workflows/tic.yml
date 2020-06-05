@@ -21,10 +21,9 @@ jobs:
       matrix:
         config:
           # use a different tic template type if you do not want to build on all listed platforms
-          - { os: windows-latest, r: "release" }
-          - { os: macOS-latest, r: "release", pkgdown: "true", latex: "true" }
-          - { os: macOS-latest, r: "devel" }
-          - { os: ubuntu-latest, r: "release" }
+          - { os: windows-latest, r: "release", pkgdown: "true", latex: "true", java: "false" }
+          - { os: macOS-latest, r: "release", pkgdown: "true", latex: "true", java: "false" }
+          - { os: ubuntu-latest, r: "release", pkgdown: "true", latex: "true", java: "false" }
 
     env:
       # otherwise remotes::fun() errors cause the build to fail. Example: Unavailability of binaries
@@ -36,8 +35,6 @@ jobs:
       CCACHE_DIR: ${{ GITHUB.WORKSPACE }}/.ccache
       CCACHE_NOHASHDIR: true
       CCACHE_SLOPPINESS: include_file_ctime
-      # make sure to run `tic::use_ghactions_deploy()` to set up deployment
-      TIC_DEPLOY_KEY: ${{ secrets.TIC_DEPLOY_KEY }}
       # prevent rgl issues because no X11 display is available
       RGL_USE_NULL: true
       # if you use bookdown or blogdown, replace "PKGDOWN" by the respective
@@ -49,7 +46,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v2.1.1
+      - uses: actions/checkout@master
 
       - uses: r-lib/actions/setup-r@master
         with:
@@ -64,6 +61,12 @@ jobs:
         if: matrix.config.latex == 'true'
 
       - uses: r-lib/actions/setup-pandoc@master
+        if: matrix.config.latex == 'true'
+
+      - uses: actions/setup-java@master
+        if: matrix.config.java == 'true'
+        with:
+          java-version: '8'
 
       # set date/week for use in cache creation
       # https://github.community/t5/GitHub-Actions/How-to-set-and-access-a-Workflow-variable/m-p/42970
@@ -75,7 +78,7 @@ jobs:
 
       - name: "[Cache] Cache R packages"
         if: runner.os != 'Windows'
-        uses: pat-s/always-upload-cache@v2.0.0
+        uses: pat-s/always-upload-cache@master
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-r-${{ matrix.config.r }}-${{steps.date.outputs.date}}
@@ -91,30 +94,23 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt install libcurl4-openssl-dev
 
-      - name: "[Stage] [Linux] Install javastuff"
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt install libbz2-dev r-cran-rjava liblzma-dev openjdk-8-jdk
-          sudo R CMD javareconf
+      - name: "[Stage] Configure R Java"
+        if: runner.os != 'Windows' && matrix.config.java == 'true'
+        run: sudo R CMD javareconf
+
 
       - name: "[Stage] [Linux] Install Magick++"
-        if: runner.os = 'macOS'
+        if: runner.os == 'Linux'
         run: sudo apt install libmagick++-dev
 
       - name: "[Stage] [macOS] Install Magick++"
-        if: runner.os = 'macOS'
+        if: runner.os == 'macOS'
         run: brew install imagemagick@6
+
 
       - name: "[Stage] Install"
         if: matrix.config.os != 'macOS-latest' || matrix.config.r != 'devel'
         run: Rscript -e "remotes::install_github('ropensci/tic')" -e "print(tic::dsl_load())" -e "tic::prepare_all_stages()" -e "tic::before_install()" -e "tic::install()"
-
-      # macOS devel needs its own stage because we need to work with an option to suppress the usage of binaries
-      - name: "[Stage] Prepare & Install (macOS-devel)"
-        if: matrix.config.os == 'macOS-latest' && matrix.config.r == 'devel'
-        run: |
-          echo -e 'options(Ncpus = 4, pkgType = "source", repos = structure(c(CRAN = "https://cloud.r-project.org/")))' > $HOME/.Rprofile
-          Rscript -e "remotes::install_github('ropensci/tic')" -e "print(tic::dsl_load())" -e "tic::prepare_all_stages()" -e "tic::before_install()" -e "tic::install()"
 
       - name: "[Stage] Script"
         run: Rscript -e 'tic::script()'

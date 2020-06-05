@@ -1,6 +1,6 @@
 Package: sigident
 Title: Signature Analyses in Genomic Expression Sets
-Version: 0.0.5.9002
+Version: 0.0.5.9003
 Authors@R: 
     c(person(given = "Lorenz A.",
              family = "Kapsner",
@@ -24,7 +24,7 @@ URL: https://github.com/miracum/clearly-sigident
 BugReports: https://github.com/miracum/clearly-sigident/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
-Date: 2020-06-04
+Date: 2020-06-05
 biocViews: 
 Imports: 
     data.table,
@@ -47,7 +47,6 @@ Suggests:
     qpdf,
     knitr,
     lintr
-Remotes: 
+Remotes:  
     github::miracum/clearly-sigident.preproc@development,
     github::miracum/clearly-sigident.func@development
-RoxygenNote: 7.1.0
