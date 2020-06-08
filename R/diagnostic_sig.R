@@ -478,20 +478,19 @@ validate_diagnostic_signatures <- function(validationstudylist,
   for (i in names(models)) {
     if (i %in% c("svm", "knn", "rf")) {
 
-        predicted <- predict(object = models[[i]]$model,
-                                 test_x = v_data_all)
+        predicted <- predict(models[[i]]$model,
+                                 v_data_all)
 
         confmat <-
           caret::confusionMatrix(
-            data = factor(ifelse(
-              as.numeric(as.character(predicted)) < 0.5, 0, 1
-            )),
-            reference = factor(diagnosis),
-            positive = "1"
-          ) # determine the true case with the 'positive' argument
+            predicted,
+            as.factor(diagnosis)
+            #,positive = "1"
+          )
+        # determine the true case with the 'positive' argument
 
         # Calculate Roc
-        roc <- calc_roc(test_y = diagnosis,
+        roc <- calc_roc(test_y = as.factor(diagnosis),
                         prediction = predicted)
 
         outlist[[st]][[i]] <- list(
