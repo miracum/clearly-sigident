@@ -484,8 +484,8 @@ validate_diagnostic_signatures <- function(validationstudylist,
         confmat <-
           caret::confusionMatrix(
             predicted,
-            as.factor(diagnosis)
-            #,positive = "1"
+            as.factor(diagnosis),
+            positive = "1"
           )
         # determine the true case with the 'positive' argument
 
