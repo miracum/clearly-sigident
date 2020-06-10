@@ -223,17 +223,17 @@ sigidentDiagnostic <- function(mergeset, # nolint
     ),
 
     "knn" = list(
-      "model" = rv$diagnostic_svm$model,
-      "confmat" = rv$diagnostic_svm$confusion_matrix,
-      "prediction" = rv$diagnostic_svm$prediction,
-      "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
+      "model" = rv$diagnostic_knn$model,
+      "confmat" = rv$diagnostic_knn$confusion_matrix,
+      "prediction" = rv$diagnostic_knn$prediction,
+      "auc" = as.numeric(rv$diagnostic_knn$roc$auc)
     ),
 
     "rf" = list(
-      "model" = rv$diagnostic_svm$model,
-      "confmat" = rv$diagnostic_svm$confusion_matrix,
-      "prediction" = rv$diagnostic_svm$prediction,
-      "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
+      "model" = rv$diagnostic_rf$model,
+      "confmat" = rv$diagnostic_rf$confusion_matrix,
+      "prediction" = rv$diagnostic_rf$prediction,
+      "auc" = as.numeric(rv$diagnostic_rf$roc$auc)
     ),
 
     "elasticnet_grid" = list(
