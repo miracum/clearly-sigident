@@ -54,7 +54,7 @@ build_predictive_rf <- function(train_x,
 
   # go parallel
   ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 2, 2, ncores)
+  cores <- ifelse(ncores > 2, ncores-1, ncores)
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
