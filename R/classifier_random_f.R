@@ -4,32 +4,39 @@
 #'
 #' @param traininglist A list object containing the training data. The output
 #'   of the function `create_training_test_split()`.
-#'
 #' @param seed Intilization state of random number generator
 #'
-#' @export
+#' @inheritParams sigidentDiagnostic
+#'
 rf_classifier <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
   outlist$fit_cv <- caret::trainControl(
-    method = "repeatedcv", number = nfolds,
+    method = "repeatedcv",
+    number = nfolds,
     repeats = 3
   )
   metric <- "Accuracy"
 
-  outlist$model <- build_predictive_rf(traininglist$train$x,
-                                       traininglist$train$y,
-                                       outlist$fit_cv,
-                                       metric
+  outlist$rf_model <- build_predictive_rf(
+    traininglist$train$x,
+    traininglist$train$y,
+    outlist$fit_cv,
+    metric
   )
 
-  outlist$importance <- caret::varImp(outlist$model, scale = FALSE)
-  outlist$prediction <- predict(outlist$model, traininglist$test$x)
-  outlist$confusion_matrix <- caret::confusionMatrix(
-    outlist$prediction, as.factor(traininglist$test$y)
+  outlist$predicted_rf <- predict_rf(
+    model = outlist$rf_model,
+    test_x = traininglist$test$x
   )
-  outlist$roc <- calc_roc(outlist$prediction, as.factor(traininglist$test$y))
+  outlist$confmat_rf <- caret::confusionMatrix(
+    outlist$predicted_rf, as.factor(traininglist$test$y)
+  )
+  outlist$roc_rf <- calc_roc(
+    outlist$predicted_rf,
+    as.factor(traininglist$test$y)
+  )
 
   return(outlist)
 }
@@ -41,12 +48,10 @@ rf_classifier <- function(traininglist, seed, nfolds) {
 #' the given data.
 #'
 #' @param train_x The learning data values.
-#'
 #' @param train_y The learning data classes.
-#'
 #' @param fit_cv Options for the cross validation
+#' @param metric A character. The metric to be used during caret::train.
 #'
-#' @export
 build_predictive_rf <- function(train_x,
                                 train_y,
                                 fit_cv,
@@ -54,7 +59,7 @@ build_predictive_rf <- function(train_x,
 
   # go parallel
   ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 2, ncores-1, ncores)
+  cores <- ifelse(ncores > 2, ncores - 1, ncores)
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
@@ -65,7 +70,7 @@ build_predictive_rf <- function(train_x,
     trControl = fit_cv,
     metric = metric,
     preProc = c("center", "scale"),
-    tuneLength = 10,
+    tuneLength = 5,
     allowParallel = T)
   # stop parallel computation
   parallel::stopCluster(cl)
@@ -85,12 +90,16 @@ build_predictive_rf <- function(train_x,
 #'
 #' @param test_x The data to be classified.
 #'
-#' @export
 predict_rf <- function(model,
                        test_x) {
 
-  outdat <- as.factor(predict(model, test_x, type = "class"))
+  outdat <- as.factor(
+    stats::predict(
+      model,
+      test_x,
+      type = "class"
+    )
+  )
 
   return(outdat)
 }
-

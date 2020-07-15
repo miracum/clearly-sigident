@@ -47,10 +47,6 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 # Preprocessing 
 
-In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
-
-For a more detailed background and description of the following steps please view the `sigident.preproc` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
-
 ## Initialization of important variables
 
 ```{r setup}
@@ -58,7 +54,6 @@ library(sigident)
 library(sigident.preproc)
 library(sigident.func)
 library(knitr)
-library(caret)
 
 # initialize filePath:
 filePath <- tempdir()
@@ -107,8 +102,6 @@ studiesinfo <- list(
 
 ## Load GEO datasets
 
-All downloaded datasets will be assigned to the global environment.
-
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 sigident.preproc::load_geo_data(
   studiesinfo = studiesinfo,
@@ -120,31 +113,13 @@ sigident.preproc::load_geo_data(
 ) 
 ```
 
-### Visualize batch effect
-
-By using the argument `viz_batch_boxp = TRUE` and `viz_batch_gpca = TRUE`, one can visualize batch effects before and after correction with two methods: boxplots and gPCA and store them in the directory specified in `plotdir`. For further details please view the package vignette of the `sigident.preproc` R package. 
-Due to the ressource intensive calculations of the plots, this argument is set to FALSE here. 
-
 # Preparations for utilizing the sigident package 
 
-Before using the `sigident` package, these variables need to be defined properly. One could use them also as arguments directly in the respective function. However, to keep the code clearer we define them here at the beginning and refer at each function to the respective variable. 
-`idtype` and `plotdir` have already been defined during the preprocessing steps.
-
-In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
-
-For a detailed background on the following steps please view the `sigident.preproc` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
 
 ```{r}
 # general
 csvdir <- "./csv/"
 dir.create(csvdir)
-
-# enrichment analysis
-species <- "Hs"
-OrgDb <- "org.Hs.eg.db"
-organism <- "hsa"
-#pathwayid <- "hsa04110" # Cell Cycle
-pathwayid <- "hsa04151" # PI3K-Akt
 
 # diagnostic signature
 seed <- 111
@@ -154,8 +129,6 @@ nfolds <- 10
 
 # DEG analysis 
 
-For a detailed background and description of the following steps please view the `sigident.func` package's vignette.
-
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # define the false discovery rate here
 fdr <- 0.05
@@ -163,180 +136,11 @@ fdr <- 0.05
 genes <- sigident.func::identify_degs(mergeset = mergeset,
                                       diagnosis = diagnosis,
                                       q_value = fdr)
-
-# heatmap creation
-filename <- paste0(plotdir, "DEG_heatmap.png")
-# create colors for map
-ht_colors <- sigident.func::color_heatmap(sample_metadata = sample_metadata)
-sigident.func::plot_deg_heatmap(mergeset = mergeset,
-                                genes = genes,
-                                patientcolors = ht_colors,
-                                filename = filename)
 ```
-
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r}
-deg_info <- sigident.func::export_deg_annotations(mergedset = mergedset,
-                                                  genes = genes,
-                                                  idtype = idtype)
-data.table::fwrite(deg_info, paste0(csvdir, "DEG_info.csv"))
-```
-
-```{r}
-dim(deg_info)
-knitr::kable(head(deg_info))
-```
-
-```{r}
-deg_results <- sigident.func::limma_top_table(mergeset = mergeset,
-                                              diagnosis = diagnosis,
-                                              q_value = fdr)
-data.table::fwrite(deg_results, paste0(csvdir, "DEG_results.csv"))
-```
-
-```{r}
-dim(deg_results)
-knitr::kable(head(deg_results))
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-rm(deg_info, deg_results, studiesinfo)
-gc()
-```
-
-
-<!-- # Functional analysis -->
-
-<!-- ## Gene enrichment -->
-
-<!-- For a detailed background and description of the following steps please view the `sigident.func` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes). -->
-
-<!-- ```{r} -->
-<!-- deg_entrez <- unique(mergedset@featureData@data$ENTREZ_GENE_ID) -->
-<!-- deg_entrez <- deg_entrez[deg_entrez != ""] -->
-<!-- ``` -->
-
-<!-- ## Test for over-representation  -->
-
-<!-- ```{r} -->
-<!-- enr_topgo <- sigident.func::extract_go_terms(gene = deg_entrez, -->
-<!--                                              species = species) -->
-<!-- data.table::fwrite(enr_topgo, paste0(csvdir, "Top_GO.csv")) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- dim(enr_topgo) -->
-<!-- knitr::kable(head(enr_topgo)) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- enr_topkegg <- sigident.func::extract_kegg_terms(gene = deg_entrez, -->
-<!--                                                  species = species) -->
-<!-- data.table::fwrite(enr_topkegg, paste0(csvdir, "Top_KEGG.csv")) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- dim(enr_topkegg) -->
-<!-- knitr::kable(head(enr_topkegg)) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- enr_fitlm <- sigident.func::go_diff_reg( -->
-<!--   mergeset = mergeset, -->
-<!--   idtype = idtype, -->
-<!--   diagnosis = diagnosis, -->
-<!--   entrezids = mergedset@featureData@data$ENTREZ_GENE_ID -->
-<!-- ) -->
-
-<!-- enr_fitlm_topgo <- sigident.func::extract_go_terms( -->
-<!--   gene = enr_fitlm, -->
-<!--   species = species, -->
-<!--   fdr = 0.01 -->
-<!-- ) -->
-<!-- data.table::fwrite(enr_fitlm_topgo, paste0(csvdir, "Top_GO_fitlm.csv")) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- dim(enr_fitlm_topgo) -->
-<!-- knitr::kable(head(enr_fitlm_topgo)) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- enr_fitlm_topkegg <- sigident.func::extract_kegg_terms( -->
-<!--   gene = enr_fitlm, -->
-<!--   species = species -->
-<!-- ) -->
-<!-- data.table::fwrite(enr_fitlm_topkegg, paste0(csvdir, "Top_KEGG_fitlm.csv")) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- dim(enr_fitlm_topkegg) -->
-<!-- knitr::kable(head(enr_fitlm_topkegg)) -->
-<!-- ``` -->
-
-<!-- ## GO enrichment analysis -->
-
-<!-- ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE} -->
-<!-- enr_analysis <- sigident.func::go_enrichment_analysis( -->
-<!--   gene = deg_entrez, -->
-<!--   org_db = OrgDb, -->
-<!--   organism = organism, -->
-<!--   fitlm = enr_fitlm, -->
-<!--   pathwayid = pathwayid, -->
-<!--   species = organism, -->
-<!--   plotdir = plotdir -->
-<!-- ) -->
-<!-- ``` -->
-<!-- ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE} -->
-<!-- filename <- paste0(plotdir, "/", pathwayid, ".png") -->
-<!-- ``` -->
-<!-- ```{r out.width='80%'} -->
-<!-- knitr::include_graphics(filename) -->
-<!-- ``` -->
-<!-- ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE} -->
-<!-- filename <- paste0(plotdir, "/", pathwayid, ".pathview.png") -->
-<!-- ``` -->
-<!-- ```{r out.width='80%'} -->
-<!-- knitr::include_graphics(filename) -->
-<!-- ``` -->
-
-<!-- ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE} -->
-<!-- filename <- paste0(plotdir, "Enriched_GO.png") -->
-<!-- sigident.func::plot_enriched_barplot( -->
-<!--   enrichmentobj = enr_analysis$go, -->
-<!--   type = "GO", -->
-<!--   filename = filename -->
-<!-- ) -->
-<!-- ``` -->
-<!-- ```{r out.width='80%'} -->
-<!-- knitr::include_graphics(filename) -->
-<!-- ``` -->
-
-<!-- ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE} -->
-<!-- filename <- paste0(plotdir, "Enriched_KEGG.png") -->
-<!-- sigident.func::plot_enriched_barplot( -->
-<!--   enrichmentobj = enr_analysis$kegg, -->
-<!--   type = "KEGG", -->
-<!--   filename = filename -->
-<!-- ) -->
-<!-- ``` -->
-<!-- ```{r out.width='80%'} -->
-<!-- knitr::include_graphics(filename) -->
-<!-- ``` -->
-
-<!-- ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE} -->
-<!-- rm(bods, enr_analysis, enr_fitlm, enr_fitlm_topgo, enr_fitlm_topkegg, -->
-<!--    enr_topgo, enr_topkegg, gene.idtype.bods, korg, cpd.simtypes, -->
-<!--    deg_entrez, gene.idtype.list, ht_colors, mergedset) -->
-<!-- gc() -->
-<!-- ``` -->
 
 # Identification of diagnostic signatures 
 
-A common task regarding gene expression data is to distinguish between different groups or subtypes. In order to train a multi-gene classifier, a large amount of expression data is required. Due to the imbalance of features (p) versus observations (n), the application of an appropriate method is needed.
-
 ## Split data into training and test dataset
-
-A statistical prediction model is usually trained on 70%-80% percent of the present data. `create_training_test_split` randomly splits the merged dataset into a training and a test set with the former defined value `split` regarding to a balanced distribution of the groups (here diagnosis). For reproducibility, a seed must be set.  
 
 ```{r}
 training_list <- sigident::create_training_test_split(
@@ -347,7 +151,7 @@ training_list <- sigident::create_training_test_split(
 )
 ```
 
-## random forest regression 
+## Random Forest Regression 
 
 The random forest regression is a supervised learning algorithm that randomly creates and merges multiple decision trees into one forest. The goal is not to rely on a single learning model, but rather a collection of decision models to improve accuracy. The primary difference between this approach and the standard decision tree algorithms is that the root nodes feature splitting nodes are generated randomly.
 
@@ -358,22 +162,39 @@ diagnostic_rf <- sigident::signature(
   nfolds = nfolds,
   seed = seed
 )
-filename <- paste0(plotdir, "CV_RF.png")
-sigident::plot_cvplot(cv_obj = diagnostic_rf$model,
-                      filename = filename)
+filename <- paste0(plotdir, "RF_model.png")
+sigident::plot_grid_model_plot(
+    model = diagnostic_rf$rf_model,
+    filename = filename
+)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "ROC_RF.png")
-sigident::plot_rocplot(roc = diagnostic_rf$roc,
-                       filename = filename)
+filename <- paste0(plotdir, "RF_variable_importance.png")
+sigident::plot_grid_varimp_plot(
+    model = diagnostic_rf$rf_model,
+    filename = filename
+)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
+
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_RF.png")
+sigident::plot_rocplot(
+    roc = diagnostic_rf$roc_rf,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
 
 ## SVM 
 
@@ -440,24 +261,26 @@ These models can be included into a list and the performance metrices for classi
 
 ```{r}
 diagnostic_models <- list(
-  "svm" = list("model" = diagnostic_svm$model,
-                 "confmat" = diagnostic_svm$confusion_matrix,
-                 "prediction" = diagnostic_svm$prediction,
-                 "auc" = as.numeric(diagnostic_svm$roc$auc)
-                 
-  ),
-  "knn" = list("model" = diagnostic_knn$model,
-                 "confmat" = diagnostic_knn$confusion_matrix,
-                 "prediction" = diagnostic_knn$prediction,
-                 "auc" = as.numeric(diagnostic_knn$roc$auc)
-                 
-  ),
-  "rf" = list("model" = diagnostic_rf$model,
-                 "confmat" = diagnostic_rf$confusion_matrix,
-                 "prediction" = diagnostic_rf$prediction,
-                 "auc" = as.numeric(diagnostic_rf$roc$auc)
-                 
-  )
+  "svm" = list(
+        "model" = diagnostic_svm$svm_model,
+        "confmat" = diagnostic_svm$confmat_svm,
+        "prediction" = diagnostic_svm$predicted_svm,
+        "auc" = as.numeric(diagnostic_svm$roc_svm$auc)
+    ),
+
+    "knn" = list(
+      "model" = diagnostic_knn$knn_model,
+      "confmat" = diagnostic_knn$confmat_knn,
+      "prediction" = diagnostic_knn$predicted_knn,
+      "auc" = as.numeric(diagnostic_knn$roc_knn$auc)
+    ),
+
+    "rf" = list(
+      "model" = diagnostic_rf$rf_model,
+      "confmat" = diagnostic_rf$confmat_rf,
+      "prediction" = diagnostic_rf$predicted_rf,
+      "auc" = as.numeric(diagnostic_rf$roc_rf$auc)
+    )
 )
 ```
 

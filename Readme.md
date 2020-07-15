@@ -1,6 +1,10 @@
 # sigident (!!! under development !!!)
 
 <!-- badges: start -->
+[![R CMD Check via {tic}](https://github.com/miracum/clearly-sigident/workflows/R%20CMD%20Check%20via%20{tic}/badge.svg?branch=master)](https://github.com/miracum/clearly-sigident/actions)
+[![linting](https://github.com/miracum/clearly-sigident/workflows/lint/badge.svg?branch=master)](https://github.com/miracum/clearly-sigident/actions)
+[![test-coverage](https://github.com/miracum/clearly-sigident/workflows/test-coverage/badge.svg?branch=master)](https://github.com/miracum/clearly-sigident/actions)
+[![codecov](https://codecov.io/gh/miracum/clearly-sigident/branch/master/graph/badge.svg)](https://codecov.io/gh/miracum/clearly-sigident)
 [![pipeline status](https://gitlab.miracum.org/clearly/sigident/badges/master/pipeline.svg)](https://gitlab.miracum.org/clearly/sigident/commits/master)
 [![coverage report](https://gitlab.miracum.org/clearly/sigident/badges/master/coverage.svg)](https://gitlab.miracum.org/clearly/sigident/commits/master)
 <!-- badges: end -->
@@ -9,8 +13,8 @@ This is the repository of the R package 'sigident'. It provides core functionali
 
 Currently implemented features are:
 
-- merging of microarray datasets (via the R package [`sigident.preproc`](https://gitlab.miracum.org/clearly/sigident.preproc.git))
-- DEG analysis and functional analysis (via the R package [`sigident.func`](https://gitlab.miracum.org/clearly/sigident.func.git))
+- merging of microarray datasets (via the R package [`sigident.preproc`](https://github.com/miracum/clearly-sigident.preproc.git))
+- DEG analysis and functional analysis (via the R package [`sigident.func`](https://github.com/miracum/clearly-sigident.func.git))
 - Identification and validation of diagnostic signatures, using
   + Lasso regression
   + Elastic net regression
@@ -22,22 +26,21 @@ Currently implemented features are:
 You can install *sigident* with the following commands in R:
 
 ```r
-options('repos' = 'https://ftp.fau.de/cran/')
 install.packages("devtools")
-devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
+devtools::install_github("miracum/clearly-sigident")
 ```
 
 The version of the package, which was used for the publication [A Toolbox for Functional Analysis and the Systematic Identification of Diagnostic and Prognostic Gene Expression Signatures Combining Meta-Analysis and Machine Learning](https://www.mdpi.com/2072-6694/11/10/1606) can anytime be reproduced using the version tag *v0.0.2* during the installation process:
 
 ```r
-devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git", ref = "v0.0.2")
+devtools::install_github("miracum/clearly-sigident", ref = "v0.0.2")
 ```
 
 # Example
 
-Please view the package's vignette to see a detailled description how to prepare datasets in order to be suitable for usage with the `sigident` package and to learn, how to perform merging, signature and functional analyses of microarray data.
+Please view the [package's vignette](vignettes/) to see a detailled description how to prepare datasets in order to be suitable for usage with the `sigident` package and to learn, how to perform merging, signature and functional analyses of microarray data.
 
-Since the building the package vignette takes rather long (~ 40 min.), we provide the already built vignettes in [this repository](https://gitlab.miracum.org/clearly/sigident_vignettes). 
+Since the building the package vignette takes rather long (~ 40 min.), we provide the already built vignettes in [this repository](https://github.com/miracum/clearly-sigident_vignettes). 
 
 # Notice 
 

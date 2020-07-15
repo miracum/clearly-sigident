@@ -32,3 +32,6 @@
 ^Meta$
 ^\.vscode$
 ^\.lintr$
+^\.ccache$
+^\.github$
+^tic\.R$

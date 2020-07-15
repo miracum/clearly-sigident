@@ -29,6 +29,10 @@ plots
 *.rds
 /.vscode
 !/.lintr
-.Rproj.user
 doc
 Meta
+docs/
+!/.github/
+!/tic.R
+
+.Rproj.user

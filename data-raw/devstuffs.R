@@ -10,22 +10,20 @@ my_desc$set("Package", packagename)
 my_desc$set_authors(c(
   person("Lorenz A.", "Kapsner", email = "lorenz.kapsner@uk-erlangen.de", role = c('cre', 'aut'),
          comment = c(ORCID = "0000-0003-1866-860X")),
-  person("Johannes", "Vey", role = c('aut')),
+  person("Johannes", "Vey", role = c('aut'),
+         comment = c(ORCID = "0000-0002-2610-9667")),
   person("Meik", "Kunz", role = c('ctb')),
   person("Andreas", "Pittroff", role = c('ctb')),
   person("Tobias", "Leis", role = c('ctb')),
-  person("Julian", "Henke", role = c('ctb'))
+  person("Julian", "Henke", role = c('ctb')),
+  person("Nicholas", "Dickel", role = c('ctb'))
 ))
 # Remove some author fields
 my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-<<<<<<< HEAD
-my_desc$set_version("0.0.5.9001")
-=======
-my_desc$set_version("0.0.5.9002")
->>>>>>> development
+my_desc$set_version("0.0.5.9005")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -33,8 +31,8 @@ my_desc$set(Description = "Identify diagnostic and prognostic signatures from ge
 # The description of your package
 my_desc$set("Date" = as.character(Sys.Date()))
 # The urls
-my_desc$set("URL", "https://gitlab.miracum.org/clearly/sigident")
-my_desc$set("BugReports", "https://gitlab.miracum.org/clearly/sigident/issues")
+my_desc$set("URL", "https://github.com/miracum/clearly-sigident")
+my_desc$set("BugReports", "https://github.com/miracum/clearly-sigident/issues")
 # License
 my_desc$set("License", "GPL-3")
 
@@ -78,6 +76,8 @@ usethis::use_package("plyr", type="Imports")
 usethis::use_package("survminer", type="Imports")
 usethis::use_package("class", type="Imports")
 usethis::use_package("randomForest", type="Imports")
+usethis::use_package("sigident.preproc", type="Imports")
+usethis::use_package("sigident.func", type="Imports")
 
 # Bioconductor
 # https://github.com/r-lib/devtools/issues/700
@@ -95,16 +95,16 @@ usethis::use_package("lintr", type = "Suggests")
 preproc_tag <- "development"
 func_tag <- "development"
 
-devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.preproc", ref = preproc_tag, upgrade = "always")
-devtools::install_git(url = "https://gitlab.miracum.org/clearly/sigident.func", ref = func_tag, upgrade = "always")
+devtools::install_github("miracum/clearly-sigident.preproc", ref = preproc_tag, upgrade = "always")
+devtools::install_github("miracum/clearly-sigident.func", ref = func_tag, upgrade = "always")
 
 # https://cran.r-project.org/web/packages/devtools/vignettes/dependencies.html
 desc::desc_set_remotes(c(
   paste0(
-    "url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/", preproc_tag, "/sigident.preproc-", preproc_tag, ".zip"),
+    "github::miracum/clearly-sigident.preproc@", preproc_tag),
   # sigident.func is only required for the vignettes (therefore a "suggests"-package)
   paste0(
-    "url::https://gitlab.miracum.org/clearly/sigident.func/-/archive/", func_tag, "/sigident.func-", func_tag, ".zip")
+    "github::miracum/clearly-sigident.func@", func_tag)
 ),
 file = usethis::proj_get())
 
