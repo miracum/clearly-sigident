@@ -12,7 +12,8 @@ editor_options:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -162,6 +163,7 @@ diagnostic_rf <- sigident::signature(
   nfolds = nfolds,
   seed = seed
 )
+gc();gc();
 filename <- paste0(plotdir, "RF_model.png")
 sigident::plot_grid_model_plot(
     model = diagnostic_rf$rf_model,
@@ -182,7 +184,6 @@ sigident::plot_grid_varimp_plot(
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
-
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_RF.png")
@@ -208,9 +209,23 @@ diagnostic_svm <- sigident::signature(
   nfolds = nfolds,
   seed = seed
 )
-filename <- paste0(plotdir, "CV_SVM.png")
-sigident::plot_cvplot(cv_obj = diagnostic_svm$model,
-                      filename = filename)
+gc();gc();
+filename <- paste0(plotdir, "SVM_model.png")
+sigident::plot_grid_model_plot(
+    model = diagnostic_svm$svm_model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "SVM_variable_importance.png")
+sigident::plot_grid_varimp_plot(
+    model = diagnostic_svm$svm_model,
+    filename = filename
+)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -218,14 +233,17 @@ knitr::include_graphics(filename)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_SVM.png")
-sigident::plot_rocplot(roc = diagnostic_svm$roc,
-                       filename = filename)
+sigident::plot_rocplot(
+    roc = diagnostic_svm$roc_svm,
+    filename = filename
+)
+gc();gc();
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
-## k-nearest neighbors regression 
+## K-Nearest Neighbors Regression 
 
 The k-nearest neighbors algorithm, or kNN, is one of the simplest machine learning algorithms. Usually, k is a small, odd number - sometimes only 1. The larger k is, the more accurate the classification will be, but the longer it takes to perform the classification. It classifies an object into one of several classes by looking at the k elements of the training set that are closest to the one you want to classify, and letting them vote by majority on what that object’s class should be.
 
@@ -236,9 +254,22 @@ diagnostic_knn <- sigident::signature(
   nfolds = nfolds,
   seed = seed
 )
-filename <- paste0(plotdir, "CV_KNN.png")
-sigident::plot_cvplot(cv_obj = diagnostic_knn$model,
-                      filename = filename)
+filename <- paste0(plotdir, "KNN_model.png")
+sigident::plot_grid_model_plot(
+    model = diagnostic_knn$knn_model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "KNN_variable_importance.png")
+sigident::plot_grid_varimp_plot(
+    model = diagnostic_knn$knn_model,
+    filename = filename
+)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -246,8 +277,10 @@ knitr::include_graphics(filename)
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_KNN.png")
-sigident::plot_rocplot(roc = diagnostic_knn$roc,
-                       filename = filename)
+sigident::plot_rocplot(
+    roc = diagnostic_knn$roc_knn,
+    filename = filename
+)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
@@ -255,9 +288,7 @@ knitr::include_graphics(filename)
 
 ## Analysis of diagnostic models 
 
-### Comparing model performance  
-
-These models can be included into a list and the performance metrices for classification can then be printed using the function `compare_diagnostic_models()`. This list includes all information of the respective models, which can be accessed by the following structure.  
+### Comparing model performance 
 
 ```{r}
 diagnostic_models <- list(
@@ -298,8 +329,6 @@ gc()
 
 ### Model performance measurements
 
-Additionally, the confusion matrix and the calculated performance metrics can be printed out for each model. 
-
 #### SVM
 
 ```{r}
@@ -317,42 +346,6 @@ diagnostic_models$knn$confmat
 ```{r}
 diagnostic_models$rf$confmat
 ```
-
-<!-- ### Export selected IDs for each model  -->
-
-<!-- The following function enables the extraction of the selected genes (Affy-IDs) for each model as csv file. -->
-
-<!-- ```{r} -->
-<!-- signaturegenes <- sigident::gene_map_sig( -->
-<!--   mergeset = mergeset, -->
-<!--   model = diagnostic_models$svm$model -->
-<!-- ) -->
-<!-- data.table::fwrite(signaturegenes, -->
-<!--                    paste0(csvdir, "signaturegenes_svm.csv")) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- signaturegenes <- sigident::gene_map_sig( -->
-<!--   mergeset = mergeset, -->
-<!--   model = diagnostic_models$knn$model -->
-<!-- ) -->
-<!-- data.table::fwrite(signaturegenes, -->
-<!--                    paste0(csvdir, "signaturegenes_knn.csv")) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- signaturegenes <- sigident::gene_map_sig( -->
-<!--   mergeset = mergeset, -->
-<!--   model = diagnostic_models$rf$model -->
-<!-- ) -->
-<!-- data.table::fwrite(signaturegenes, -->
-<!--                    paste0(csvdir, "signaturegenes_rf.csv")) -->
-<!-- ``` -->
-
-<!-- ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE} -->
-<!-- rm(signaturegenes) -->
-<!-- gc() -->
-<!-- ``` -->
 
 ## Validation of diagnostic signatures 
 

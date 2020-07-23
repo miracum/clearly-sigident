@@ -12,18 +12,18 @@ rf_classifier <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
-  outlist$fit_cv <- caret::trainControl(
+  fit_cv <- caret::trainControl(
     method = "repeatedcv",
     number = nfolds,
-    repeats = 3
+    repeats = 5
   )
   metric <- "Accuracy"
 
   outlist$rf_model <- build_predictive_rf(
-    traininglist$train$x,
-    traininglist$train$y,
-    outlist$fit_cv,
-    metric
+    train_x = traininglist$train$x,
+    train_y = traininglist$train$y,
+    fit_cv = fit_cv,
+    metric = metric
   )
 
   outlist$predicted_rf <- predict_rf(
@@ -31,11 +31,13 @@ rf_classifier <- function(traininglist, seed, nfolds) {
     test_x = traininglist$test$x
   )
   outlist$confmat_rf <- caret::confusionMatrix(
-    outlist$predicted_rf, as.factor(traininglist$test$y)
+    data = outlist$predicted_rf,
+    reference = traininglist$test$y,
+    positive = "1"
   )
   outlist$roc_rf <- calc_roc(
-    outlist$predicted_rf,
-    as.factor(traininglist$test$y)
+    test_y = traininglist$test$y,
+    prediction = outlist$predicted_rf
   )
 
   return(outlist)
@@ -59,7 +61,7 @@ build_predictive_rf <- function(train_x,
 
   # go parallel
   ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 2, ncores - 1, ncores)
+  cores <- ifelse(ncores > 4, 4, ncores)
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
@@ -71,7 +73,8 @@ build_predictive_rf <- function(train_x,
     metric = metric,
     preProc = c("center", "scale"),
     tuneLength = 5,
-    allowParallel = T)
+    allowParallel = T
+  )
   # stop parallel computation
   parallel::stopCluster(cl)
   gc()
@@ -93,12 +96,10 @@ build_predictive_rf <- function(train_x,
 predict_rf <- function(model,
                        test_x) {
 
-  outdat <- as.factor(
-    stats::predict(
-      model,
-      test_x,
-      type = "class"
-    )
+  outdat <- caret::predict.train(
+    model,
+    test_x,
+    type = "raw"
   )
 
   return(outdat)

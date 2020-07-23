@@ -66,11 +66,13 @@ glm_prediction <- function(model,
 
   # Generate Confusion Matrix
   outlist$confmat <-
-    caret::confusionMatrix(data = factor(ifelse(as.numeric(
-      as.character(outlist$predicted)
-    ) < 0.5, 0, 1)),
-    reference = test_y,
-    positive = "1") # determine the true case with the 'positive' argument
+    caret::confusionMatrix(
+      data = factor(ifelse(as.numeric(
+        as.character(outlist$predicted)
+      ) < 0.5, 0, 1)),
+      reference = test_y,
+      positive = "1"
+    ) # determine the true case with the 'positive' argument
   # Calculate Roc
   outlist$roc <- calc_roc(test_y = test_y,
                           prediction = outlist$predicted)
@@ -93,7 +95,7 @@ glmnet_classifier <- function(traininglist, type, seed, nfolds) {
 
   # go parallel
   ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 2, ncores - 1, ncores)
+  cores <- ifelse(ncores > 4, 4, ncores)
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 

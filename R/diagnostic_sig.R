@@ -41,7 +41,7 @@ signature <- function(traininglist,
     outlist <- knn_classifier(traininglist, seed, nfolds)
   } else if (type == "rf") {
     outlist <- rf_classifier(traininglist, seed, nfolds)
-  } else {
+  } else if (type %in% c("lasso", "elastic")) {
     outlist <- glmnet_classifier(traininglist, type, seed, nfolds)
   }
 

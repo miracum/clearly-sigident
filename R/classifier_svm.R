@@ -12,7 +12,7 @@ svm_classifier <- function(traininglist, seed, nfolds) {
   # initialize outlist
   outlist <- list()
 
-  outlist$fit_cv <- caret::trainControl(
+  fit_cv <- caret::trainControl(
     method = "repeatedcv",
     number = nfolds,
     repeats = 5,
@@ -21,9 +21,9 @@ svm_classifier <- function(traininglist, seed, nfolds) {
   )
 
   outlist$svm_model <- build_predictive_svm(
-    traininglist$train$x,
-    traininglist$train$y,
-    outlist$fit_cv
+    train_x = traininglist$train$x,
+    train_y = traininglist$train$y,
+    fit_cv = fit_cv
   )
 
   outlist$predicted_svm <- predict_svm(
@@ -31,12 +31,13 @@ svm_classifier <- function(traininglist, seed, nfolds) {
     test_x = traininglist$test$x
   )
   outlist$confmat_svm <- caret::confusionMatrix(
-    outlist$predicted_svm,
-    as.factor(traininglist$test$y)
+    data = outlist$predicted_svm,
+    reference = traininglist$test$y,
+    positive = "1"
   )
   outlist$roc_svm <- calc_roc(
-    outlist$predicted_svm,
-    as.factor(traininglist$test$y)
+    test_y = traininglist$test$y,
+    prediction = outlist$predicted_svm
   )
 
   return(outlist)
@@ -57,7 +58,7 @@ build_predictive_svm <- function(train_x,
 
   # go parallel
   ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 2, ncores - 1, ncores)
+  cores <- ifelse(ncores > 4, 4, ncores)
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
@@ -92,7 +93,11 @@ build_predictive_svm <- function(train_x,
 predict_svm <- function(model,
                         test_x) {
 
-  outdat <- as.factor(stats::predict(model, test_x, type = "class"))
+  outdat <- caret::predict.train(
+    model,
+    test_x,
+    type = "raw"
+  )
 
   return(outdat)
 }

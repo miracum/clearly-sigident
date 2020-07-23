@@ -21,7 +21,7 @@ glmnet_gridsearch <- function(traininglist, seed, nfolds) {
 
   # go parallel
   ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 2, ncores - 1, ncores)
+  cores <- ifelse(ncores > 4, 4, ncores)
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
