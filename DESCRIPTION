@@ -48,7 +48,6 @@ Imports:
     survival,
     plyr,
     survminer,
-    class,
     randomForest,
     sigident.preproc,
     sigident.func

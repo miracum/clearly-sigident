@@ -144,7 +144,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
 
         prediction <- predict_caret(
           model = models[[i]]$model,
-          text_x = v_data_all
+          test_x = v_data_all
         )
 
         confmat <-
