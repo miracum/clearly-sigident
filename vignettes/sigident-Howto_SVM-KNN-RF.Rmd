@@ -556,24 +556,3 @@ validation_results[["GSE102287"]] <- NULL
 rm(validationstudylist, diagnostic_models, GSE102287, GSE33356)
 gc()
 ```
-
-# Identification of prognostic signatures 
-
-## Create a list that contains specifications of the study/studies that contain(s) survival time information 
-
-```{r eval = TRUE}
-discoverystudies_w_timedata <- list(
-  "GSE19188" = list(
-    setid = 1,
-    timecol = "characteristics_ch1.2",
-    status = list(
-      statuscol = "characteristics_ch1.3",
-      levels = list(alive = "status: alive",
-                    deceased = "status: deceased",
-                    na = "status: Not available")),
-    targetcolname = "characteristics_ch1",
-    controllevelname = "tissue type: healthy",
-    targetlevelname = "tissue type: tumor",
-    use_rawdata = TRUE)
-)
-```

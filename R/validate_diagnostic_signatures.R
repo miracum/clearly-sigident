@@ -100,6 +100,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
 
     for (i in names(models)) {
       if (i %in% c("lasso", "elasticnet")) {
+        message(paste0("Validating signature using model: ", i))
         for (j in c("min", "1se")) {
           prediction <- predict_glm(model = models[[i]][[j]]$model,
                                     test_x = v_data_all,
@@ -125,6 +126,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
           )
         }
       } else if (i %in% "elasticnet_grid") {
+        message(paste0("Validating signature using model: ", i))
 
         prediction <- predict_glm(model = models[[i]]$model,
                                   test_x = v_data_all,
@@ -149,6 +151,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
           roc = roc
         )
       } else if (i %in% c("svm", "knn", "rf")) {
+        message(paste0("Validating signature using model: ", i))
 
         prediction <- predict_caret(
           model = models[[i]]$model,
