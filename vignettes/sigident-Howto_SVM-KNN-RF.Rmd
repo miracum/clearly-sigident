@@ -18,9 +18,11 @@ knitr::opts_chunk$set(
 ```
 
 The R package `sigident` is the core package of the `sigident` package framework. This framework consists of several packages which can be used to perform analyses of gene signatures. The following packages are included in the framework: 
-* Core package: [sigident](https://gitlab.miracum.org/clearly/sigident) 
-* Data preprocessing: [sigident.preproc](https://gitlab.miracum.org/clearly/sigident.preproc) 
-* Functional analyses: [sigident.func](https://gitlab.miracum.org/clearly/sigident.func)  
+* Core package: [sigident](https://github.com/miracum/clearly-sigident) 
+* Data preprocessing: [sigident.preproc](https://github.com/miracum/clearly-sigident.preproc) 
+* Functional analyses: [sigident.func](https://github.com/miracum/clearly-sigident.func)  
+
+**Please view the [main vignette](https://github.com/miracum/clearly-sigident/blob/master/vignettes/sigident-Howto_Microarray.Rmd) for a detailled explanation of the specific workflow steps presented within this vignette.**
 
 # Prerequisites and installation 
 
