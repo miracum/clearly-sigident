@@ -13,7 +13,8 @@ sigidentDiagnostic(
   repeats = 5,
   tunelength = 10,
   split = 0.8,
-  plotdir = "./plots/"
+  plotdir = paste0(tempdir(), "/plots/"),
+  colindices = NULL
 )
 }
 \arguments{
@@ -40,7 +41,7 @@ to be integrated into the training set for machine learning
 (default: 0.8).}
 
 \item{plotdir}{A character string. Path to the folder to store resulting
-plots. Default: "./plots/".}
+plots (default = paste0(tempdir(), "/plots/")).}
 }
 \description{
 One function to perform diagnostic signature analysis.

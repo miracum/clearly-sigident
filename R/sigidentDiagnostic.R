@@ -27,7 +27,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
                                repeats = 5,
                                tunelength = 10,
                                split = 0.8,
-                               plotdir = "./plots/") {
+                               plotdir = paste0(tempdir(), "/plots/"),
+                               colindices = NULL) {
 
   stopifnot(
     class(mergeset) == "matrix",
@@ -74,6 +75,10 @@ sigidentDiagnostic <- function(mergeset, # nolint
       seed = rv$seed
     )
 
+  if (!is.null(colindices)) {
+    rv$training_list$train$x <- rv$training_list$train$x[, colindices]
+    rv$training_list$test$x <- rv$training_list$test$x[, colindices]
+  }
 
   # Lasso regression
   rv$diagnostic_lasso <- sigident_signature(

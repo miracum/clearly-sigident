@@ -32,7 +32,7 @@ are being removed!}
 metadata folder.}
 
 \item{colindices}{A vector of integers. Indices of columns to run the
-validation on.}
+validation on (default = NULL).}
 }
 \description{
 Helper function to validate diagnostic signatures

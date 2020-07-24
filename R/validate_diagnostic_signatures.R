@@ -7,7 +7,7 @@
 #' @param models A list of prediction models. Usually the output of the
 #'   function `sigidentDiagnostic`.
 #' @param colindices A vector of integers. Indices of columns to run the
-#'   validation on.
+#'   validation on (default = NULL).
 #'
 #' @inheritParams sigidentPrognostic
 #'
