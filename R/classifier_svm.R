@@ -6,6 +6,8 @@
 #'   of the function `create_training_test_split()`.
 #' @param seed Intilization state of random number generator
 #'
+#' @importFrom caret knn3
+#'
 #' @inheritParams sigidentDiagnostic
 #'
 svm_classifier <- function(traininglist, seed, nfolds, repeats) {
