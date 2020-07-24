@@ -166,7 +166,7 @@ A support vector machine is a collection of supervised learning algorithms that 
 So for classification, every input is turned into a point in n-dimensional space (n being the number of features), and the value of each feature defined as the value of a unique coordinate on the hyperplane. Classification is determined by finding the hyperplane that most clearly separates the two classes. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_svm <- sigident::signature(
+diagnostic_svm <- sigident::sigident_signature(
   traininglist = training_list,
   type = "svm",
   nfolds = nfolds,
@@ -211,7 +211,7 @@ knitr::include_graphics(filename)
 The random forest regression is a supervised learning algorithm that randomly creates and merges multiple decision trees into one forest. The goal is not to rely on a single learning model, but rather a collection of decision models to improve accuracy. The primary difference between this approach and the standard decision tree algorithms is that the root nodes feature splitting nodes are generated randomly.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_rf <- sigident::signature(
+diagnostic_rf <- sigident::sigident_signature(
   traininglist = training_list,
   type = "rf",
   nfolds = nfolds,
@@ -256,7 +256,7 @@ knitr::include_graphics(filename)
 The k-nearest neighbors algorithm, or kNN, is one of the simplest machine learning algorithms. Usually, k is a small, odd number - sometimes only 1. The larger k is, the more accurate the classification will be, but the longer it takes to perform the classification. It classifies an object into one of several classes by looking at the k elements of the training set that are closest to the one you want to classify, and letting them vote by majority on what that object’s class should be.
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_knn <- sigident::signature(
+diagnostic_knn <- sigident::sigident_signature(
   traininglist = training_list,
   type = "knn",
   nfolds = nfolds,

@@ -361,7 +361,7 @@ Regularization requires the selection of a tuning parameter (lambda) that determ
 Furthermore, a ROC curve is plotted to visualize the performance measurement of the model.  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_lasso <- sigident::signature(
+diagnostic_lasso <- sigident::sigident_signature(
   traininglist = training_list,
   type = "lasso",
   nfolds = nfolds,
@@ -398,7 +398,7 @@ knitr::include_graphics(filename)
 The elastic net is a mixture of lasso and ridge regularization to shrink coefficients (like in ridge regression) and to set some coefficients to zero (as in lasso). Therefore, the mixing parameter alpha needs to be determined as value between 1 (for lasso) and 0 (for ridge). A grid search for calculating optimal alpha and lambda can be conducted (as it is done next) but might take much computing capacity, hence we propose setting alpha manually to 0.9. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_elasticnet <- sigident::signature(
+diagnostic_elasticnet <- sigident::sigident_signature(
   traininglist = training_list,
   type = "elastic",
   alpha = 0.9,
@@ -436,7 +436,7 @@ knitr::include_graphics(filename)
 Setting `type = "elasticnet_grid"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/package=caret).  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_glmgrid <- sigident::signature(
+diagnostic_glmgrid <- sigident::sigident_signature(
   traininglist = training_list,
   type = "elasticnet_grid",
   nfolds = nfolds,

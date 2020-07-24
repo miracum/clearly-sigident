@@ -7,7 +7,7 @@
 plot_cvplot(cv_obj, filename)
 }
 \arguments{
-\item{cv_obj}{A object. The result of the function `signature()`.}
+\item{cv_obj}{A object. The result of the function `sigident_signature()`.}
 
 \item{filename}{A character string. The filename.}
 }

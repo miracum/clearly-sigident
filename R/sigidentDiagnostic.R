@@ -71,7 +71,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
 
 
   # Lasso regression
-  rv$diagnostic_lasso <- signature(
+  rv$diagnostic_lasso <- sigident_signature(
     traininglist = rv$training_list,
     type = "lasso",
     nfolds = rv$nfolds,
@@ -93,7 +93,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
 
   # Elastic net regression
   rv$diagnostic_elasticnet <-
-    signature(
+    sigident_signature(
       traininglist = rv$training_list,
       type = "elastic",
       alpha = 0.9,
@@ -116,7 +116,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
   # with both calculated hyperparameters alpha and
   # lambda applying grid search
   rv$diagnostic_glmgrid <-
-    signature(
+    sigident_signature(
       traininglist = rv$training_list,
       type = "elasticnet_grid",
       nfolds = rv$nfolds,
@@ -142,7 +142,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
 
   # SVM
   rv$diagnostic_svm <-
-    signature(
+    sigident_signature(
       traininglist = rv$training_list,
       type = "svm",
       nfolds = rv$nfolds,
@@ -167,7 +167,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
 
   # RF
   rv$diagnostic_rf <-
-    signature(
+    sigident_signature(
       traininglist = rv$training_list,
       type = "rf",
       nfolds = rv$nfolds,
@@ -192,7 +192,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
 
   # KNN
   rv$diagnostic_knn <-
-    signature(
+    sigident_signature(
       traininglist = rv$training_list,
       type = "knn",
       nfolds = rv$nfolds,

@@ -34,7 +34,7 @@ plot_rocplot <- function(roc,
 #'
 #' @description Helper function to create cross-validation plots
 #'
-#' @param cv_obj A object. The result of the function `signature()`.
+#' @param cv_obj A object. The result of the function `sigident_signature()`.
 #'
 #' @inheritParams plot_rocplot
 #'
