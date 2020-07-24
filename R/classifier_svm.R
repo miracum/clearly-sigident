@@ -21,7 +21,8 @@ svm_classifier <- function(traininglist, seed, nfolds, repeats) {
     method = "repeatedcv",
     number = nfolds,
     repeats = repeats,
-    classProbs = TRUE
+    classProbs = TRUE,
+    search = "random"
   )
 
   outlist$model <- build_predictive_svm(

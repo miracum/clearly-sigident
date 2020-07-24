@@ -72,8 +72,7 @@ build_predictive_knn <- function(train_x,
     method = "knn",
     trControl = trn_ctrl,
     preProc = c("center", "scale"),
-    tuneLength = 5,
-    allowParallel = T
+    tuneLength = 5
   )
 
   # stop parallel computation
