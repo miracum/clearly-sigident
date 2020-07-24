@@ -95,7 +95,7 @@ build_predictive_rf <- function(train_x,
 #' @param test_x The data to be classified.
 #'
 predict_caret <- function(model,
-                       test_x) {
+                          test_x) {
 
   outdat <- caret::predict.train(
     model,
