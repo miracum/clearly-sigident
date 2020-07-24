@@ -4,7 +4,7 @@
 \alias{svm_classifier}
 \title{svm_classifier}
 \usage{
-svm_classifier(traininglist, seed, nfolds)
+svm_classifier(traininglist, seed, nfolds, repeats)
 }
 \arguments{
 \item{traininglist}{A list object containing the training data. The output
@@ -14,6 +14,9 @@ of the function `create_training_test_split()`.}
 
 \item{nfolds}{A integer. The number of folds used for cross validation
 (default: 10).}
+
+\item{repeats}{An integer. The number of repeated cross validations
+(default = 3).}
 }
 \description{
 Helper function to create a svm classifier model

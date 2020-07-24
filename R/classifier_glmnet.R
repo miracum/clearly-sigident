@@ -133,7 +133,7 @@ glmnet_classifier <- function(traininglist, type, seed, nfolds) {
     s = outlist$fit_cv$lambda.min
   )
 
-  outlist$predicted_min <- pred_min$predicted
+  outlist$prediction_min <- pred_min$predicted
   outlist$confmat_min <- pred_min$confmat
   outlist$roc_min <- pred_min$roc
 
@@ -146,7 +146,7 @@ glmnet_classifier <- function(traininglist, type, seed, nfolds) {
     s = outlist$fit_cv$lambda.1se
   )
 
-  outlist$predicted_1se <- pred_1se$predicted
+  outlist$prediction_1se <- pred_1se$predicted
   outlist$confmat_1se <- pred_1se$confmat
   outlist$roc_1se <- pred_1se$roc
 

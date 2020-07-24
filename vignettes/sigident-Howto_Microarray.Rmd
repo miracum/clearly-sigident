@@ -476,12 +476,12 @@ diagnostic_models <- list(
     "CV" = diagnostic_lasso$fit_cv,
     "min" = list("model" = diagnostic_lasso$lambda_min,
                  "confmat" = diagnostic_lasso$confmat_min,
-                 "prediction" = diagnostic_lasso$predicted_min,
+                 "prediction" = diagnostic_lasso$prediction_min,
                  "auc" = as.numeric(diagnostic_lasso$roc_min$auc)
                  ),
     "1se" = list("model" = diagnostic_lasso$lambda_1se,
                  "confmat" = diagnostic_lasso$confmat_1se,
-                 "prediction" = diagnostic_lasso$predicted_1se,
+                 "prediction" = diagnostic_lasso$prediction_1se,
                  "auc" = as.numeric(diagnostic_lasso$roc_1se$auc)
                  )
   ),
@@ -489,12 +489,12 @@ diagnostic_models <- list(
     "CV" = diagnostic_elasticnet$fit_cv,
     "min" = list("model" = diagnostic_elasticnet$lambda_min,
                  "confmat" = diagnostic_elasticnet$confmat_min,
-                 "prediction" = diagnostic_elasticnet$predicted_min,
+                 "prediction" = diagnostic_elasticnet$prediction_min,
                  "auc" = as.numeric(diagnostic_elasticnet$roc_min$auc)
                  ),
     "1se" = list("model" = diagnostic_elasticnet$lambda_1se,
                  "confmat" = diagnostic_elasticnet$confmat_1se,
-                 "prediction" = diagnostic_elasticnet$predicted_1se,
+                 "prediction" = diagnostic_elasticnet$prediction_1se,
                  "auc" = as.numeric(diagnostic_elasticnet$roc_1se$auc)
                  )
   ),

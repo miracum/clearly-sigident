@@ -10,6 +10,7 @@ sigidentDiagnostic(
   diagnosis,
   seed = 111,
   nfolds = 10,
+  repeats = 3,
   split = 0.8,
   plotdir = "./plots/"
 )
@@ -27,6 +28,9 @@ reproducible. Default: 111.}
 
 \item{nfolds}{A integer. The number of folds used for cross validation
 (default: 10).}
+
+\item{repeats}{An integer. The number of repeated cross validations
+(default = 3).}
 
 \item{split}{A numeric value between 0 and 1. The proportion of the data
 to be integrated into the training set for machine learning

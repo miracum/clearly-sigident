@@ -8,36 +8,37 @@
 #'
 #' @inheritParams sigidentDiagnostic
 #'
-rf_classifier <- function(traininglist, seed, nfolds) {
+rf_classifier <- function(traininglist, seed, nfolds, repeats) {
   # initialize outlist
   outlist <- list()
 
-  fit_cv <- caret::trainControl(
+  trn_ctrl <- caret::trainControl(
     method = "repeatedcv",
     number = nfolds,
-    repeats = 5
+    repeats = repeats,
+    classProbs = TRUE
   )
-  metric <- "Accuracy"
 
-  outlist$rf_model <- build_predictive_rf(
+  outlist$model <- build_predictive_rf(
     train_x = traininglist$train$x,
     train_y = traininglist$train$y,
-    fit_cv = fit_cv,
-    metric = metric
+    trn_ctrl = trn_ctrl
   )
 
-  outlist$predicted_rf <- predict_rf(
-    model = outlist$rf_model,
+  outlist$prediction <- predict_rf(
+    model = outlist$model,
     test_x = traininglist$test$x
   )
-  outlist$confmat_rf <- caret::confusionMatrix(
-    data = outlist$predicted_rf,
+  outlist$confmat <- caret::confusionMatrix(
+    data = factor(ifelse(as.numeric(
+      as.character(outlist$prediction)
+    ) < 0.5, 0, 1)),
     reference = traininglist$test$y,
     positive = "1"
   )
-  outlist$roc_rf <- calc_roc(
+  outlist$roc <- calc_roc(
     test_y = traininglist$test$y,
-    prediction = outlist$predicted_rf
+    prediction = outlist$prediction
   )
 
   return(outlist)
@@ -51,13 +52,11 @@ rf_classifier <- function(traininglist, seed, nfolds) {
 #'
 #' @param train_x The learning data values.
 #' @param train_y The learning data classes.
-#' @param fit_cv Options for the cross validation
-#' @param metric A character. The metric to be used during caret::train.
+#' @param trn_ctrl Options for the cross validation.
 #'
 build_predictive_rf <- function(train_x,
                                 train_y,
-                                fit_cv,
-                                metric) {
+                                trn_ctrl) {
 
   # go parallel
   ncores <- parallel::detectCores()
@@ -67,10 +66,9 @@ build_predictive_rf <- function(train_x,
 
   model <- caret::train(
     x = train_x,
-    y = train_y,
+    y = as.factor(train_y),
     method = "rf",
-    trControl = fit_cv,
-    metric = metric,
+    trControl = trn_ctrl,
     preProc = c("center", "scale"),
     tuneLength = 5,
     allowParallel = T
@@ -99,8 +97,8 @@ predict_rf <- function(model,
   outdat <- caret::predict.train(
     model,
     test_x,
-    type = "raw"
-  )
+    type = "prob"
+  )[, "1"]
 
   return(outdat)
 }

@@ -7,33 +7,37 @@
 #' @param seed Intilization state of random number generator
 #'
 #' @inheritParams sigidentDiagnostic
-knn_classifier <- function(traininglist, seed, nfolds) {
+knn_classifier <- function(traininglist, seed, nfolds, repeats) {
   # initialize outlist
   outlist <- list()
 
-  fit_cv <- caret::trainControl(
+  trn_ctrl <- caret::trainControl(
     method = "repeatedcv",
-    repeats = 5
+    number = nfolds,
+    repeats = repeats,
+    classProbs = TRUE
   )
 
-  outlist$knn_model <- build_predictive_knn(
+  outlist$model <- build_predictive_knn(
     train_x = traininglist$train$x,
     train_y = traininglist$train$y,
-    fit_cv = fit_cv
+    trn_ctrl = trn_ctrl
   )
 
-  outlist$predicted_knn <- predict_knn(
-    model = outlist$knn_model,
+  outlist$prediction <- predict_knn(
+    model = outlist$model,
     test_x = traininglist$test$x
   )
-  outlist$confmat_knn <- caret::confusionMatrix(
-    data = outlist$predicted_knn,
+  outlist$confmat <- caret::confusionMatrix(
+    data = factor(ifelse(as.numeric(
+      as.character(outlist$prediction)
+    ) < 0.5, 0, 1)),
     reference = traininglist$test$y,
     positive = "1"
   )
-  outlist$roc_knn <- calc_roc(
+  outlist$roc <- calc_roc(
     test_y = traininglist$test$y,
-    prediction = outlist$predicted_knn
+    prediction = outlist$prediction
   )
 
   return(outlist)
@@ -45,10 +49,10 @@ knn_classifier <- function(traininglist, seed, nfolds) {
 #'
 #' @param train_x The learning data values.
 #' @param train_y The learning data classes.
-#' @param fit_cv Options for the cross validation
+#' @param trn_ctrl Options for the cross validation
 build_predictive_knn <- function(train_x,
                                  train_y,
-                                 fit_cv
+                                 trn_ctrl
 ) {
 
   # go parallel
@@ -59,11 +63,12 @@ build_predictive_knn <- function(train_x,
 
   model <- caret::train(
     x = train_x,
-    y = as.factor(as.factor(train_y)),
+    y = as.factor(train_y),
     method = "knn",
-    trControl = fit_cv,
+    trControl = trn_ctrl,
     preProc = c("center", "scale"),
-    tuneLength = 5
+    tuneLength = 5,
+    allowParallel = T
   )
 
 
@@ -90,8 +95,8 @@ predict_knn <- function(model,
   outdat <- caret::predict.train(
     model,
     test_x,
-    type = "raw"
-  )
+    type = "prob"
+  )[, "1"]
 
   return(outdat)
 }

@@ -4,14 +4,14 @@
 \alias{build_predictive_svm}
 \title{build_predictive_svm}
 \usage{
-build_predictive_svm(train_x, train_y, fit_cv)
+build_predictive_svm(train_x, train_y, trn_ctrl)
 }
 \arguments{
 \item{train_x}{The learning data values.}
 
 \item{train_y}{The learning data classes.}
 
-\item{fit_cv}{Options for the cross validation}
+\item{trn_ctrl}{Options for the cross validation}
 }
 \description{
 Function builds a svm classifier model based on the given data.

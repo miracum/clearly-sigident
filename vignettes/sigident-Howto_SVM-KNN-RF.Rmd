@@ -212,7 +212,7 @@ diagnostic_rf <- sigident::signature(
 gc();gc();
 filename <- paste0(plotdir, "RF_model.png")
 sigident::plot_grid_model_plot(
-    model = diagnostic_rf$rf_model,
+    model = diagnostic_rf$model,
     filename = filename
 )
 ```
@@ -223,7 +223,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "RF_variable_importance.png")
 sigident::plot_grid_varimp_plot(
-    model = diagnostic_rf$rf_model,
+    model = diagnostic_rf$model,
     filename = filename
 )
 ```
@@ -234,7 +234,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_RF.png")
 sigident::plot_rocplot(
-    roc = diagnostic_rf$roc_rf,
+    roc = diagnostic_rf$roc,
     filename = filename
 )
 ```
@@ -256,7 +256,7 @@ diagnostic_knn <- sigident::signature(
 )
 filename <- paste0(plotdir, "KNN_model.png")
 sigident::plot_grid_model_plot(
-    model = diagnostic_knn$knn_model,
+    model = diagnostic_knn$model,
     filename = filename
 )
 ```
@@ -267,7 +267,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "KNN_variable_importance.png")
 sigident::plot_grid_varimp_plot(
-    model = diagnostic_knn$knn_model,
+    model = diagnostic_knn$model,
     filename = filename
 )
 ```
@@ -278,7 +278,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 filename <- paste0(plotdir, "ROC_KNN.png")
 sigident::plot_rocplot(
-    roc = diagnostic_knn$roc_knn,
+    roc = diagnostic_knn$roc,
     filename = filename
 )
 ```
@@ -300,17 +300,17 @@ diagnostic_models <- list(
     ),
 
     "knn" = list(
-      "model" = diagnostic_knn$knn_model,
-      "confmat" = diagnostic_knn$confmat_knn,
-      "prediction" = diagnostic_knn$predicted_knn,
-      "auc" = as.numeric(diagnostic_knn$roc_knn$auc)
+      "model" = diagnostic_knn$model,
+      "confmat" = diagnostic_knn$confmat,
+      "prediction" = diagnostic_knn$prediction,
+      "auc" = as.numeric(diagnostic_knn$roc$auc)
     ),
 
     "rf" = list(
-      "model" = diagnostic_rf$rf_model,
-      "confmat" = diagnostic_rf$confmat_rf,
-      "prediction" = diagnostic_rf$predicted_rf,
-      "auc" = as.numeric(diagnostic_rf$roc_rf$auc)
+      "model" = diagnostic_rf$model,
+      "confmat" = diagnostic_rf$confmat,
+      "prediction" = diagnostic_rf$prediction,
+      "auc" = as.numeric(diagnostic_rf$roc$auc)
     )
 )
 ```

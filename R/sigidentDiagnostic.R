@@ -12,6 +12,8 @@
 #' @param split A numeric value between 0 and 1. The proportion of the data
 #'   to be integrated into the training set for machine learning
 #'   (default: 0.8).
+#' @param repeats An integer. The number of repeated cross validations
+#'   (default = 3).
 #'
 #' @inheritParams sigidentPrognostic
 #'
@@ -21,6 +23,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
                                diagnosis,
                                seed = 111,
                                nfolds = 10,
+                               repeats = 3,
                                split = 0.8,
                                plotdir = "./plots/") {
 
@@ -30,7 +33,9 @@ sigidentDiagnostic <- function(mergeset, # nolint
     is.numeric(seed),
     is.numeric(split),
     is.numeric(nfolds),
-    split < 1 & split > 0
+    split < 1 & split > 0,
+    is.numeric(repeats),
+    repeats > 0
   )
 
   # create internal list for storage
@@ -48,6 +53,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
   # store seed, traintest_split
   rv$seed <- seed
   rv$nfolds <- nfolds
+  rv$repeats <- repeats
   rv$traintest_split <- split
 
   # add mergeset to list
@@ -107,79 +113,6 @@ sigidentDiagnostic <- function(mergeset, # nolint
     filename = paste0(rv$plotdir, "ROC_elasticNet.1se.png")
   )
 
-
-  # SVM
-  rv$diagnostic_svm <-
-    signature(
-      traininglist = rv$training_list,
-      type = "svm",
-      nfolds = rv$nfolds,
-      seed = rv$seed
-    )
-  # plot model of gridsearch
-  plot_grid_model_plot(
-    model = rv$diagnostic_svm$model,
-    filename = paste0(rv$plotdir, "SVM_model.png")
-  )
-  # plot variable importance of gridsearch
-  plot_grid_varimp_plot(
-    model = rv$diagnostic_svm$model,
-    filename = paste0(rv$plotdir, "SVM_variable_importance.png")
-  )
-  # create roc plot
-  plot_rocplot(
-    roc = rv$diagnostic_svm$roc,
-    filename = paste0(rv$plotdir, "ROC_SVM.png")
-  )
-
-  # KNN
-  rv$diagnostic_knn <-
-    signature(
-      traininglist = rv$training_list,
-      type = "knn",
-      nfolds = rv$nfolds,
-      seed = rv$seed
-    )
-  # plot model of gridsearch
-  plot_grid_model_plot(
-    model = rv$diagnostic_knn$knn_model,
-    filename = paste0(rv$plotdir, "KNN_model.png")
-  )
-  # plot variable importance of gridsearch
-  plot_grid_varimp_plot(
-    model = rv$diagnostic_knn$knn_model,
-    filename = paste0(rv$plotdir, "KNN_variable_importance.png")
-  )
-  # create roc plot
-  plot_rocplot(
-    roc = rv$diagnostic_knn$roc_knn,
-    filename = paste0(rv$plotdir, "ROC_KNN.png")
-  )
-
-  # RF
-  rv$diagnostic_rf <-
-    signature(
-      traininglist = rv$training_list,
-      type = "rf",
-      nfolds = rv$nfolds,
-      seed = rv$seed
-    )
-  # plot model of gridsearch
-  plot_grid_model_plot(
-    model = rv$diagnostic_rf$rf_model,
-    filename = paste0(rv$plotdir, "RF_model.png")
-  )
-  # plot variable importance of gridsearch
-  plot_grid_varimp_plot(
-    model = rv$diagnostic_rf$rf_model,
-    filename = paste0(rv$plotdir, "RF_variable_importance.png")
-  )
-  # create roc plot
-  plot_rocplot(
-    roc = rv$diagnostic_rf$roc_rf,
-    filename = paste0(rv$plotdir, "ROC_RF.png")
-  )
-
   # with both calculated hyperparameters alpha and
   # lambda applying grid search
   rv$diagnostic_glmgrid <-
@@ -187,6 +120,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
       traininglist = rv$training_list,
       type = "elasticnet_grid",
       nfolds = rv$nfolds,
+      repeats = rv$repeats,
       seed = rv$seed
     )
   # plot model of gridsearch
@@ -206,6 +140,81 @@ sigidentDiagnostic <- function(mergeset, # nolint
   )
 
 
+  # SVM
+  rv$diagnostic_svm <-
+    signature(
+      traininglist = rv$training_list,
+      type = "svm",
+      nfolds = rv$nfolds,
+      repeats = rv$repeats,
+      seed = rv$seed
+    )
+  # plot model of gridsearch
+  plot_grid_model_plot(
+    model = rv$diagnostic_svm$model,
+    filename = paste0(rv$plotdir, "SVM_model.png")
+  )
+  # plot variable importance of gridsearch
+  plot_grid_varimp_plot(
+    model = rv$diagnostic_svm$model,
+    filename = paste0(rv$plotdir, "SVM_variable_importance.png")
+  )
+  # create roc plot
+  plot_rocplot(
+    roc = rv$diagnostic_svm$roc,
+    filename = paste0(rv$plotdir, "ROC_SVM.png")
+  )
+
+  # RF
+  rv$diagnostic_rf <-
+    signature(
+      traininglist = rv$training_list,
+      type = "rf",
+      nfolds = rv$nfolds,
+      repeats = rv$repeats,
+      seed = rv$seed
+    )
+  # plot model of gridsearch
+  plot_grid_model_plot(
+    model = rv$diagnostic_rf$model,
+    filename = paste0(rv$plotdir, "RF_model.png")
+  )
+  # plot variable importance of gridsearch
+  plot_grid_varimp_plot(
+    model = rv$diagnostic_rf$model,
+    filename = paste0(rv$plotdir, "RF_variable_importance.png")
+  )
+  # create roc plot
+  plot_rocplot(
+    roc = rv$diagnostic_rf$roc,
+    filename = paste0(rv$plotdir, "ROC_RF.png")
+  )
+
+  # KNN
+  rv$diagnostic_knn <-
+    signature(
+      traininglist = rv$training_list,
+      type = "knn",
+      nfolds = rv$nfolds,
+      repeats = rv$repeats,
+      seed = rv$seed
+    )
+  # plot model of gridsearch
+  plot_grid_model_plot(
+    model = rv$diagnostic_knn$model,
+    filename = paste0(rv$plotdir, "KNN_model.png")
+  )
+  # plot variable importance of gridsearch
+  plot_grid_varimp_plot(
+    model = rv$diagnostic_knn$model,
+    filename = paste0(rv$plotdir, "KNN_variable_importance.png")
+  )
+  # create roc plot
+  plot_rocplot(
+    roc = rv$diagnostic_knn$roc,
+    filename = paste0(rv$plotdir, "ROC_KNN.png")
+  )
+
   # compare aucs
   diagnostic_models <- list(
 
@@ -214,13 +223,13 @@ sigidentDiagnostic <- function(mergeset, # nolint
       "min" = list(
         "model" = rv$diagnostic_lasso$lambda_min,
         "confmat" = rv$diagnostic_lasso$confmat_min,
-        "prediction" = rv$diagnostic_lasso$predicted_min,
+        "prediction" = rv$diagnostic_lasso$prediction_min,
         "auc" = as.numeric(rv$diagnostic_lasso$roc_min$auc)
       ),
       "1se" = list(
         "model" = rv$diagnostic_lasso$lambda_1se,
         "confmat" = rv$diagnostic_lasso$confmat_1se,
-        "prediction" = rv$diagnostic_lasso$predicted_1se,
+        "prediction" = rv$diagnostic_lasso$prediction_1se,
         "auc" = as.numeric(rv$diagnostic_lasso$roc_1se$auc)
       )
     ),
@@ -230,13 +239,13 @@ sigidentDiagnostic <- function(mergeset, # nolint
       "min" = list(
         "model" = rv$diagnostic_elasticnet$lambda_min,
         "confmat" = rv$diagnostic_elasticnet$confmat_min,
-        "prediction" = rv$diagnostic_elasticnet$predicted_min,
+        "prediction" = rv$diagnostic_elasticnet$prediction_min,
         "auc" = as.numeric(rv$diagnostic_elasticnet$roc_min$auc)
       ),
       "1se" = list(
         "model" = rv$diagnostic_elasticnet$lambda_1se,
         "confmat" = rv$diagnostic_elasticnet$confmat_1se,
-        "prediction" = rv$diagnostic_elasticnet$predicted_1se,
+        "prediction" = rv$diagnostic_elasticnet$prediction_1se,
         "auc" = as.numeric(rv$diagnostic_elasticnet$roc_1se$auc)
       )
     ),
@@ -256,18 +265,18 @@ sigidentDiagnostic <- function(mergeset, # nolint
         "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
     ),
 
-    "knn" = list(
-      "model" = rv$diagnostic_knn$knn_model,
-      "confmat" = rv$diagnostic_knn$confmat_knn,
-      "prediction" = rv$diagnostic_knn$predicted_knn,
-      "auc" = as.numeric(rv$diagnostic_knn$roc_knn$auc)
+    "rf" = list(
+      "model" = rv$diagnostic_rf$model,
+      "confmat" = rv$diagnostic_rf$confmat,
+      "prediction" = rv$diagnostic_rf$prediction,
+      "auc" = as.numeric(rv$diagnostic_rf$roc$auc)
     ),
 
-    "rf" = list(
-      "model" = rv$diagnostic_rf$rf_model,
-      "confmat" = rv$diagnostic_rf$confmat_rf,
-      "prediction" = rv$diagnostic_rf$predicted_rf,
-      "auc" = as.numeric(rv$diagnostic_rf$roc_rf$auc)
+    "knn" = list(
+      "model" = rv$diagnostic_knn$model,
+      "confmat" = rv$diagnostic_knn$confmat,
+      "prediction" = rv$diagnostic_knn$prediction,
+      "auc" = as.numeric(rv$diagnostic_knn$roc$auc)
     )
   )
   return(diagnostic_models = diagnostic_models)

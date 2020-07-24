@@ -10,9 +10,12 @@ glmnet_gridsearch <- function(traininglist, seed, nfolds, repeats) {
   alpha_grid <- seq(0.1, 1, length = 10)
 
   # set up cross validation method for train function
-  trn_ctrl <- caret::trainControl(method = "repeatedcv",
-                                  repeats = repeats,
-                                  number = nfolds)
+  trn_ctrl <- caret::trainControl(
+    method = "repeatedcv",
+    number = nfolds,
+    repeats = repeats,
+    classProbs = TRUE
+  )
 
   srch_grd <- expand.grid(.alpha = alpha_grid,
                           .lambda = lambda_grid)

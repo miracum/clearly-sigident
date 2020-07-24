@@ -19,6 +19,7 @@ signature <- function(traininglist,
                       type,
                       alpha = NULL,
                       nfolds = 10,
+                      repeats = 3,
                       seed) {
 
   stopifnot(
@@ -34,13 +35,13 @@ signature <- function(traininglist,
   )
 
   if (type == "elasticnet_grid") {
-    outlist <- glmnet_gridsearch(traininglist, seed, nfolds)
+    outlist <- glmnet_gridsearch(traininglist, seed, nfolds, repeats)
   } else if (type == "svm") {
-    outlist <- svm_classifier(traininglist, seed, nfolds)
+    outlist <- svm_classifier(traininglist, seed, nfolds, repeats)
   } else if (type == "knn") {
-    outlist <- knn_classifier(traininglist, seed, nfolds)
+    outlist <- knn_classifier(traininglist, seed, nfolds, repeats)
   } else if (type == "rf") {
-    outlist <- rf_classifier(traininglist, seed, nfolds)
+    outlist <- rf_classifier(traininglist, seed, nfolds, repeats)
   } else if (type %in% c("lasso", "elastic")) {
     outlist <- glmnet_classifier(traininglist, type, seed, nfolds)
   }

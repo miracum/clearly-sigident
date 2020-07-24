@@ -4,7 +4,7 @@
 \alias{signature}
 \title{signature}
 \usage{
-signature(traininglist, type, alpha = NULL, nfolds = 10, seed)
+signature(traininglist, type, alpha = NULL, nfolds = 10, repeats = 3, seed)
 }
 \arguments{
 \item{traininglist}{A list object containing the training data. The output
@@ -19,6 +19,9 @@ passed to `glmnet::glmnet()`.}
 
 \item{nfolds}{A integer. The number of folds used for cross validation
 (default: 10).}
+
+\item{repeats}{An integer. The number of repeated cross validations
+(default = 3).}
 
 \item{seed}{A integer value. Seed to make machine learning algorithms
 reproducible. Default: 111.}

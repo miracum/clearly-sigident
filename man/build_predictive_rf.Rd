@@ -4,16 +4,14 @@
 \alias{build_predictive_rf}
 \title{build_predictive_rf}
 \usage{
-build_predictive_rf(train_x, train_y, fit_cv, metric)
+build_predictive_rf(train_x, train_y, trn_ctrl)
 }
 \arguments{
 \item{train_x}{The learning data values.}
 
 \item{train_y}{The learning data classes.}
 
-\item{fit_cv}{Options for the cross validation}
-
-\item{metric}{A character. The metric to be used during caret::train.}
+\item{trn_ctrl}{Options for the cross validation.}
 }
 \description{
 Function builds a random forest classifier model based on

@@ -12,18 +12,17 @@ svm_classifier <- function(traininglist, seed, nfolds, repeats) {
   # initialize outlist
   outlist <- list()
 
-  fit_cv <- caret::trainControl(
+  trn_ctrl <- caret::trainControl(
     method = "repeatedcv",
     number = nfolds,
     repeats = repeats,
-    savePredictions = TRUE,
-    search = "random"
+    classProbs = TRUE
   )
 
   outlist$model <- build_predictive_svm(
     train_x = traininglist$train$x,
     train_y = traininglist$train$y,
-    fit_cv = fit_cv
+    trn_ctrl = trn_ctrl
   )
 
   outlist$prediction <- predict_svm(
@@ -51,12 +50,11 @@ svm_classifier <- function(traininglist, seed, nfolds, repeats) {
 #'
 #' @param train_x The learning data values.
 #' @param train_y The learning data classes.
-#' @param fit_cv Options for the cross validation
+#' @param trn_ctrl Options for the cross validation
 #'
-#' @export
 build_predictive_svm <- function(train_x,
                                  train_y,
-                                 fit_cv) {
+                                 trn_ctrl) {
 
   # go parallel
   ncores <- parallel::detectCores()
@@ -66,12 +64,13 @@ build_predictive_svm <- function(train_x,
 
   model <- caret::train(
     x = train_x,
-    y = as.factor(as.factor(train_y)),
+    y = as.factor(train_y),
     method = "svmLinear",
-    trControl = fit_cv,
+    trControl = trn_ctrl,
     preProc = c("center", "scale"),
     tuneLength = 5,
-    allowParallel = T)
+    allowParallel = T
+  )
 
   # stop parallel computation
   parallel::stopCluster(cl)
@@ -99,7 +98,7 @@ predict_svm <- function(model,
     model,
     test_x,
     type = "prob"
-  )[, 2]
+  )[, "1"]
 
   return(outdat)
 }
