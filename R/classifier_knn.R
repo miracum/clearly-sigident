@@ -8,6 +8,11 @@
 #'
 #' @inheritParams sigidentDiagnostic
 knn_classifier <- function(traininglist, seed, nfolds, repeats) {
+
+  stopifnot(
+    unique(traininglist$train$y) %in% c(0, 1)
+  )
+
   # initialize outlist
   outlist <- list()
 
@@ -20,11 +25,11 @@ knn_classifier <- function(traininglist, seed, nfolds, repeats) {
 
   outlist$model <- build_predictive_knn(
     train_x = traininglist$train$x,
-    train_y = traininglist$train$y,
+    train_y = paste0("X", traininglist$train$y),
     trn_ctrl = trn_ctrl
   )
 
-  outlist$prediction <- predict_knn(
+  outlist$prediction <- predict_caret(
     model = outlist$model,
     test_x = traininglist$test$x
   )
@@ -71,32 +76,9 @@ build_predictive_knn <- function(train_x,
     allowParallel = T
   )
 
-
   # stop parallel computation
   parallel::stopCluster(cl)
   gc()
 
-
   return(model)
-}
-
-#' @title predict_knn
-#'
-#' @description Function to classify given data based on the created
-#'   model.
-#'
-#' @param model A list object containing the training data. The output
-#'   of the function `build_predictive_knn()`.
-#' @param test_x The data to be classified.
-#'
-predict_knn <- function(model,
-                        test_x) {
-
-  outdat <- caret::predict.train(
-    model,
-    test_x,
-    type = "prob"
-  )[, "1"]
-
-  return(outdat)
 }

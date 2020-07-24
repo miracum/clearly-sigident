@@ -9,6 +9,11 @@
 #' @inheritParams sigidentDiagnostic
 #'
 rf_classifier <- function(traininglist, seed, nfolds, repeats) {
+
+  stopifnot(
+    unique(traininglist$train$y) %in% c(0, 1)
+  )
+
   # initialize outlist
   outlist <- list()
 
@@ -21,11 +26,11 @@ rf_classifier <- function(traininglist, seed, nfolds, repeats) {
 
   outlist$model <- build_predictive_rf(
     train_x = traininglist$train$x,
-    train_y = traininglist$train$y,
+    train_y = paste0("X", traininglist$train$y),
     trn_ctrl = trn_ctrl
   )
 
-  outlist$prediction <- predict_rf(
+  outlist$prediction <- predict_caret(
     model = outlist$model,
     test_x = traininglist$test$x
   )
@@ -81,24 +86,22 @@ build_predictive_rf <- function(train_x,
   return(model)
 }
 
-#' @title predict_rf
+#' @title predict_caret
 #'
 #' @description Function to classify given data based on the created
 #'   model.
 #'
-#' @param model A list object containing the training data. The output
-#'   of the function `build_predictive_rf()`.
-#'
+#' @param model The caret model.
 #' @param test_x The data to be classified.
 #'
-predict_rf <- function(model,
+predict_caret <- function(model,
                        test_x) {
 
   outdat <- caret::predict.train(
     model,
     test_x,
     type = "prob"
-  )[, "1"]
+  )[, "X1"]
 
   return(outdat)
 }
