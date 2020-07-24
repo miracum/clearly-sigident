@@ -9,7 +9,8 @@ validate_diagnostic_signatures(
   models,
   genes,
   idtype,
-  datadir
+  datadir,
+  colindices = NULL
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ are being removed!}
 
 \item{datadir}{A character string. Path to the data-folder inside the
 metadata folder.}
+
+\item{colindices}{A vector of integers. Indices of columns to run the
+validation on.}
 }
 \description{
 Helper function to validate diagnostic signatures

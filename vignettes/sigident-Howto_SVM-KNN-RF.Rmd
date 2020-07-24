@@ -12,8 +12,7 @@ editor_options:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  eval = FALSE
+  comment = "#>"
 )
 ```
 
@@ -152,6 +151,13 @@ training_list <- sigident::create_training_test_split(
   split = split,
   seed = seed
 )
+```
+
+For demonstration/ runtime purposes, the data is reduced to the first 1000 genes. If you want to run the analyses on the whole dataset, please comment out the following lines.
+
+```{r}
+training_list$train$x <- training_list$train$x[, 1:1000]
+training_list$test$x <- training_list$test$x[, 1:1000]
 ```
 
 ## SVM 
@@ -380,7 +386,8 @@ validation_results <- sigident::validate_diagnostic_signatures(
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  datadir = datadir
+  datadir = datadir,
+  colindices = 1:1000
 )
 ```
 

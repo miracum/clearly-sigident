@@ -6,6 +6,8 @@
 #'   study used for validation of the diagnostic signature.
 #' @param models A list of prediction models. Usually the output of the
 #'   function `sigidentDiagnostic`.
+#' @param colindices A vector of integers. Indices of columns to run the
+#'   validation on.
 #'
 #' @inheritParams sigidentPrognostic
 #'
@@ -14,9 +16,11 @@ validate_diagnostic_signatures <- function(validationstudylist,
                                            models,
                                            genes,
                                            idtype,
-                                           datadir) {
+                                           datadir,
+                                           colindices = NULL) {
   stopifnot(
-    is.list(validationstudylist)
+    is.list(validationstudylist),
+    is.null(colindices) || is.numeric(colindices)
   )
 
   targetcol <- "target"
@@ -89,6 +93,10 @@ validate_diagnostic_signatures <- function(validationstudylist,
 
     # creating data frame including all genes
     v_data_all <- t(expr)
+
+    if (!is.null(colindices)) {
+      v_data_all <- v_data_all[, colindices]
+    }
 
     for (i in names(models)) {
       if (i %in% c("lasso", "elasticnet")) {
