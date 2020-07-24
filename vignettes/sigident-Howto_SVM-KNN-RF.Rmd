@@ -344,17 +344,18 @@ gc()
 diagnostic_models$svm$confmat
 ```
 
+#### RF
+
+```{r}
+diagnostic_models$rf$confmat
+```
+
 #### KNN
 
 ```{r}
 diagnostic_models$knn$confmat
 ```
 
-#### RF
-
-```{r}
-diagnostic_models$rf$confmat
-```
 
 ## Validation of diagnostic signatures 
 

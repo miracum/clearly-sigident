@@ -739,16 +739,16 @@ diagnostic_models$elasticnet_grid$confmat
 diagnostic_models$svm$confmat
 ```
 
-#### KNN
-
-```{r}
-diagnostic_models$knn$confmat
-```
-
 #### RF
 
 ```{r}
 diagnostic_models$rf$confmat
+```
+
+#### KNN
+
+```{r}
+diagnostic_models$knn$confmat
 ```
 
 ### Export selected IDs for some models 
