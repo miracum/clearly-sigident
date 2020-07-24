@@ -42,6 +42,9 @@ to be integrated into the training set for machine learning
 
 \item{plotdir}{A character string. Path to the folder to store resulting
 plots (default = paste0(tempdir(), "/plots/")).}
+
+\item{colindices}{A vector of integers. Indices of columns to run the
+validation on (default = NULL).}
 }
 \description{
 One function to perform diagnostic signature analysis.

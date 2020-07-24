@@ -12,8 +12,7 @@ editor_options:
 ```{r include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  eval = FALSE
+  comment = "#>"
 )
 ```
 
@@ -148,7 +147,13 @@ filename <- paste0(plotdir, "/", pathwayid, ".pathview.png")
 knitr::include_graphics(filename)
 ```
 
-## Run `sigidentDiagnostic`-function 
+## Run `sigidentDiagnostic`-function
+
+```{r}
+# run only on first 1000 columns
+colindices <- 1:1000
+```
+
 
 ```{r}
 diagnostic_models <- sigident::sigidentDiagnostic(
@@ -158,7 +163,7 @@ diagnostic_models <- sigident::sigidentDiagnostic(
   nfolds = nfolds,
   split = split,
   plotdir = plotdir,
-  colindices = 1:1000
+  colindices = colindices
 )
 ```
 
@@ -208,7 +213,7 @@ validation_results <- sigident::validate_diagnostic_signatures(
   genes = genes,
   idtype = idtype,
   datadir = datadir,
-  colindices = 1:1000
+  colindices = colindices
 )
 ```
 

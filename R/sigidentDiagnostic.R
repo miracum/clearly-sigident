@@ -17,6 +17,7 @@
 #' @param tunelength An integer. The caret tuning length (default = 10).
 #'
 #' @inheritParams sigidentPrognostic
+#' @inheritParams validate_diagnostic_signatures
 #'
 #'
 #' @export
