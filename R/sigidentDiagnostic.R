@@ -118,17 +118,17 @@ sigidentDiagnostic <- function(mergeset, # nolint
     )
   # plot model of gridsearch
   plot_grid_model_plot(
-    model = rv$diagnostic_svm$svm_model,
+    model = rv$diagnostic_svm$model,
     filename = paste0(rv$plotdir, "SVM_model.png")
   )
   # plot variable importance of gridsearch
   plot_grid_varimp_plot(
-    model = rv$diagnostic_svm$svm_model,
+    model = rv$diagnostic_svm$model,
     filename = paste0(rv$plotdir, "SVM_variable_importance.png")
   )
   # create roc plot
   plot_rocplot(
-    roc = rv$diagnostic_svm$roc_svm,
+    roc = rv$diagnostic_svm$roc,
     filename = paste0(rv$plotdir, "ROC_SVM.png")
   )
 
@@ -201,7 +201,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
   )
   # create roc plot
   plot_rocplot(
-    roc = rv$diagnostic_glmgrid$roc_elasticnet,
+    roc = rv$diagnostic_glmgrid$roc,
     filename = paste0(rv$plotdir, "ROC_elasticNet.grid.png")
   )
 
@@ -243,17 +243,17 @@ sigidentDiagnostic <- function(mergeset, # nolint
 
     "elasticnet_grid" = list(
       "CV" = rv$diagnostic_glmgrid$caret_train,
-      "model" = rv$diagnostic_glmgrid$elasticnet_auto,
-      "confmat" = rv$diagnostic_glmgrid$confmat_elasticnet,
-      "prediction" = rv$diagnostic_glmgrid$predicted_elasticnet,
-      "auc" = as.numeric(rv$diagnostic_glmgrid$roc_elasticnet$auc)
+      "model" = rv$diagnostic_glmgrid$model,
+      "confmat" = rv$diagnostic_glmgrid$confmat,
+      "prediction" = rv$diagnostic_glmgrid$prediction,
+      "auc" = as.numeric(rv$diagnostic_glmgrid$roc$auc)
     ),
 
     "svm" = list(
-        "model" = rv$diagnostic_svm$svm_model,
-        "confmat" = rv$diagnostic_svm$confmat_svm,
-        "prediction" = rv$diagnostic_svm$predicted_svm,
-        "auc" = as.numeric(rv$diagnostic_svm$roc_svm$auc)
+        "model" = rv$diagnostic_svm$model,
+        "confmat" = rv$diagnostic_svm$confmat,
+        "prediction" = rv$diagnostic_svm$prediction,
+        "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
     ),
 
     "knn" = list(

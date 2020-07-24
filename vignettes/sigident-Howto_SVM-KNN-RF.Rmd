@@ -152,6 +152,52 @@ training_list <- sigident::create_training_test_split(
 )
 ```
 
+## SVM 
+
+A support vector machine is a collection of supervised learning algorithms that use hyperplane graphing to analyze new, unlabeled data. In Support Vector Machine incoming data is categorized into one of two classes. For SVM models, each data point is interpreted as a p-dimensional vector, which the machine attempts to create a linear classifier by fitting the data point inside a hyperplane (p-1 dimension). 
+So for classification, every input is turned into a point in n-dimensional space (n being the number of features), and the value of each feature defined as the value of a unique coordinate on the hyperplane. Classification is determined by finding the hyperplane that most clearly separates the two classes. 
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_svm <- sigident::signature(
+  traininglist = training_list,
+  type = "svm",
+  nfolds = nfolds,
+  seed = seed
+)
+gc();gc();
+filename <- paste0(plotdir, "SVM_model.png")
+sigident::plot_grid_model_plot(
+    model = diagnostic_svm$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "SVM_variable_importance.png")
+sigident::plot_grid_varimp_plot(
+    model = diagnostic_svm$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_SVM.png")
+sigident::plot_rocplot(
+    roc = diagnostic_svm$roc,
+    filename = filename
+)
+gc();gc();
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
 ## Random Forest Regression 
 
 The random forest regression is a supervised learning algorithm that randomly creates and merges multiple decision trees into one forest. The goal is not to rely on a single learning model, but rather a collection of decision models to improve accuracy. The primary difference between this approach and the standard decision tree algorithms is that the root nodes feature splitting nodes are generated randomly.
@@ -196,52 +242,6 @@ sigident::plot_rocplot(
 knitr::include_graphics(filename)
 ```
 
-
-## SVM 
-
-A support vector machine is a collection of supervised learning algorithms that use hyperplane graphing to analyze new, unlabeled data. In Support Vector Machine incoming data is categorized into one of two classes. For SVM models, each data point is interpreted as a p-dimensional vector, which the machine attempts to create a linear classifier by fitting the data point inside a hyperplane (p-1 dimension). 
-So for classification, every input is turned into a point in n-dimensional space (n being the number of features), and the value of each feature defined as the value of a unique coordinate on the hyperplane. Classification is determined by finding the hyperplane that most clearly separates the two classes. 
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_svm <- sigident::signature(
-  traininglist = training_list,
-  type = "svm",
-  nfolds = nfolds,
-  seed = seed
-)
-gc();gc();
-filename <- paste0(plotdir, "SVM_model.png")
-sigident::plot_grid_model_plot(
-    model = diagnostic_svm$svm_model,
-    filename = filename
-)
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "SVM_variable_importance.png")
-sigident::plot_grid_varimp_plot(
-    model = diagnostic_svm$svm_model,
-    filename = filename
-)
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-filename <- paste0(plotdir, "ROC_SVM.png")
-sigident::plot_rocplot(
-    roc = diagnostic_svm$roc_svm,
-    filename = filename
-)
-gc();gc();
-```
-```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
 
 ## K-Nearest Neighbors Regression 
 
@@ -293,10 +293,10 @@ knitr::include_graphics(filename)
 ```{r}
 diagnostic_models <- list(
   "svm" = list(
-        "model" = diagnostic_svm$svm_model,
-        "confmat" = diagnostic_svm$confmat_svm,
-        "prediction" = diagnostic_svm$predicted_svm,
-        "auc" = as.numeric(diagnostic_svm$roc_svm$auc)
+        "model" = diagnostic_svm$model,
+        "confmat" = diagnostic_svm$confmat,
+        "prediction" = diagnostic_svm$prediction,
+        "auc" = as.numeric(diagnostic_svm$roc$auc)
     ),
 
     "knn" = list(

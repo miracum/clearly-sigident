@@ -1,4 +1,4 @@
-glmnet_gridsearch <- function(traininglist, seed, nfolds) {
+glmnet_gridsearch <- function(traininglist, seed, nfolds, repeats) {
   # initialize outlist
   outlist <- list()
 
@@ -11,7 +11,7 @@ glmnet_gridsearch <- function(traininglist, seed, nfolds) {
 
   # set up cross validation method for train function
   trn_ctrl <- caret::trainControl(method = "repeatedcv",
-                                  repeats = 5,
+                                  repeats = repeats,
                                   number = nfolds)
 
   srch_grd <- expand.grid(.alpha = alpha_grid,
@@ -41,7 +41,7 @@ glmnet_gridsearch <- function(traininglist, seed, nfolds) {
   parallel::stopCluster(cl)
   gc()
 
-  outlist$elasticnet_auto <-
+  outlist$model <-
     perform_glmnet(
       train_x = traininglist$train$x,
       train_y = traininglist$train$y,
@@ -51,15 +51,15 @@ glmnet_gridsearch <- function(traininglist, seed, nfolds) {
 
   # prediction
   pred_elasticnet <- glm_prediction(
-    model = outlist$elasticnet_auto,
+    model = outlist$model,
     test_x = traininglist$test$x,
     test_y = traininglist$test$y,
     s = NULL
   )
 
-  outlist$predicted_elasticnet <- pred_elasticnet$predicted
-  outlist$confmat_elasticnet <- pred_elasticnet$confmat
-  outlist$roc_elasticnet <- pred_elasticnet$roc
+  outlist$prediction <- pred_elasticnet$predicted
+  outlist$confmat <- pred_elasticnet$confmat
+  outlist$roc <- pred_elasticnet$roc
 
   return(outlist)
 }

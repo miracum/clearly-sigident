@@ -8,36 +8,38 @@
 #'
 #' @inheritParams sigidentDiagnostic
 #'
-svm_classifier <- function(traininglist, seed, nfolds) {
+svm_classifier <- function(traininglist, seed, nfolds, repeats) {
   # initialize outlist
   outlist <- list()
 
   fit_cv <- caret::trainControl(
     method = "repeatedcv",
     number = nfolds,
-    repeats = 5,
+    repeats = repeats,
     savePredictions = TRUE,
     search = "random"
   )
 
-  outlist$svm_model <- build_predictive_svm(
+  outlist$model <- build_predictive_svm(
     train_x = traininglist$train$x,
     train_y = traininglist$train$y,
     fit_cv = fit_cv
   )
 
-  outlist$predicted_svm <- predict_svm(
-    model = outlist$svm_model,
+  outlist$prediction <- predict_svm(
+    model = outlist$model,
     test_x = traininglist$test$x
   )
-  outlist$confmat_svm <- caret::confusionMatrix(
-    data = outlist$predicted_svm,
+  outlist$confmat <- caret::confusionMatrix(
+    data = factor(ifelse(as.numeric(
+      as.character(outlist$prediction)
+    ) < 0.5, 0, 1)),
     reference = traininglist$test$y,
     positive = "1"
   )
-  outlist$roc_svm <- calc_roc(
+  outlist$roc <- calc_roc(
     test_y = traininglist$test$y,
-    prediction = outlist$predicted_svm
+    prediction = outlist$prediction
   )
 
   return(outlist)
@@ -96,8 +98,8 @@ predict_svm <- function(model,
   outdat <- caret::predict.train(
     model,
     test_x,
-    type = "raw"
-  )
+    type = "prob"
+  )[, 2]
 
   return(outdat)
 }

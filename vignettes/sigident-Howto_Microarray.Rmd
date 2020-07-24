@@ -457,7 +457,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_elasticNet.grid.png")
-sigident::plot_rocplot(roc = diagnostic_glmgrid$roc_elasticnet,
+sigident::plot_rocplot(roc = diagnostic_glmgrid$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -500,10 +500,10 @@ diagnostic_models <- list(
   ),
   "elasticnet_grid" = list(
     "CV" = diagnostic_glmgrid$caret_train,
-    "model" = diagnostic_glmgrid$elasticnet_auto,
-    "confmat" = diagnostic_glmgrid$confmat_elasticnet,
-    "prediction" = diagnostic_glmgrid$predicted_elasticnet,
-    "auc" = as.numeric(diagnostic_glmgrid$roc_elasticnet$auc)
+    "model" = diagnostic_glmgrid$model,
+    "confmat" = diagnostic_glmgrid$confmat,
+    "prediction" = diagnostic_glmgrid$prediction,
+    "auc" = as.numeric(diagnostic_glmgrid$roc$auc)
     )
 )
 ```
