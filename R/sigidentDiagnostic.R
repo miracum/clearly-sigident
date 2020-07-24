@@ -13,7 +13,8 @@
 #'   to be integrated into the training set for machine learning
 #'   (default: 0.8).
 #' @param repeats An integer. The number of repeated cross validations
-#'   (default = 3).
+#'   (default = 5).
+#' @param tunelength An integer. The caret tuning length (default = 10).
 #'
 #' @inheritParams sigidentPrognostic
 #'
@@ -23,7 +24,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
                                diagnosis,
                                seed = 111,
                                nfolds = 10,
-                               repeats = 3,
+                               repeats = 5,
+                               tunelength = 10,
                                split = 0.8,
                                plotdir = "./plots/") {
 
@@ -35,7 +37,9 @@ sigidentDiagnostic <- function(mergeset, # nolint
     is.numeric(nfolds),
     split < 1 & split > 0,
     is.numeric(repeats),
-    repeats > 0
+    repeats > 0,
+    is.numeric(tunelength),
+    tunelength > 0
   )
 
   # create internal list for storage
@@ -54,6 +58,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
   rv$seed <- seed
   rv$nfolds <- nfolds
   rv$repeats <- repeats
+  rv$tunelength <- tunelength
   rv$traintest_split <- split
 
   # add mergeset to list
@@ -121,6 +126,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
       type = "elasticnet_grid",
       nfolds = rv$nfolds,
       repeats = rv$repeats,
+      tunelength = rv$tunelength,
       seed = rv$seed
     )
   # plot model of gridsearch
@@ -147,6 +153,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
       type = "svm",
       nfolds = rv$nfolds,
       repeats = rv$repeats,
+      tunelength = rv$tunelength,
       seed = rv$seed
     )
   # plot model of gridsearch
@@ -172,6 +179,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
       type = "rf",
       nfolds = rv$nfolds,
       repeats = rv$repeats,
+      tunelength = rv$tunelength,
       seed = rv$seed
     )
   # plot model of gridsearch
@@ -197,6 +205,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
       type = "knn",
       nfolds = rv$nfolds,
       repeats = rv$repeats,
+      tunelength = rv$tunelength,
       seed = rv$seed
     )
   # plot model of gridsearch
@@ -259,10 +268,10 @@ sigidentDiagnostic <- function(mergeset, # nolint
     ),
 
     "svm" = list(
-        "model" = rv$diagnostic_svm$model,
-        "confmat" = rv$diagnostic_svm$confmat,
-        "prediction" = rv$diagnostic_svm$prediction,
-        "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
+      "model" = rv$diagnostic_svm$model,
+      "confmat" = rv$diagnostic_svm$confmat,
+      "prediction" = rv$diagnostic_svm$prediction,
+      "auc" = as.numeric(rv$diagnostic_svm$roc$auc)
     ),
 
     "rf" = list(

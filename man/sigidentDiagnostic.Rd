@@ -10,7 +10,8 @@ sigidentDiagnostic(
   diagnosis,
   seed = 111,
   nfolds = 10,
-  repeats = 3,
+  repeats = 5,
+  tunelength = 10,
   split = 0.8,
   plotdir = "./plots/"
 )
@@ -30,7 +31,9 @@ reproducible. Default: 111.}
 (default: 10).}
 
 \item{repeats}{An integer. The number of repeated cross validations
-(default = 3).}
+(default = 5).}
+
+\item{tunelength}{An integer. The caret tuning length (default = 10).}
 
 \item{split}{A numeric value between 0 and 1. The proportion of the data
 to be integrated into the training set for machine learning

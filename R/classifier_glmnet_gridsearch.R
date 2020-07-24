@@ -1,4 +1,10 @@
-glmnet_gridsearch <- function(traininglist, seed, nfolds, repeats) {
+glmnet_gridsearch <- function(
+  traininglist = traininglist,
+  seed = seed,
+  nfolds = nfolds,
+  repeats = repeats,
+  tunelength = tunelength
+) {
   # initialize outlist
   outlist <- list()
 
@@ -38,6 +44,7 @@ glmnet_gridsearch <- function(traininglist, seed, nfolds, repeats) {
     tuneGrid = gr_init$srchGrd,
     trControl = gr_init$trnCtrl,
     standardize = TRUE,
+    tuneLength = tunelength,
     maxit = 1e7
   )
   # stop parallel computation

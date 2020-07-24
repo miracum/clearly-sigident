@@ -9,7 +9,8 @@ sigident_signature(
   type,
   alpha = NULL,
   nfolds = 10,
-  repeats = 3,
+  repeats = 5,
+  tunelength = 10,
   seed
 )
 }
@@ -28,7 +29,9 @@ passed to `glmnet::glmnet()`.}
 (default: 10).}
 
 \item{repeats}{An integer. The number of repeated cross validations
-(default = 3).}
+(default = 5).}
+
+\item{tunelength}{An integer. The caret tuning length (default = 10).}
 
 \item{seed}{A integer value. Seed to make machine learning algorithms
 reproducible. Default: 111.}

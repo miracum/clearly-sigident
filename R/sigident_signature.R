@@ -19,7 +19,8 @@ sigident_signature <- function(traininglist,
                                type,
                                alpha = NULL,
                                nfolds = 10,
-                               repeats = 3,
+                               repeats = 5,
+                               tunelength = 10,
                                seed) {
 
   stopifnot(
@@ -35,13 +36,37 @@ sigident_signature <- function(traininglist,
   )
 
   if (type == "elasticnet_grid") {
-    outlist <- glmnet_gridsearch(traininglist, seed, nfolds, repeats)
+    outlist <- glmnet_gridsearch(
+      traininglist = traininglist,
+      seed = seed,
+      nfolds = nfolds,
+      repeats = repeats,
+      tunelength = tunelength
+    )
   } else if (type == "svm") {
-    outlist <- svm_classifier(traininglist, seed, nfolds, repeats)
+    outlist <- svm_classifier(
+      traininglist = traininglist,
+      seed = seed,
+      nfolds = nfolds,
+      repeats = repeats,
+      tunelength = tunelength
+    )
   } else if (type == "knn") {
-    outlist <- knn_classifier(traininglist, seed, nfolds, repeats)
+    outlist <- knn_classifier(
+      traininglist = traininglist,
+      seed = seed,
+      nfolds = nfolds,
+      repeats = repeats,
+      tunelength = tunelength
+    )
   } else if (type == "rf") {
-    outlist <- rf_classifier(traininglist, seed, nfolds, repeats)
+    outlist <- rf_classifier(
+      traininglist = traininglist,
+      seed = seed,
+      nfolds = nfolds,
+      repeats = repeats,
+      tunelength = tunelength
+    )
   } else if (type %in% c("lasso", "elastic")) {
     outlist <- glmnet_classifier(traininglist, type, seed, nfolds)
   }

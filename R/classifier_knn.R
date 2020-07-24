@@ -7,7 +7,13 @@
 #' @param seed Intilization state of random number generator
 #'
 #' @inheritParams sigidentDiagnostic
-knn_classifier <- function(traininglist, seed, nfolds, repeats) {
+knn_classifier <- function(
+  traininglist = traininglist,
+  seed = seed,
+  nfolds = nfolds,
+  repeats = repeats,
+  tunelength = tunelength
+) {
 
   stopifnot(
     unique(traininglist$train$y) %in% c(0, 1)
@@ -26,7 +32,8 @@ knn_classifier <- function(traininglist, seed, nfolds, repeats) {
   outlist$model <- build_predictive_knn(
     train_x = traininglist$train$x,
     train_y = paste0("X", traininglist$train$y),
-    trn_ctrl = trn_ctrl
+    trn_ctrl = trn_ctrl,
+    tunelength = tunelength
   )
 
   outlist$prediction <- predict_caret(
@@ -55,9 +62,11 @@ knn_classifier <- function(traininglist, seed, nfolds, repeats) {
 #' @param train_x The learning data values.
 #' @param train_y The learning data classes.
 #' @param trn_ctrl Options for the cross validation
-build_predictive_knn <- function(train_x,
-                                 train_y,
-                                 trn_ctrl
+build_predictive_knn <- function(
+  train_x,
+  train_y,
+  trn_ctrl,
+  tunelength
 ) {
 
   # go parallel
@@ -72,7 +81,7 @@ build_predictive_knn <- function(train_x,
     method = "knn",
     trControl = trn_ctrl,
     preProc = c("center", "scale"),
-    tuneLength = 5
+    tuneLength = tunelength
   )
 
   # stop parallel computation

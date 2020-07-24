@@ -4,7 +4,13 @@
 \alias{svm_classifier}
 \title{svm_classifier}
 \usage{
-svm_classifier(traininglist, seed, nfolds, repeats)
+svm_classifier(
+  traininglist = traininglist,
+  seed = seed,
+  nfolds = nfolds,
+  repeats = repeats,
+  tunelength = tunelength
+)
 }
 \arguments{
 \item{traininglist}{A list object containing the training data. The output
@@ -16,7 +22,9 @@ of the function `create_training_test_split()`.}
 (default: 10).}
 
 \item{repeats}{An integer. The number of repeated cross validations
-(default = 3).}
+(default = 5).}
+
+\item{tunelength}{An integer. The caret tuning length (default = 10).}
 }
 \description{
 Helper function to create a svm classifier model
