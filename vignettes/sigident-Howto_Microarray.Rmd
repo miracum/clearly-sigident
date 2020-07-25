@@ -349,11 +349,11 @@ training_list <- sigident::create_training_test_split(
 )
 ```
 
-For demonstration/ runtime purposes, the data is reduced to the first 1000 genes. If you want to run the analyses on the whole dataset, please comment out the following lines.
+For demonstration/ runtime purposes, the data is reduced to the first 300 genes. If you want to run the analyses on the whole dataset, please comment out the following lines.
 
 ```{r}
-training_list$train$x <- training_list$train$x[, 1:1000]
-training_list$test$x <- training_list$test$x[, 1:1000]
+training_list$train$x <- training_list$train$x[, 1:300]
+training_list$test$x <- training_list$test$x[, 1:300]
 ```
 
 ## Lasso regression
@@ -471,7 +471,6 @@ sigident::plot_rocplot(roc = diagnostic_glmgrid$roc,
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
-
 
 ## SVM 
 
@@ -843,6 +842,12 @@ All models can be provided via the argument 'model' to the function `sigident::v
 
 To perform the validation of the diagnostic signatures, simply run the function `sigident::validate_diagnostic_signatures` with the specified `validationstudylist`.
 
+```{r}
+# define gene subset
+colindices <- 1:300
+```
+
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 validation_results <- sigident::validate_diagnostic_signatures(
   validationstudylist = validationstudylist,
@@ -850,7 +855,7 @@ validation_results <- sigident::validate_diagnostic_signatures(
   genes = genes,
   idtype = idtype,
   datadir = datadir,
-  colindices = 1:1000
+  colindices = colindices
 )
 ```
 
@@ -1204,11 +1209,6 @@ sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$elasticnet_grid$r
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
-```
-
-```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-validation_results[["GSE102287"]] <- NULL
-gc()
 ```
 
 #### SVM

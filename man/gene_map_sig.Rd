@@ -11,8 +11,7 @@ gene_map_sig(mergeset, model)
 columns = samples). The output of the funtion
 `sigident.preproc::load_geo_data()`.}
 
-\item{model}{An object containing the model information. The
-ouput of the function `glmnetSignature_()` with \code{type = "grid"}.}
+\item{model}{An object containing the model information.}
 }
 \description{
 Helper function to map relevant input variables of a diagnostic

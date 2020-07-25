@@ -7,8 +7,7 @@
 plot_grid_model_plot(model, filename)
 }
 \arguments{
-\item{model}{An object containing the model information. The
-ouput of the function `glmnetSignature_()` with \code{type = "grid"}.}
+\item{model}{An object containing the model information.}
 
 \item{filename}{A character string. The filename.}
 }

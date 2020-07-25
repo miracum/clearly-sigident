@@ -7,9 +7,7 @@
 plot_rocplot(roc, filename)
 }
 \arguments{
-\item{roc}{An object containing the roc information.
-The ouput of the function `glmnetSignature_()`
-with \code{type = "elastic"} or \code{type = "lasso"}.}
+\item{roc}{An object containing the roc information.}
 
 \item{filename}{A character string. The filename.}
 }
