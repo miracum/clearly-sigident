@@ -5,6 +5,11 @@ glmnet_gridsearch <- function(
   repeats = repeats,
   tunelength = tunelength
 ) {
+
+  stopifnot(
+    unique(traininglist$train$y) %in% c(0, 1)
+  )
+
   # initialize outlist
   outlist <- list()
 
@@ -19,8 +24,7 @@ glmnet_gridsearch <- function(
   trn_ctrl <- caret::trainControl(
     method = "repeatedcv",
     number = nfolds,
-    repeats = repeats,
-    classProbs = TRUE
+    repeats = repeats
   )
 
   srch_grd <- expand.grid(.alpha = alpha_grid,

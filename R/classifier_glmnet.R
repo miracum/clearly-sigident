@@ -4,8 +4,8 @@ perform_glmnet <- function(train_x,
                            lambda) {
 
   outdat <- glmnet::glmnet(
-    train_x,
-    train_y,
+    x = train_x,
+    y = train_y,
     family = "binomial",
     alpha = alpha,
     lambda = lambda
@@ -22,10 +22,12 @@ build_predictive_glm <- function(train_x,
 
   outlist <- list()
   for (i in c("lambda.min", "lambda.1se")) {
-    outlist[[i]] <- perform_glmnet(train_x,
-                                   train_y,
-                                   alpha,
-                                   fit_cv[[i]])
+    outlist[[i]] <- perform_glmnet(
+      train_x = train_x,
+      train_y = train_y,
+      alpha = alpha,
+      lambda = fit_cv[[i]]
+    )
   }
   gc()
   return(outlist)
@@ -39,7 +41,7 @@ predict_glm <- function(model,
 
   outdat <- as.factor(
     glmnet::predict.glmnet(
-      model,
+      object = model,
       newx = test_x,
       s = s,
       type = type
@@ -80,13 +82,15 @@ glm_prediction <- function(model,
   return(outlist)
 }
 
-glmnet_classifier <- function(traininglist, type, seed, nfolds) {
+glmnet_classifier <- function(traininglist, type, seed, nfolds, a) {
   # use provided alpha only in elastic
   if (type == "lasso") {
-    alpha <- 1
+    a <- 1
   } else if (type == "elastic") {
-    stopifnot(!is.null(alpha),
-              alpha >= 0 | alpha <= 1)
+    stopifnot(
+      !is.null(a),
+      a >= 0 || a <= 1
+    )
   }
 
   # initialize outlist
@@ -101,12 +105,12 @@ glmnet_classifier <- function(traininglist, type, seed, nfolds) {
 
   set.seed(seed)
   outlist$fit_cv <- glmnet::cv.glmnet(
-    traininglist$train$x,
-    traininglist$train$y,
+    x = traininglist$train$x,
+    y = traininglist$train$y,
     family = "binomial",
     type.measure = "mse",
     nfolds = nfolds,
-    alpha = alpha,
+    alpha = a,
     parallel = TRUE
   )
   # stop parallel computation
@@ -115,9 +119,9 @@ glmnet_classifier <- function(traininglist, type, seed, nfolds) {
 
   # build the predictive models utilizing calculated lambda values
   glmpred <- build_predictive_glm(
-    traininglist$train$x,
-    traininglist$train$y,
-    alpha = alpha,
+    train_x = traininglist$train$x,
+    train_y = traininglist$train$y,
+    alpha = a,
     fit_cv = outlist$fit_cv
   )
   outlist$lambda_min <- glmpred$lambda.min

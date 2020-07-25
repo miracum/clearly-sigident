@@ -9,7 +9,7 @@
 #'   Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic",
 #'   "svm", "knn"}.
 #'
-#' @param alpha A numeric between 0 and 1. The elastic net mixing parameter
+#' @param a A numeric between 0 and 1. The elastic net mixing parameter 'alpha'
 #'   passed to `glmnet::glmnet()`.
 #'
 #' @inheritParams sigidentDiagnostic
@@ -17,7 +17,7 @@
 #' @export
 sigident_signature <- function(traininglist,
                                type,
-                               alpha = NULL,
+                               a = NULL,
                                nfolds = 10,
                                repeats = 5,
                                tunelength = 10,
@@ -68,7 +68,7 @@ sigident_signature <- function(traininglist,
       tunelength = tunelength
     )
   } else if (type %in% c("lasso", "elastic")) {
-    outlist <- glmnet_classifier(traininglist, type, seed, nfolds)
+    outlist <- glmnet_classifier(traininglist, type, seed, nfolds, a)
   }
 
   return(outlist)

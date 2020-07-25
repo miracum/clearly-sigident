@@ -32,7 +32,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
                                colindices = NULL) {
 
   stopifnot(
-    class(mergeset) == "matrix",
+    class(mergeset) == c("matrix", "array"),
     is.numeric(diagnosis),
     is.numeric(seed),
     is.numeric(split),
@@ -107,7 +107,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
     sigident_signature(
       traininglist = rv$training_list,
       type = "elastic",
-      alpha = 0.9,
+      a = 0.9,
       nfolds = rv$nfolds,
       seed = rv$seed
     )
@@ -294,5 +294,5 @@ sigidentDiagnostic <- function(mergeset, # nolint
       "auc" = as.numeric(rv$diagnostic_knn$roc$auc)
     )
   )
-  return(diagnostic_models = diagnostic_models)
+  return(diagnostic_models)
 }

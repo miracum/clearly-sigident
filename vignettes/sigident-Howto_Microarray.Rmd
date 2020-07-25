@@ -402,7 +402,7 @@ The elastic net is a mixture of lasso and ridge regularization to shrink coeffic
 diagnostic_elasticnet <- sigident::sigident_signature(
   traininglist = training_list,
   type = "elastic",
-  alpha = 0.9,
+  a = 0.9,
   nfolds = nfolds,
   seed = seed
 )
@@ -563,7 +563,6 @@ sigident::plot_rocplot(
 knitr::include_graphics(filename)
 ```
 
-
 ## K-Nearest Neighbors Regression 
 
 The k-nearest neighbors algorithm, or kNN, is one of the simplest machine learning algorithms. Usually, k is a small, odd number - sometimes only 1. The larger k is, the more accurate the classification will be, but the longer it takes to perform the classification. It classifies an object into one of several classes by looking at the k elements of the training set that are closest to the one you want to classify, and letting them vote by majority on what that object’s class should be.
@@ -660,18 +659,18 @@ diagnostic_models <- list(
       "auc" = as.numeric(diagnostic_svm$roc$auc)
   ),
 
-  "knn" = list(
-    "model" = diagnostic_knn$model,
-    "confmat" = diagnostic_knn$confmat,
-    "prediction" = diagnostic_knn$prediction,
-    "auc" = as.numeric(diagnostic_knn$roc$auc)
-  ),
-
   "rf" = list(
     "model" = diagnostic_rf$model,
     "confmat" = diagnostic_rf$confmat,
     "prediction" = diagnostic_rf$prediction,
     "auc" = as.numeric(diagnostic_rf$roc$auc)
+  ),
+
+  "knn" = list(
+    "model" = diagnostic_knn$model,
+    "confmat" = diagnostic_knn$confmat,
+    "prediction" = diagnostic_knn$prediction,
+    "auc" = as.numeric(diagnostic_knn$roc$auc)
   )
 )
 ```

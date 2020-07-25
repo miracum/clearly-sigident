@@ -40,7 +40,7 @@ sigidentPrognostic <- function(mergeset, # nolint
                                plotdir = paste0(tempdir(), "/plots/"),
                                csvdir = paste0(tempdir(), "/tables/")) {
   stopifnot(
-    class(mergeset) == "matrix",
+    class(mergeset) == c("matrix", "array"),
     is.character(plotdir),
     is.character(csvdir),
     is.list(discoverystudies_w_timedata),
