@@ -25,7 +25,7 @@ In order to simplify the whole sigident-workflow described in the vignette [sigi
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-For a more detailed background and description of the following steps please view the `sigident.preproc` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
+For a more detailed background and description of the following steps please view the `sigident.preproc` package's [vignette](https://github.com/miracum/clearly-sigident.preproc/blob/master/vignettes/sigident_preproc_Howto_GEO.Rmd).
 
 ## Initialization of important variables
 
@@ -185,8 +185,6 @@ knitr::kable(
 ```
 
 ### Validation of the diagnostic signatures 
-
-Some users may validate the resulting models using new independent data sets. This can be conducted running the function `validate_diagnostic_signatures`. First, a list containing meta information on the validation study must be created.
 
 ```{r}
 validationstudylist <- list(
