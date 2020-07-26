@@ -150,6 +150,7 @@ pathwayid <- "hsa04151" # PI3K-Akt
 seed <- 111
 split <- 0.8
 nfolds <- 10
+ncores <- 4
 ```
 
 # DEG analysis 
@@ -366,7 +367,8 @@ diagnostic_lasso <- sigident::sigident_signature(
   traininglist = training_list,
   type = "lasso",
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 filename <- paste0(plotdir, "CV_lasso.png")
 sigident::plot_cvplot(cv_obj = diagnostic_lasso$fit_cv,
@@ -404,7 +406,8 @@ diagnostic_elasticnet <- sigident::sigident_signature(
   type = "elastic",
   a = 0.9,
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 filename <- paste0(plotdir, "CV_elasticNet.png")
 sigident::plot_cvplot(cv_obj = diagnostic_elasticnet$fit_cv,
@@ -441,7 +444,8 @@ diagnostic_glmgrid <- sigident::sigident_signature(
   traininglist = training_list,
   type = "elasticnet_grid",
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 # plot model of gridsearch
 filename <- paste0(plotdir, "Gridsearch_model.png")
@@ -482,7 +486,8 @@ diagnostic_svm <- sigident::sigident_signature(
   traininglist = training_list,
   type = "svm",
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 gc();gc();
 filename <- paste0(plotdir, "SVM_model.png")
@@ -527,7 +532,8 @@ diagnostic_rf <- sigident::sigident_signature(
   traininglist = training_list,
   type = "rf",
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 gc();gc();
 filename <- paste0(plotdir, "RF_model.png")
@@ -571,7 +577,8 @@ diagnostic_knn <- sigident::sigident_signature(
   traininglist = training_list,
   type = "knn",
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 filename <- paste0(plotdir, "KNN_model.png")
 sigident::plot_grid_model_plot(
