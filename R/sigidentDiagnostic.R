@@ -31,14 +31,17 @@ sigidentDiagnostic <- function(mergeset, # nolint
                                tunelength = 10,
                                split = 0.8,
                                plotdir = paste0(tempdir(), "/plots/"),
-                               colindices = NULL) {
+                               colindices = NULL,
+                               ncores = 4) {
 
   stopifnot(
     class(mergeset) == c("matrix", "array"),
     is.numeric(diagnosis),
     is.numeric(seed),
-    is.numeric(split),
+    seed > 0,
     is.numeric(nfolds),
+    nfolds > 0,
+    is.numeric(split),
     split < 1 & split > 0,
     is.numeric(repeats),
     repeats > 0,

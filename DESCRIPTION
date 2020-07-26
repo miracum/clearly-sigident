@@ -62,4 +62,4 @@ Suggests:
 Remotes: 
     github::miracum/clearly-sigident.preproc@development,
     github::miracum/clearly-sigident.func@development
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

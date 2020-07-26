@@ -11,7 +11,12 @@ build_predictive_knn(train_x, train_y, trn_ctrl, tunelength, seed)
 
 \item{train_y}{The learning data classes.}
 
-\item{trn_ctrl}{Options for the cross validation}
+\item{trn_ctrl}{Options for the cross validation.}
+
+\item{tunelength}{An integer. The caret tuning length (default = 10).}
+
+\item{seed}{A integer value. Seed to make machine learning algorithms
+reproducible. Default: 111.}
 }
 \description{
 Function builds a knn classifier model based on the given data.

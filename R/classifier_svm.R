@@ -66,7 +66,9 @@ svm_classifier <- function(
 #'
 #' @param train_x The learning data values.
 #' @param train_y The learning data classes.
-#' @param trn_ctrl Options for the cross validation
+#' @param trn_ctrl Options for the cross validation.
+#'
+#' @inheritParams sigidentDiagnostic
 #'
 build_predictive_svm <- function(
   train_x,

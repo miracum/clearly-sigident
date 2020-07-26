@@ -31,9 +31,17 @@ sigident_signature <- function(traininglist,
                 "svm",
                 "knn",
                 "rf"),
-    is.numeric(nfolds),
+    is.list(traininglist),
     is.numeric(seed),
-    is.list(traininglist)
+    seed > 0,
+    is.numeric(nfolds),
+    nfolds > 0,
+    is.numeric(repeats),
+    repeats > 0,
+    is.numeric(tunelength),
+    tunelength > 0,
+    is.numeric(ncores),
+    ncores > 0
   )
 
   message(paste0("signature identification using type = ", type))

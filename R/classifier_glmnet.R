@@ -20,7 +20,8 @@ perform_glmnet <- function(train_x,
 build_predictive_glm <- function(train_x,
                                  train_y,
                                  alpha,
-                                 fit_cv) {
+                                 fit_cv,
+                                 seed) {
 
   outlist <- list()
   for (i in c("lambda.min", "lambda.1se")) {
@@ -115,7 +116,8 @@ glmnet_classifier <- function(traininglist, type, seed, nfolds, a) {
     train_x = traininglist$train$x,
     train_y = traininglist$train$y,
     alpha = a,
-    fit_cv = outlist$fit_cv
+    fit_cv = outlist$fit_cv,
+    seed = seed
   )
   outlist$lambda_min <- glmpred$lambda.min
   outlist$lambda_1se <- glmpred$lambda.1se

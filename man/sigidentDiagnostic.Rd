@@ -14,7 +14,8 @@ sigidentDiagnostic(
   tunelength = 10,
   split = 0.8,
   plotdir = paste0(tempdir(), "/plots/"),
-  colindices = NULL
+  colindices = NULL,
+  ncores = 4
 )
 }
 \arguments{
