@@ -15,6 +15,8 @@
 #' @param repeats An integer. The number of repeated cross validations
 #'   (default = 5).
 #' @param tunelength An integer. The caret tuning length (default = 10).
+#' @param ncores An integers. The number of CPU cores used for running
+#'   the algorithms (default = 4).
 #'
 #' @inheritParams sigidentPrognostic
 #' @inheritParams validate_diagnostic_signatures
@@ -41,7 +43,9 @@ sigidentDiagnostic <- function(mergeset, # nolint
     is.numeric(repeats),
     repeats > 0,
     is.numeric(tunelength),
-    tunelength > 0
+    tunelength > 0,
+    is.numeric(ncores),
+    ncores > 0
   )
 
   # create internal list for storage
@@ -62,6 +66,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
   rv$repeats <- repeats
   rv$tunelength <- tunelength
   rv$traintest_split <- split
+
+  rv$ncores <- ncores
 
   # add mergeset to list
   rv$mergeset <- mergeset
@@ -86,7 +92,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
     traininglist = rv$training_list,
     type = "lasso",
     nfolds = rv$nfolds,
-    seed = rv$seed
+    seed = rv$seed,
+    ncores = rv$ncores
   )
   plot_cvplot(
     cv_obj = rv$diagnostic_lasso$fit_cv,
@@ -109,7 +116,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
       type = "elastic",
       a = 0.9,
       nfolds = rv$nfolds,
-      seed = rv$seed
+      seed = rv$seed,
+      ncores = rv$ncores
     )
   plot_cvplot(
     cv_obj = rv$diagnostic_elasticnet$fit_cv,
@@ -133,7 +141,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
       nfolds = rv$nfolds,
       repeats = rv$repeats,
       tunelength = rv$tunelength,
-      seed = rv$seed
+      seed = rv$seed,
+      ncores = rv$ncores
     )
   # plot model of gridsearch
   plot_grid_model_plot(
@@ -160,7 +169,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
       nfolds = rv$nfolds,
       repeats = rv$repeats,
       tunelength = rv$tunelength,
-      seed = rv$seed
+      seed = rv$seed,
+      ncores = rv$ncores
     )
   # plot model of gridsearch
   plot_grid_model_plot(
@@ -186,7 +196,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
       nfolds = rv$nfolds,
       repeats = rv$repeats,
       tunelength = rv$tunelength,
-      seed = rv$seed
+      seed = rv$seed,
+      ncores = rv$ncores
     )
   # plot model of gridsearch
   plot_grid_model_plot(
@@ -212,7 +223,8 @@ sigidentDiagnostic <- function(mergeset, # nolint
       nfolds = rv$nfolds,
       repeats = rv$repeats,
       tunelength = rv$tunelength,
-      seed = rv$seed
+      seed = rv$seed,
+      ncores = rv$ncores
     )
   # plot model of gridsearch
   plot_grid_model_plot(

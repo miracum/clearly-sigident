@@ -1,9 +1,9 @@
 glmnet_gridsearch <- function(
-  traininglist = traininglist,
-  seed = seed,
-  nfolds = nfolds,
-  repeats = repeats,
-  tunelength = tunelength
+  traininglist,
+  seed,
+  nfolds,
+  repeats,
+  tunelength
 ) {
 
   stopifnot(
@@ -32,12 +32,6 @@ glmnet_gridsearch <- function(
 
   gr_init <- list(srchGrd = srch_grd, trnCtrl = trn_ctrl)
 
-  # go parallel
-  ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 4, 4, ncores)
-  cl <- parallel::makeCluster(cores)
-  doParallel::registerDoParallel(cl)
-
   # perform cv forecasting
   set.seed(seed)
   outlist$caret_train <- caret::train(
@@ -51,9 +45,6 @@ glmnet_gridsearch <- function(
     tuneLength = tunelength,
     maxit = 1e7
   )
-  # stop parallel computation
-  parallel::stopCluster(cl)
-  gc()
 
   outlist$model <-
     perform_glmnet(

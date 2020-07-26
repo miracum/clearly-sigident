@@ -21,7 +21,8 @@ sigident_signature <- function(traininglist,
                                nfolds = 10,
                                repeats = 5,
                                tunelength = 10,
-                               seed) {
+                               seed,
+                               ncores = 4) {
 
   stopifnot(
     type %in% c("elasticnet_grid",
@@ -36,6 +37,22 @@ sigident_signature <- function(traininglist,
   )
 
   message(paste0("signature identification using type = ", type))
+
+  # go parallel
+  available_cores <- parallel::detectCores()
+
+  # reset cores, if user-provided ncores > available_cores
+  if (ncores > available_cores) {
+    cores <- available_cores
+  } else {
+    cores <- ncores
+  }
+
+  message(paste0("### parallel computation using ", cores, " cores ###"))
+
+  cl <- parallel::makeCluster(cores)
+  set.seed(seed)
+  doParallel::registerDoParallel(cl)
 
   if (type == "elasticnet_grid") {
     outlist <- glmnet_gridsearch(
@@ -72,6 +89,10 @@ sigident_signature <- function(traininglist,
   } else if (type %in% c("lasso", "elastic")) {
     outlist <- glmnet_classifier(traininglist, type, seed, nfolds, a)
   }
+
+  # stop parallel computation
+  parallel::stopCluster(cl)
+  gc()
 
   return(outlist)
 }

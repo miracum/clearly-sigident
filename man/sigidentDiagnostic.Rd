@@ -45,6 +45,9 @@ plots (default = paste0(tempdir(), "/plots/")).}
 
 \item{colindices}{A vector of integers. Indices of columns to run the
 validation on (default = NULL).}
+
+\item{ncores}{An integers. The number of CPU cores used for running
+the algorithms (default = 4).}
 }
 \description{
 One function to perform diagnostic signature analysis.

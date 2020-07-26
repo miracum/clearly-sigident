@@ -11,7 +11,8 @@ sigident_signature(
   nfolds = 10,
   repeats = 5,
   tunelength = 10,
-  seed
+  seed,
+  ncores = 4
 )
 }
 \arguments{
@@ -36,6 +37,9 @@ passed to `glmnet::glmnet()`.}
 
 \item{seed}{A integer value. Seed to make machine learning algorithms
 reproducible. Default: 111.}
+
+\item{ncores}{An integers. The number of CPU cores used for running
+the algorithms (default = 4).}
 }
 \description{
 Helper function to identify a multi-gene classifier

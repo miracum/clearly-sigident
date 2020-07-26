@@ -11,11 +11,11 @@
 #' @inheritParams sigidentDiagnostic
 #'
 svm_classifier <- function(
-  traininglist = traininglist,
-  seed = seed,
-  nfolds = nfolds,
-  repeats = repeats,
-  tunelength = tunelength
+  traininglist,
+  seed,
+  nfolds,
+  repeats,
+  tunelength
 ) {
 
   stopifnot(
@@ -76,12 +76,6 @@ build_predictive_svm <- function(
   seed = seed
 ) {
 
-  # go parallel
-  ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 4, 4, ncores)
-  cl <- parallel::makeCluster(cores)
-  doParallel::registerDoParallel(cl)
-
   set.seed(seed)
   model <- caret::train(
     x = train_x,
@@ -92,11 +86,6 @@ build_predictive_svm <- function(
     tuneLength = tunelength,
     allowParallel = T
   )
-
-  # stop parallel computation
-  parallel::stopCluster(cl)
-  gc()
-
 
   return(model)
 }

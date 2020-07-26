@@ -4,13 +4,7 @@
 \alias{rf_classifier}
 \title{rf_classifier}
 \usage{
-rf_classifier(
-  traininglist = traininglist,
-  seed = seed,
-  nfolds = nfolds,
-  repeats = repeats,
-  tunelength = tunelength
-)
+rf_classifier(traininglist, seed, nfolds, repeats, tunelength)
 }
 \arguments{
 \item{traininglist}{A list object containing the training data. The output

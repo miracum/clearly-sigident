@@ -99,13 +99,6 @@ glmnet_classifier <- function(traininglist, type, seed, nfolds, a) {
   # initialize outlist
   outlist <- list()
 
-
-  # go parallel
-  ncores <- parallel::detectCores()
-  cores <- ifelse(ncores > 4, 4, ncores)
-  cl <- parallel::makeCluster(cores)
-  doParallel::registerDoParallel(cl)
-
   set.seed(seed)
   outlist$fit_cv <- glmnet::cv.glmnet(
     x = traininglist$train$x,
@@ -116,9 +109,6 @@ glmnet_classifier <- function(traininglist, type, seed, nfolds, a) {
     alpha = a,
     parallel = TRUE
   )
-  # stop parallel computation
-  parallel::stopCluster(cl)
-  gc()
 
   # build the predictive models utilizing calculated lambda values
   glmpred <- build_predictive_glm(

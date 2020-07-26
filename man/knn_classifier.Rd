@@ -4,13 +4,7 @@
 \alias{knn_classifier}
 \title{knn_classifier}
 \usage{
-knn_classifier(
-  traininglist = traininglist,
-  seed = seed,
-  nfolds = nfolds,
-  repeats = repeats,
-  tunelength = tunelength
-)
+knn_classifier(traininglist, seed, nfolds, repeats, tunelength)
 }
 \arguments{
 \item{traininglist}{A list object containing the training data. The output

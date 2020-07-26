@@ -4,13 +4,7 @@
 \alias{svm_classifier}
 \title{svm_classifier}
 \usage{
-svm_classifier(
-  traininglist = traininglist,
-  seed = seed,
-  nfolds = nfolds,
-  repeats = repeats,
-  tunelength = tunelength
-)
+svm_classifier(traininglist, seed, nfolds, repeats, tunelength)
 }
 \arguments{
 \item{traininglist}{A list object containing the training data. The output
