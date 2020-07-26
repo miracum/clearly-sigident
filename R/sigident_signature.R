@@ -1,13 +1,13 @@
 #' @title sigident_signature
 #'
-#' @description Helper function to conduct lasso or elastic net regualization
-#'   for fitting a GLM in order to identify a multi-gene classifier
+#' @description Helper function to identify a multi-gene classifier
 #'
 #' @param traininglist A list object containing the training data. The output
 #'   of the function `create_training_test_split()`.
 #' @param type A character string. The algorihm used to perform calculations.
 #'   Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic",
-#'   "svm", "knn"}.
+#'   "svm" (support vector machine), "rf" (random forest) and "knn" (k-nearest
+#'   neighbors)}.
 #'
 #' @param a A numeric between 0 and 1. The elastic net mixing parameter 'alpha'
 #'   passed to `glmnet::glmnet()`.
@@ -34,6 +34,8 @@ sigident_signature <- function(traininglist,
     is.numeric(seed),
     is.list(traininglist)
   )
+
+  message(paste0("signature identification using type = ", type))
 
   if (type == "elasticnet_grid") {
     outlist <- glmnet_gridsearch(
