@@ -33,7 +33,8 @@ knn_classifier <- function(
     train_x = traininglist$train$x,
     train_y = paste0("X", traininglist$train$y),
     trn_ctrl = trn_ctrl,
-    tunelength = tunelength
+    tunelength = tunelength,
+    seed = seed
   )
 
   outlist$prediction <- predict_caret(
@@ -66,7 +67,8 @@ build_predictive_knn <- function(
   train_x,
   train_y,
   trn_ctrl,
-  tunelength
+  tunelength,
+  seed
 ) {
 
   # go parallel
@@ -75,6 +77,7 @@ build_predictive_knn <- function(
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
 
+  set.seed(seed)
   model <- caret::train(
     x = train_x,
     y = as.factor(train_y),

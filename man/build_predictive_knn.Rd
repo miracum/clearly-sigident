@@ -4,7 +4,7 @@
 \alias{build_predictive_knn}
 \title{build_predictive_knn}
 \usage{
-build_predictive_knn(train_x, train_y, trn_ctrl, tunelength)
+build_predictive_knn(train_x, train_y, trn_ctrl, tunelength, seed)
 }
 \arguments{
 \item{train_x}{The learning data values.}

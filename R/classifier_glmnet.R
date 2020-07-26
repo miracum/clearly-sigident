@@ -1,8 +1,10 @@
 perform_glmnet <- function(train_x,
                            train_y,
                            alpha,
-                           lambda) {
+                           lambda,
+                           seed) {
 
+  set.seed(seed)
   outdat <- glmnet::glmnet(
     x = train_x,
     y = train_y,
@@ -26,7 +28,8 @@ build_predictive_glm <- function(train_x,
       train_x = train_x,
       train_y = train_y,
       alpha = alpha,
-      lambda = fit_cv[[i]]
+      lambda = fit_cv[[i]],
+      seed = seed
     )
   }
   gc()

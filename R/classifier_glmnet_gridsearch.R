@@ -60,7 +60,8 @@ glmnet_gridsearch <- function(
       train_x = traininglist$train$x,
       train_y = traininglist$train$y,
       alpha = outlist$caret_train$bestTune$alpha,
-      lambda = outlist$caret_train$bestTune$lambda
+      lambda = outlist$caret_train$bestTune$lambda,
+      seed = seed
     )
 
   # prediction

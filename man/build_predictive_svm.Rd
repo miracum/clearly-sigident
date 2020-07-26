@@ -4,7 +4,7 @@
 \alias{build_predictive_svm}
 \title{build_predictive_svm}
 \usage{
-build_predictive_svm(train_x, train_y, trn_ctrl, tunelength)
+build_predictive_svm(train_x, train_y, trn_ctrl, tunelength, seed = seed)
 }
 \arguments{
 \item{train_x}{The learning data values.}

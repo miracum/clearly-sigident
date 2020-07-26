@@ -87,10 +87,6 @@ validate_diagnostic_signatures <- function(validationstudylist,
       idtype = idtype
     )
 
-    # TODO why is this code in the original script?
-    # # creating data frame, selecting only DEGs
-    #% v.data.DEG <- base::subset(t(expr), select = genes)
-
     # creating data frame including all genes
     v_data_all <- t(expr)
 
@@ -100,7 +96,9 @@ validate_diagnostic_signatures <- function(validationstudylist,
 
     for (i in names(models)) {
       if (i %in% c("lasso", "elasticnet")) {
+
         message(paste0("Validating signature using model: ", i))
+
         for (j in c("min", "1se")) {
           prediction <- predict_glm(model = models[[i]][[j]]$model,
                                     test_x = v_data_all,
@@ -125,13 +123,26 @@ validate_diagnostic_signatures <- function(validationstudylist,
             roc = roc
           )
         }
-      } else if (i %in% "elasticnet_grid") {
-        message(paste0("Validating signature using model: ", i))
+      } else {
+        if (i %in% "elasticnet_grid") {
 
-        prediction <- predict_glm(model = models[[i]]$model,
-                                  test_x = v_data_all,
-                                  type = "response")
+          message(paste0("Validating signature using model: ", i))
 
+          prediction <- predict_glm(model = models[[i]]$model,
+                                    test_x = v_data_all,
+                                    type = "response")
+
+        } else if (i %in% c("svm", "knn", "rf")) {
+
+          message(paste0("Validating signature using model: ", i))
+
+          prediction <- predict_caret(
+            model = models[[i]]$model,
+            test_x = v_data_all
+          )
+        }
+
+        # create confmat
         confmat <-
           caret::confusionMatrix(
             data = factor(ifelse(
@@ -143,33 +154,6 @@ validate_diagnostic_signatures <- function(validationstudylist,
 
         # Calculate Roc
         roc <- calc_roc(test_y = diagnosis,
-                        prediction = prediction)
-
-        outlist[[st]][[i]] <- list(
-          prediction = prediction,
-          confmat = confmat,
-          roc = roc
-        )
-      } else if (i %in% c("svm", "knn", "rf")) {
-        message(paste0("Validating signature using model: ", i))
-
-        prediction <- predict_caret(
-          model = models[[i]]$model,
-          test_x = v_data_all
-        )
-
-        confmat <-
-          caret::confusionMatrix(
-            data = factor(ifelse(as.numeric(
-              as.character(prediction)
-            ) < 0.5, 0, 1)),
-            reference = as.factor(diagnosis),
-            positive = "1"
-          )
-        # determine the true case with the 'positive' argument
-
-        # Calculate Roc
-        roc <- calc_roc(test_y = as.factor(diagnosis),
                         prediction = prediction)
 
         outlist[[st]][[i]] <- list(

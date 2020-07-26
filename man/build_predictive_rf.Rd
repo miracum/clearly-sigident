@@ -4,7 +4,7 @@
 \alias{build_predictive_rf}
 \title{build_predictive_rf}
 \usage{
-build_predictive_rf(train_x, train_y, trn_ctrl, tunelength)
+build_predictive_rf(train_x, train_y, trn_ctrl, tunelength, seed)
 }
 \arguments{
 \item{train_x}{The learning data values.}
