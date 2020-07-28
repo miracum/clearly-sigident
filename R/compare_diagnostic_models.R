@@ -67,9 +67,9 @@ get_diagnostic_lambda_values <- function(modellist) {
         rbind(
           outdat,
           data.table::data.table(
-            "Model" = paste(n, "(best tune, alpha, lambda)"),
-            "Lambda min" = round(modellist[[n]]$CV$bestTune$alpha, 6),
-            "Lambda 1se" = round(modellist[[n]]$CV$bestTune$lambda, 6)
+            "Model" = paste(n, "(best tune: alpha, lambda)"),
+            "Lambda min" = round(modellist[[n]]$model$bestTune$alpha, 6),
+            "Lambda 1se" = round(modellist[[n]]$model$bestTune$lambda, 6)
           )
         )
     }

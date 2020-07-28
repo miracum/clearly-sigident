@@ -43,13 +43,13 @@ predict_glm <- function(model,
                         s = NULL,
                         type) {
 
-  outdat <- as.factor(
-    glmnet::predict.glmnet(
+  outdat <- unname(
+    stats::predict(
       object = model,
       newx = test_x,
       s = s,
       type = type
-    )
+    )[, "1"]
   )
   return(outdat)
 }
@@ -67,7 +67,7 @@ glm_prediction <- function(model,
     model = model,
     test_x = test_x,
     s = s,
-    type = "class"
+    type = "response"
   )
 
   # Generate Confusion Matrix

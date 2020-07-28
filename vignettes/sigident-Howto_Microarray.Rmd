@@ -449,7 +449,7 @@ diagnostic_glmgrid <- sigident::sigident_signature(
 )
 # plot model of gridsearch
 filename <- paste0(plotdir, "Gridsearch_model.png")
-sigident::plot_grid_model_plot(model = diagnostic_glmgrid$caret_train,
+sigident::plot_grid_model_plot(model = diagnostic_glmgrid$model,
                                filename = filename)
 ```
 ```{r out.width='80%'}
@@ -459,7 +459,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # plot variable importance of gridsearch
 filename <- paste0(plotdir, "Elasticnet_Gridsearch_var_imp.png")
-sigident::plot_grid_varimp_plot(model = diagnostic_glmgrid$caret_train,
+sigident::plot_grid_varimp_plot(model = diagnostic_glmgrid$model,
                                 filename = filename)
 ```
 ```{r out.width='80%'}
@@ -651,7 +651,6 @@ diagnostic_models <- list(
   ),
   
   "elasticnet_grid" = list(
-    "CV" = diagnostic_glmgrid$caret_train,
     "model" = diagnostic_glmgrid$model,
     "confmat" = diagnostic_glmgrid$confmat,
     "prediction" = diagnostic_glmgrid$prediction,
