@@ -23,7 +23,7 @@ compare_diagnostic_models <- function(modellist) {
                   ))
         }
       }
-    } else if (n %in% c("elasticnet_grid", "svm", "knn", "rf")) {
+    } else if (n %in% c("glmnet", "svm", "knn", "rf")) {
       outdat <-
         rbind(outdat,
               data.table::data.table(
@@ -62,7 +62,7 @@ get_diagnostic_lambda_values <- function(modellist) {
           "Lambda 1se" = round(modellist[[n]]$CV$lambda.1se, 6)
         )
       )
-    } else if (n %in% c("elasticnet_grid")) {
+    } else if (n %in% c("glmnet")) {
       outdat <-
         rbind(
           outdat,

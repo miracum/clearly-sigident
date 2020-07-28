@@ -140,7 +140,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
   rv$diagnostic_glmgrid <-
     sigident_signature(
       traininglist = rv$training_list,
-      type = "elasticnet_grid",
+      type = "glmnet",
       nfolds = rv$nfolds,
       repeats = rv$repeats,
       tunelength = rv$tunelength,
@@ -280,7 +280,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
       )
     ),
 
-    "elasticnet_grid" = list(
+    "glmnet" = list(
       "model" = rv$diagnostic_glmgrid$model,
       "confmat" = rv$diagnostic_glmgrid$confmat,
       "prediction" = rv$diagnostic_glmgrid$prediction,

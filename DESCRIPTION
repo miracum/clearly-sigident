@@ -59,6 +59,7 @@ Suggests:
     qpdf,
     knitr,
     lintr
-Remotes:  
+Remotes: 
     github::miracum/clearly-sigident.preproc@development,
     github::miracum/clearly-sigident.func@development
+RoxygenNote: 7.1.1

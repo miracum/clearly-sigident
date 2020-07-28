@@ -5,7 +5,7 @@
 #' @param traininglist A list object containing the training data. The output
 #'   of the function `create_training_test_split()`.
 #' @param type A character string. The algorihm used to perform calculations.
-#'   Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic",
+#'   Currently implemented are \emph{"glmnet", "lasso", "elastic",
 #'   "svm" (support vector machine), "rf" (random forest) and "knn" (k-nearest
 #'   neighbors)}.
 #'
@@ -25,7 +25,7 @@ sigident_signature <- function(traininglist,
                                ncores = 4) {
 
   stopifnot(
-    type %in% c("elasticnet_grid",
+    type %in% c("glmnet",
                 "lasso",
                 "elastic",
                 "svm",
@@ -62,7 +62,7 @@ sigident_signature <- function(traininglist,
   set.seed(seed)
   doParallel::registerDoParallel(cl)
 
-  if (type == "elasticnet_grid") {
+  if (type == "glmnet") {
     outlist <- glmnet_gridsearch(
       traininglist = traininglist,
       seed = seed,

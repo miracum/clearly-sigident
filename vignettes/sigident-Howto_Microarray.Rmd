@@ -437,12 +437,12 @@ knitr::include_graphics(filename)
 
 ## Gridsearch to find alpha and lambda
 
-Setting `type = "elasticnet_grid"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/package=caret).  
+Setting `type = "glmnet"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/package=caret).  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 diagnostic_glmgrid <- sigident::sigident_signature(
   traininglist = training_list,
-  type = "elasticnet_grid",
+  type = "glmnet",
   nfolds = nfolds,
   seed = seed,
   ncores = ncores
@@ -650,7 +650,7 @@ diagnostic_models <- list(
                  )
   ),
   
-  "elasticnet_grid" = list(
+  "glmnet" = list(
     "model" = diagnostic_glmgrid$model,
     "confmat" = diagnostic_glmgrid$confmat,
     "prediction" = diagnostic_glmgrid$prediction,
@@ -734,7 +734,7 @@ diagnostic_models$elasticnet[["1se"]]$confmat
 #### Elastic net (grid search)
 
 ```{r}
-diagnostic_models$elasticnet_grid$confmat
+diagnostic_models$glmnet$confmat
 ```
 
 #### SVM
@@ -793,15 +793,6 @@ signaturegenes <- sigident::gene_map_sig(
 )
 data.table::fwrite(signaturegenes,
                    paste0(csvdir, "signaturegenes_elasticnet_1se.csv"))
-```
-
-```{r}
-signaturegenes <- sigident::gene_map_sig(
-  mergeset = mergeset,
-  model = diagnostic_models$elasticnet_grid$model
-)
-data.table::fwrite(signaturegenes,
-                   paste0(csvdir, "signaturegenes_elasticnet_grid.csv"))
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -934,13 +925,13 @@ knitr::include_graphics(filename)
 #### Elasticnet gridsearch (best model) 
 
 ```{r}
-validation_results[["GSE30219"]]$elasticnet_grid$confmat
+validation_results[["GSE30219"]]$glmnet$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
-filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_grid.png")
-sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$elasticnet_grid$roc,
+filename <- paste0(plotdir, "ROC_validation_GSE30219_glmnet.png")
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$glmnet$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -1069,13 +1060,13 @@ knitr::include_graphics(filename)
 #### Elasticnet gridsearch (best model) 
 
 ```{r}
-validation_results[["GSE33356"]]$elasticnet_grid$confmat
+validation_results[["GSE33356"]]$glmnet$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
-filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_grid.png")
-sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$elasticnet_grid$roc,
+filename <- paste0(plotdir, "ROC_validation_GSE33356_glmnet.png")
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$glmnet$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -1204,13 +1195,13 @@ knitr::include_graphics(filename)
 #### Elasticnet gridsearch (best model) 
 
 ```{r}
-validation_results[["GSE102287"]]$elasticnet_grid$confmat
+validation_results[["GSE102287"]]$glmnet$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
-filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_grid.png")
-sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$elasticnet_grid$roc,
+filename <- paste0(plotdir, "ROC_validation_GSE102287_glmnet.png")
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$glmnet$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
