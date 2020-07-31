@@ -20,7 +20,7 @@ sigident_signature(
 of the function `create_training_test_split()`.}
 
 \item{type}{A character string. The algorihm used to perform calculations.
-Currently implemented are \emph{"elasticnet_grid", "lasso", "elastic",
+Currently implemented are \emph{"glmnet", "lasso", "elastic",
 "svm" (support vector machine), "rf" (random forest) and "knn" (k-nearest
 neighbors)}.}
 

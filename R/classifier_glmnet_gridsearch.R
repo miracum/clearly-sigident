@@ -24,7 +24,8 @@ glmnet_gridsearch <- function(
   trn_ctrl <- caret::trainControl(
     method = "repeatedcv",
     number = nfolds,
-    repeats = repeats
+    repeats = repeats,
+    classProbs = TRUE
   )
 
   srch_grd <- expand.grid(.alpha = alpha_grid,
@@ -32,11 +33,10 @@ glmnet_gridsearch <- function(
 
   gr_init <- list(srchGrd = srch_grd, trnCtrl = trn_ctrl)
 
-  # perform cv forecasting
   set.seed(seed)
-  outlist$caret_train <- caret::train(
+  outlist$model <- caret::train(
     x = traininglist$train$x,
-    y = as.factor(traininglist$train$y),
+    y = paste0("X", traininglist$train$y),
     method = "glmnet",
     family = "binomial",
     tuneGrid = gr_init$srchGrd,
@@ -46,26 +46,21 @@ glmnet_gridsearch <- function(
     maxit = 1e7
   )
 
-  outlist$model <-
-    perform_glmnet(
-      train_x = traininglist$train$x,
-      train_y = traininglist$train$y,
-      alpha = outlist$caret_train$bestTune$alpha,
-      lambda = outlist$caret_train$bestTune$lambda,
-      seed = seed
-    )
-
-  # prediction
-  pred_elasticnet <- glm_prediction(
+  outlist$prediction <- predict_caret(
     model = outlist$model,
-    test_x = traininglist$test$x,
-    test_y = traininglist$test$y,
-    s = NULL
+    test_x = traininglist$test$x
   )
-
-  outlist$prediction <- pred_elasticnet$predicted
-  outlist$confmat <- pred_elasticnet$confmat
-  outlist$roc <- pred_elasticnet$roc
+  outlist$confmat <- caret::confusionMatrix(
+    data = factor(ifelse(as.numeric(
+      as.character(outlist$prediction)
+    ) < 0.5, 0, 1)),
+    reference = traininglist$test$y,
+    positive = "1"
+  )
+  outlist$roc <- calc_roc(
+    test_y = traininglist$test$y,
+    prediction = outlist$prediction
+  )
 
   return(outlist)
 }

@@ -140,7 +140,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
   rv$diagnostic_glmgrid <-
     sigident_signature(
       traininglist = rv$training_list,
-      type = "elasticnet_grid",
+      type = "glmnet",
       nfolds = rv$nfolds,
       repeats = rv$repeats,
       tunelength = rv$tunelength,
@@ -149,12 +149,12 @@ sigidentDiagnostic <- function(mergeset, # nolint
     )
   # plot model of gridsearch
   plot_grid_model_plot(
-    model = rv$diagnostic_glmgrid$caret_train,
+    model = rv$diagnostic_glmgrid$model,
     filename = paste0(rv$plotdir, "glmnet_gridsearch_model.png")
   )
   # plot variable importance of gridsearch
   plot_grid_varimp_plot(
-    model = rv$diagnostic_glmgrid$caret_train,
+    model = rv$diagnostic_glmgrid$model,
     filename = paste0(rv$plotdir, "glmnet_gridsearch_variable_importance.png")
   )
   # create roc plot
@@ -280,8 +280,7 @@ sigidentDiagnostic <- function(mergeset, # nolint
       )
     ),
 
-    "elasticnet_grid" = list(
-      "CV" = rv$diagnostic_glmgrid$caret_train,
+    "glmnet" = list(
       "model" = rv$diagnostic_glmgrid$model,
       "confmat" = rv$diagnostic_glmgrid$confmat,
       "prediction" = rv$diagnostic_glmgrid$prediction,

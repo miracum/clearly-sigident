@@ -23,7 +23,7 @@ compare_diagnostic_models <- function(modellist) {
                   ))
         }
       }
-    } else if (n %in% c("elasticnet_grid", "svm", "knn", "rf")) {
+    } else if (n %in% c("glmnet", "svm", "knn", "rf")) {
       outdat <-
         rbind(outdat,
               data.table::data.table(
@@ -62,14 +62,14 @@ get_diagnostic_lambda_values <- function(modellist) {
           "Lambda 1se" = round(modellist[[n]]$CV$lambda.1se, 6)
         )
       )
-    } else if (n %in% c("elasticnet_grid")) {
+    } else if (n %in% c("glmnet")) {
       outdat <-
         rbind(
           outdat,
           data.table::data.table(
-            "Model" = paste(n, "(best tune, alpha, lambda)"),
-            "Lambda min" = round(modellist[[n]]$CV$bestTune$alpha, 6),
-            "Lambda 1se" = round(modellist[[n]]$CV$bestTune$lambda, 6)
+            "Model" = paste(n, "(best tune: alpha, lambda)"),
+            "Lambda min" = round(modellist[[n]]$model$bestTune$alpha, 6),
+            "Lambda 1se" = round(modellist[[n]]$model$bestTune$lambda, 6)
           )
         )
     }
