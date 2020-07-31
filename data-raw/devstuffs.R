@@ -23,7 +23,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.1.0.9001")
+my_desc$set_version("0.1.1")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -134,6 +134,8 @@ usethis::use_build_ignore(".gitlab-ci.yml")
 usethis::use_build_ignore("ci")
 usethis::use_build_ignore(".vscode")
 usethis::use_build_ignore(".lintr")
+usethis::use_build_ignore("doc")
+usethis::use_build_ignore("Meta")
 
 
 usethis::use_git_ignore("/*")
