@@ -58,8 +58,10 @@ Suggests:
     rmarkdown,
     qpdf,
     knitr,
-    lintr
-Remotes: 
+    lintr,
+    mlr3,
+    mlr3learners,
+    mlr3viz
+Remotes:  
     github::miracum/clearly-sigident.preproc@development,
     github::miracum/clearly-sigident.func@development
-RoxygenNote: 7.1.1

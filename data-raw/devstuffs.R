@@ -89,6 +89,10 @@ usethis::use_package("rmarkdown", type = "Suggests")
 usethis::use_package("qpdf", type = "Suggests")
 usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
+usethis::use_package("mlr3", type = "Suggests")
+usethis::use_package("mlr3learners", type = "Suggests")
+usethis::use_package("mlr3viz", type = "Suggests")
+
 
 # Development package
 preproc_tag <- "development"
