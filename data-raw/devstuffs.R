@@ -23,7 +23,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.1.1")
+my_desc$set_version("0.1.1.9001")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -91,8 +91,8 @@ usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
 
 # Development package
-preproc_tag <- "v0.0.5"
-func_tag <- "v0.0.4"
+preproc_tag <- "development"
+func_tag <- "development"
 
 devtools::install_github("miracum/clearly-sigident.preproc", ref = preproc_tag, upgrade = "always")
 devtools::install_github("miracum/clearly-sigident.func", ref = func_tag, upgrade = "always")
