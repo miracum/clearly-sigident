@@ -1,6 +1,6 @@
 Package: sigident
 Title: Signature Analyses in Genomic Expression Sets
-Version: 0.0.5.9002
+Version: 0.1.1
 Authors@R: 
     c(person(given = "Lorenz A.",
              family = "Kapsner",
@@ -9,7 +9,8 @@ Authors@R:
              comment = c(ORCID = "0000-0003-1866-860X")),
       person(given = "Johannes",
              family = "Vey",
-             role = "aut"),
+             role = "aut",
+             comment = c(ORCID = "0000-0002-2610-9667")),
       person(given = "Meik",
              family = "Kunz",
              role = "ctb"),
@@ -21,15 +22,18 @@ Authors@R:
              role = "ctb"),
       person(given = "Julian",
              family = "Henke",
+             role = "ctb"),
+      person(given = "Nicholas",
+             family = "Dickel",
              role = "ctb"))
 Description: Identify diagnostic and prognostic signatures from gene expression datasets.
 License: GPL-3
 LazyData: true
-URL: https://gitlab.miracum.org/clearly/sigident
-BugReports: https://gitlab.miracum.org/clearly/sigident/issues
+URL: https://github.com/miracum/clearly-sigident
+BugReports: https://github.com/miracum/clearly-sigident/issues
 Encoding: UTF-8
 VignetteBuilder: knitr
-Date: 2020-05-26
+Date: 2020-07-31
 biocViews: 
 Imports: 
     data.table,
@@ -44,8 +48,9 @@ Imports:
     survival,
     plyr,
     survminer,
-    class,
-    randomForest
+    randomForest,
+    sigident.preproc,
+    sigident.func
 Suggests: 
     e1071,
     testthat,
@@ -55,6 +60,6 @@ Suggests:
     knitr,
     lintr
 Remotes: 
-    url::https://gitlab.miracum.org/clearly/sigident.preproc/-/archive/v0.0.4/sigident.preproc-v0.0.4.zip,
-    url::https://gitlab.miracum.org/clearly/sigident.func/-/archive/v0.0.3/sigident.func-v0.0.3.zip
-RoxygenNote: 7.1.0
+    github::miracum/clearly-sigident.preproc@v0.0.5,
+    github::miracum/clearly-sigident.func@v0.0.4
+RoxygenNote: 7.1.1

@@ -1,14 +1,9 @@
-
-
-
 #' @title plot_rocplot
 #'
 #' @description Helper function to create roc plots
 #'
 #' @param filename A character string. The filename.
 #' @param roc An object containing the roc information.
-#'   The ouput of the function `glmnetSignature_()`
-#'   with \code{type = "elastic"} or \code{type = "lasso"}.
 #'
 #' @export
 plot_rocplot <- function(roc,
@@ -34,7 +29,7 @@ plot_rocplot <- function(roc,
 #'
 #' @description Helper function to create cross-validation plots
 #'
-#' @param cv_obj A object. The result of the function `signature()`.
+#' @param cv_obj A object. The result of the function `sigident_signature()`.
 #'
 #' @inheritParams plot_rocplot
 #'
@@ -60,8 +55,7 @@ plot_cvplot <- function(cv_obj,
 #' @description Helper function to create the grid-model plot
 #'
 #' @param filename A character string. The filename.
-#' @param model An object containing the model information. The
-#'   ouput of the function `glmnetSignature_()` with \code{type = "grid"}.
+#' @param model An object containing the model information.
 #'
 #' @export
 plot_grid_model_plot <- function(model,

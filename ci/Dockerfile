@@ -1,10 +1,10 @@
-FROM rocker/verse:3.6.1
+FROM rocker/verse:4.0.0
 
 # build args
 ARG PKG_NAME
 
 # set cran repo
-RUN echo "options('repos' = 'https://ftp.fau.de/cran/')" >> /usr/local/lib/R/etc/Rprofile.site
+RUN echo "options('repos' = 'https://cloud.r-project.org/')" >> /usr/local/lib/R/etc/Rprofile.site
 
 # install system dependencies
 RUN apt-get install -y --no-install-recommends \

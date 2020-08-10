@@ -9,7 +9,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r, include = FALSE}
+```{r include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 ```
 
 The R package `sigident` is the core package of the `sigident` package framework. This framework consists of several packages which can be used to perform analyses of gene signatures. The following packages are included in the framework: 
-* Core package: [sigident](https://gitlab.miracum.org/clearly/sigident) 
-* Data preprocessing: [sigident.preproc](https://gitlab.miracum.org/clearly/sigident.preproc) 
-* Functional analyses: [sigident.func](https://gitlab.miracum.org/clearly/sigident.func)  
+* Core package: [sigident](https://github.com/miracum/clearly-sigident) 
+* Data preprocessing: [sigident.preproc](https://github.com/miracum/clearly-sigident.preproc) 
+* Functional analyses: [sigident.func](https://github.com/miracum/clearly-sigident.func)  
 
 # Prerequisites and installation 
 
@@ -49,7 +49,7 @@ devtools::install_git("https://gitlab.miracum.org/clearly/sigident.git")
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-For a more detailed background and description of the following steps please view the `sigident.preproc` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
+For a more detailed background and description of the following steps please view the `sigident.preproc` package's [vignette](https://github.com/miracum/clearly-sigident.preproc/blob/master/vignettes/sigident_preproc_Howto_GEO.Rmd).
 
 ## Initialization of important variables
 
@@ -58,6 +58,7 @@ library(sigident)
 library(sigident.preproc)
 library(sigident.func)
 library(knitr)
+library(caret)
 
 # initialize filePath:
 filePath <- tempdir()
@@ -121,8 +122,8 @@ sigident.preproc::load_geo_data(
 
 ### Visualize batch effect
 
-By using the argument `viz_batch_boxp = TRUE` and `viz_batch_gpca = TRUE`, one can visualize batch effects before and after correction with two methods: boxplots and gPCA and store them in the directory specified in `plotdir`. For further details please view the package vignette of the `sigident.preproc` R package. 
-Due to the ressource intensive calculations of the plots, this argument is set to FALSE here. 
+By using the argument `viz_batch_boxp = TRUE` and `viz_batch_gpca = TRUE`, one can visualize batch effects before and after correction with two methods: boxplots and gPCA and store them in the directory specified in `plotdir`. For further details please view the [vignette of the `sigident.preproc` R package](https://github.com/miracum/clearly-sigident.preproc/blob/master/vignettes/sigident_preproc_Howto_GEO.Rmd). 
+Due to the resource-intensive calculations of the plots, this argument is set to FALSE here. 
 
 # Preparations for utilizing the sigident package 
 
@@ -131,7 +132,7 @@ Before using the `sigident` package, these variables need to be defined properly
 
 In order to use this R package and its functions, you need to prepare a merged gene expression dataset. The workflow to achieve this is presented in the following by making use of the R package `sigident.preproc`.
 
-For a detailed background on the following steps please view the `sigident.preproc` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
+For a detailed background on the following steps please view the `sigident.preproc` package's [vignette](https://github.com/miracum/clearly-sigident.preproc/blob/master/vignettes/sigident_preproc_Howto_GEO.Rmd).
 
 ```{r}
 # general
@@ -149,11 +150,12 @@ pathwayid <- "hsa04151" # PI3K-Akt
 seed <- 111
 split <- 0.8
 nfolds <- 10
+ncores <- 4
 ```
 
 # DEG analysis 
 
-For a detailed background and description of the following steps please view the `sigident.func` package's vignette.
+For a detailed background and description of the following steps please view the [`sigident.func` package's vignette](https://github.com/miracum/clearly-sigident.func/blob/master/vignettes/sigident_func_Howto_Functional.Rmd).
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # define the false discovery rate here
@@ -211,7 +213,7 @@ gc()
 
 ## Gene enrichment
 
-For a detailed background and description of the following steps please view the `sigident.func` package's [vignette](https://gitlab.miracum.org/clearly/sigident_vignettes).
+For a detailed background and description of the following steps please view the `sigident.func` package's [vignette](https://github.com/miracum/clearly-sigident.func/blob/master/vignettes/sigident_func_Howto_Functional.Rmd).
 
 ```{r}
 deg_entrez <- unique(mergedset@featureData@data$ENTREZ_GENE_ID)
@@ -348,17 +350,25 @@ training_list <- sigident::create_training_test_split(
 )
 ```
 
+For demonstration/ runtime purposes, the data is reduced to the first 300 genes. If you want to run the analyses on the whole dataset, please comment out the following lines.
+
+```{r}
+training_list$train$x <- training_list$train$x[, 1:300]
+training_list$test$x <- training_list$test$x[, 1:300]
+```
+
 ## Lasso regression
 
 Regularization requires the selection of a tuning parameter (lambda) that determines the strength of regularization. The function `signature` performs an `nfolds` cross-validation to select the best lambda and additionally builds the predictive model. `seed` is again set for reproducibility. The plot depicts the mean squared error as the criterion for the 10-fold cross-validation and shows the optimal values of lambda and the appropriate number of selected features (genes) above the plot. The left dashed vertical line represents the log of the optimal value of lambda ('lambda min'), which results in the lowest prediction error and giving the most accurate model. The right dashed vertical line indicates the log of the lambda value resulting in a model with the smallest number of included variables but also lies within one standard error of the optimal value of lambda ('lambda 1se').   
 Furthermore, a ROC curve is plotted to visualize the performance measurement of the model.  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_lasso <- sigident::signature(
+diagnostic_lasso <- sigident::sigident_signature(
   traininglist = training_list,
   type = "lasso",
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 filename <- paste0(plotdir, "CV_lasso.png")
 sigident::plot_cvplot(cv_obj = diagnostic_lasso$fit_cv,
@@ -391,12 +401,13 @@ knitr::include_graphics(filename)
 The elastic net is a mixture of lasso and ridge regularization to shrink coefficients (like in ridge regression) and to set some coefficients to zero (as in lasso). Therefore, the mixing parameter alpha needs to be determined as value between 1 (for lasso) and 0 (for ridge). A grid search for calculating optimal alpha and lambda can be conducted (as it is done next) but might take much computing capacity, hence we propose setting alpha manually to 0.9. 
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_elasticnet <- sigident::signature(
+diagnostic_elasticnet <- sigident::sigident_signature(
   traininglist = training_list,
   type = "elastic",
-  alpha = 0.9,
+  a = 0.9,
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 filename <- paste0(plotdir, "CV_elasticNet.png")
 sigident::plot_cvplot(cv_obj = diagnostic_elasticnet$fit_cv,
@@ -426,18 +437,19 @@ knitr::include_graphics(filename)
 
 ## Gridsearch to find alpha and lambda
 
-Setting `type = "elasticnet_grid"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).  
+Setting `type = "glmnet"` of the function `signature` conducts a grid search calculating a pair of alpha and lambda for the 'glmnet'-method, that minimizes the CV error, using the R package [caret](https://cran.r-project.org/package=caret).  
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-diagnostic_glmgrid <- sigident::signature(
+diagnostic_glmgrid <- sigident::sigident_signature(
   traininglist = training_list,
-  type = "elasticnet_grid",
+  type = "glmnet",
   nfolds = nfolds,
-  seed = seed
+  seed = seed,
+  ncores = ncores
 )
 # plot model of gridsearch
 filename <- paste0(plotdir, "Gridsearch_model.png")
-sigident::plot_grid_model_plot(model = diagnostic_glmgrid$caret_train,
+sigident::plot_grid_model_plot(model = diagnostic_glmgrid$model,
                                filename = filename)
 ```
 ```{r out.width='80%'}
@@ -447,7 +459,7 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # plot variable importance of gridsearch
 filename <- paste0(plotdir, "Elasticnet_Gridsearch_var_imp.png")
-sigident::plot_grid_varimp_plot(model = diagnostic_glmgrid$caret_train,
+sigident::plot_grid_varimp_plot(model = diagnostic_glmgrid$model,
                                 filename = filename)
 ```
 ```{r out.width='80%'}
@@ -457,12 +469,149 @@ knitr::include_graphics(filename)
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
 filename <- paste0(plotdir, "ROC_elasticNet.grid.png")
-sigident::plot_rocplot(roc = diagnostic_glmgrid$roc_elasticnet,
+sigident::plot_rocplot(roc = diagnostic_glmgrid$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
+
+## SVM 
+
+A support vector machine is a collection of supervised learning algorithms that use hyperplane graphing to analyze new, unlabeled data. In Support Vector Machine incoming data is categorized into one of two classes. For SVM models, each data point is interpreted as a p-dimensional vector, which the machine attempts to create a linear classifier by fitting the data point inside a hyperplane (p-1 dimension). 
+So for classification, every input is turned into a point in n-dimensional space (n being the number of features), and the value of each feature defined as the value of a unique coordinate on the hyperplane. Classification is determined by finding the hyperplane that most clearly separates the two classes. 
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_svm <- sigident::sigident_signature(
+  traininglist = training_list,
+  type = "svm",
+  nfolds = nfolds,
+  seed = seed,
+  ncores = ncores
+)
+gc();gc();
+filename <- paste0(plotdir, "SVM_model.png")
+sigident::plot_grid_model_plot(
+    model = diagnostic_svm$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "SVM_variable_importance.png")
+sigident::plot_grid_varimp_plot(
+    model = diagnostic_svm$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_SVM.png")
+sigident::plot_rocplot(
+    roc = diagnostic_svm$roc,
+    filename = filename
+)
+gc();gc();
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+## Random Forest 
+
+The random forest is a supervised learning algorithm that randomly creates and merges multiple decision trees into one forest. The goal is not to rely on a single learning model, but rather a collection of decision models to improve accuracy. The primary difference between this approach and the standard decision tree algorithms is that the root nodes feature splitting nodes are generated randomly.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_rf <- sigident::sigident_signature(
+  traininglist = training_list,
+  type = "rf",
+  nfolds = nfolds,
+  seed = seed,
+  ncores = ncores
+)
+gc();gc();
+filename <- paste0(plotdir, "RF_model.png")
+sigident::plot_grid_model_plot(
+    model = diagnostic_rf$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "RF_variable_importance.png")
+sigident::plot_grid_varimp_plot(
+    model = diagnostic_rf$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_RF.png")
+sigident::plot_rocplot(
+    roc = diagnostic_rf$roc,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+## K-Nearest Neighbors 
+
+The k-nearest neighbors algorithm, or kNN, is one of the simplest machine learning algorithms. Usually, k is a small, odd number - sometimes only 1. The larger k is, the more accurate the classification will be, but the longer it takes to perform the classification. It classifies an object into one of several classes by looking at the k elements of the training set that are closest to the one you want to classify, and letting them vote by majority on what that object’s class should be.
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_knn <- sigident::sigident_signature(
+  traininglist = training_list,
+  type = "knn",
+  nfolds = nfolds,
+  seed = seed,
+  ncores = ncores
+)
+filename <- paste0(plotdir, "KNN_model.png")
+sigident::plot_grid_model_plot(
+    model = diagnostic_knn$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "KNN_variable_importance.png")
+sigident::plot_grid_varimp_plot(
+    model = diagnostic_knn$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_KNN.png")
+sigident::plot_rocplot(
+    roc = diagnostic_knn$roc,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
 
 ## Analysis of diagnostic models 
 
@@ -472,39 +621,62 @@ These models can be included into a list and the performance metrices for classi
 
 ```{r}
 diagnostic_models <- list(
+  
   "lasso" = list(
     "CV" = diagnostic_lasso$fit_cv,
     "min" = list("model" = diagnostic_lasso$lambda_min,
                  "confmat" = diagnostic_lasso$confmat_min,
-                 "prediction" = diagnostic_lasso$predicted_min,
+                 "prediction" = diagnostic_lasso$prediction_min,
                  "auc" = as.numeric(diagnostic_lasso$roc_min$auc)
                  ),
     "1se" = list("model" = diagnostic_lasso$lambda_1se,
                  "confmat" = diagnostic_lasso$confmat_1se,
-                 "prediction" = diagnostic_lasso$predicted_1se,
+                 "prediction" = diagnostic_lasso$prediction_1se,
                  "auc" = as.numeric(diagnostic_lasso$roc_1se$auc)
                  )
   ),
+  
   "elasticnet" = list(
     "CV" = diagnostic_elasticnet$fit_cv,
     "min" = list("model" = diagnostic_elasticnet$lambda_min,
                  "confmat" = diagnostic_elasticnet$confmat_min,
-                 "prediction" = diagnostic_elasticnet$predicted_min,
+                 "prediction" = diagnostic_elasticnet$prediction_min,
                  "auc" = as.numeric(diagnostic_elasticnet$roc_min$auc)
                  ),
     "1se" = list("model" = diagnostic_elasticnet$lambda_1se,
                  "confmat" = diagnostic_elasticnet$confmat_1se,
-                 "prediction" = diagnostic_elasticnet$predicted_1se,
+                 "prediction" = diagnostic_elasticnet$prediction_1se,
                  "auc" = as.numeric(diagnostic_elasticnet$roc_1se$auc)
                  )
   ),
-  "elasticnet_grid" = list(
-    "CV" = diagnostic_glmgrid$caret_train,
-    "model" = diagnostic_glmgrid$elasticnet_auto,
-    "confmat" = diagnostic_glmgrid$confmat_elasticnet,
-    "prediction" = diagnostic_glmgrid$predicted_elasticnet,
-    "auc" = as.numeric(diagnostic_glmgrid$roc_elasticnet$auc)
-    )
+  
+  "glmnet" = list(
+    "model" = diagnostic_glmgrid$model,
+    "confmat" = diagnostic_glmgrid$confmat,
+    "prediction" = diagnostic_glmgrid$prediction,
+    "auc" = as.numeric(diagnostic_glmgrid$roc$auc)
+    ),
+  
+  "svm" = list(
+      "model" = diagnostic_svm$model,
+      "confmat" = diagnostic_svm$confmat,
+      "prediction" = diagnostic_svm$prediction,
+      "auc" = as.numeric(diagnostic_svm$roc$auc)
+  ),
+
+  "rf" = list(
+    "model" = diagnostic_rf$model,
+    "confmat" = diagnostic_rf$confmat,
+    "prediction" = diagnostic_rf$prediction,
+    "auc" = as.numeric(diagnostic_rf$roc$auc)
+  ),
+
+  "knn" = list(
+    "model" = diagnostic_knn$model,
+    "confmat" = diagnostic_knn$confmat,
+    "prediction" = diagnostic_knn$prediction,
+    "auc" = as.numeric(diagnostic_knn$roc$auc)
+  )
 )
 ```
 
@@ -516,6 +688,7 @@ knitr::kable(
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 rm(diagnostic_glmgrid, diagnostic_elasticnet, diagnostic_lasso,
+   diagnostic_svm, diagnostic_knn, diagnostic_rf,
    training_list)
 gc()
 ```
@@ -561,10 +734,28 @@ diagnostic_models$elasticnet[["1se"]]$confmat
 #### Elastic net (grid search)
 
 ```{r}
-diagnostic_models$elasticnet_grid$confmat
+diagnostic_models$glmnet$confmat
 ```
 
-### Export selected IDs for each model 
+#### SVM
+
+```{r}
+diagnostic_models$svm$confmat
+```
+
+#### RF
+
+```{r}
+diagnostic_models$rf$confmat
+```
+
+#### KNN
+
+```{r}
+diagnostic_models$knn$confmat
+```
+
+### Export selected IDs for some models 
 
 The following function enables the extraction of the selected genes (Affy-IDs) for each model as csv file.
 
@@ -604,15 +795,6 @@ data.table::fwrite(signaturegenes,
                    paste0(csvdir, "signaturegenes_elasticnet_1se.csv"))
 ```
 
-```{r}
-signaturegenes <- sigident::gene_map_sig(
-  mergeset = mergeset,
-  model = diagnostic_models$elasticnet_grid$model
-)
-data.table::fwrite(signaturegenes,
-                   paste0(csvdir, "signaturegenes_elasticnet_grid.csv"))
-```
-
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 rm(signaturegenes)
 gc()
@@ -622,7 +804,7 @@ gc()
 
 The validation of diagnostic signatures is conducted using the independent expression datasets of the studies "GSE30219", "GSE33356" and "GSE102287". We therefore need to create a list, holding meta information about the respective studies. 
 
-You have to create a list that contains specifications of the validation studeis. The object must be named. The list structure is as follows:  
+You have to create a list that contains specifications of the validation studies. The object must be named. The list structure is as follows:  
 * `studyname`: the GEO id of the validation study  
   + `setid`: the index of the provided GEO set to be used    
   + `targetcolname`: the name of the phenoData column containing the target-variable  
@@ -657,13 +839,20 @@ All models can be provided via the argument 'model' to the function `sigident::v
 
 To perform the validation of the diagnostic signatures, simply run the function `sigident::validate_diagnostic_signatures` with the specified `validationstudylist`.
 
+```{r}
+# define gene subset
+colindices <- 1:300
+```
+
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 validation_results <- sigident::validate_diagnostic_signatures(
   validationstudylist = validationstudylist,
   models = diagnostic_models,
   genes = genes,
   idtype = idtype,
-  datadir = datadir
+  datadir = datadir,
+  colindices = colindices
 )
 ```
 
@@ -736,13 +925,61 @@ knitr::include_graphics(filename)
 #### Elasticnet gridsearch (best model) 
 
 ```{r}
-validation_results[["GSE30219"]]$elasticnet_grid$confmat
+validation_results[["GSE30219"]]$glmnet$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
-filename <- paste0(plotdir, "ROC_validation_GSE30219_elasticnet_grid.png")
-sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$elasticnet_grid$roc,
+filename <- paste0(plotdir, "ROC_validation_GSE30219_glmnet.png")
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$glmnet$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### SVM
+
+```{r}
+validation_results[["GSE30219"]]$svm$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_svm.png")
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$svm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### RF
+
+```{r}
+validation_results[["GSE30219"]]$rf$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_rf.png")
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$rf$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### KNN 
+
+```{r}
+validation_results[["GSE30219"]]$knn$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_knn.png")
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$knn$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
@@ -823,22 +1060,65 @@ knitr::include_graphics(filename)
 #### Elasticnet gridsearch (best model) 
 
 ```{r}
-validation_results[["GSE33356"]]$elasticnet_grid$confmat
+validation_results[["GSE33356"]]$glmnet$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
-filename <- paste0(plotdir, "ROC_validation_GSE33356_elasticnet_grid.png")
-sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$elasticnet_grid$roc,
+filename <- paste0(plotdir, "ROC_validation_GSE33356_glmnet.png")
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$glmnet$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
+#### SVM
+
+```{r}
+validation_results[["GSE33356"]]$svm$confmat
+```
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-validation_results[["GSE33356"]] <- NULL
-gc()
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_svm.png")
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$svm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### RF
+
+```{r}
+validation_results[["GSE33356"]]$rf$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_rf.png")
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$rf$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### KNN
+
+```{r}
+validation_results[["GSE33356"]]$knn$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_knn.png")
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$knn$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -915,22 +1195,65 @@ knitr::include_graphics(filename)
 #### Elasticnet gridsearch (best model) 
 
 ```{r}
-validation_results[["GSE102287"]]$elasticnet_grid$confmat
+validation_results[["GSE102287"]]$glmnet$confmat
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 # create roc plot
-filename <- paste0(plotdir, "ROC_validation_GSE102287_elasticnet_grid.png")
-sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$elasticnet_grid$roc,
+filename <- paste0(plotdir, "ROC_validation_GSE102287_glmnet.png")
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$glmnet$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
 knitr::include_graphics(filename)
 ```
 
+#### SVM
+
+```{r}
+validation_results[["GSE102287"]]$svm$confmat
+```
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
-validation_results[["GSE102287"]] <- NULL
-gc()
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_svm.png")
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$svm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### RF 
+
+```{r}
+validation_results[["GSE102287"]]$rf$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_rf.png")
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$rf$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### KNN 
+
+```{r}
+validation_results[["GSE102287"]]$knn$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_knn.png")
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$knn$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
 ```
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -1166,234 +1489,11 @@ fit
 filename <- paste0(plotdir, "GSE50081_Prognostic_Kaplan-Meier_Plot.png")
 sigident::plot_survplot(
   fit = fit,
-  risktable =risktable,
+  risktable = risktable,
   filename = filename
 )
 ```
 
 ```{r out.width='80%'}
-knitr::include_graphics(filename)
-```
-
-# An alternative workflow: four generic functions for signature identification 
-
-In order to simplify the workflow described above, we wrapped all these functions into four big functions.
-
-## Preprocessing: 
-
-The preprocessing of the data needs to be conform with the above described approach. Here, all necessary objects are created, including `mergeset`, `mergedset`, `batch` and `diagnosis`.
-
-### Define Variables
-
-```{r eval = FALSE}
-# initialize filePath:
-filePath <- tempdir()
-maindir <- "./geodata/"
-datadir <- paste0(maindir, "data/")
-dir.create(maindir)
-dir.create(datadir)
-
-# define more variables
-plotdir <- "./plots/"
-dir.create(plotdir)
-csvdir <- "./csv/"
-dir.create(csvdir)
-
-# pathway
-species <- "Hs"
-OrgDb <- "org.Hs.eg.db"
-organism <- "hsa"
-pathwayid <- "hsa04151"
-
-# diagnostig signature
-seed <- 111
-split <- 0.8
-nfolds <- 10
-
-# other variables
-idtype = "affy"
-fdr <- 0.05
-```
-
-## Run `sigident.func::sigidentDEG`-function
-
-```{r eval = FALSE}
-genes <- sigident.func::sigidentDEG(
-  mergeset = mergeset,
-  mergedset = mergedset,
-  sample_metadata = sample_metadata,
-  diagnosis = diagnosis,
-  idtype = idtype,
-  fdr = fdr,
-  plotdir = plotdir,
-  csvdir = csvdir
-)
-```
-
-## Run `sigident.func::sigidentEnrichment`-function
-
-```{r eval = FALSE}
-sigident.func::sigidentEnrichment(
-  mergeset = mergeset,
-  mergedset = mergedset,
-  idtype = idtype,
-  diagnosis = diagnosis,
-  species = species,
-  org_db = OrgDb,
-  organism = organism,
-  pathwayid = pathwayid,
-  plotdir = plotdir,
-  csvdir = csvdir
-)
-```
-```{r eval = FALSE}
-filename <- paste0(plotdir, "/", pathwayid, ".png")
-knitr::include_graphics(filename)
-```
-```{r eval = FALSE}
-filename <- paste0(plotdir, "/", pathwayid, ".pathview.png")
-knitr::include_graphics(filename)
-```
-
-## Run `sigidentDiagnostic`-function 
-
-```{r eval = FALSE}
-diagnostic_models <- sigident::sigidentDiagnostic(
-  mergeset = mergeset,
-  diagnosis = diagnosis,
-  seed = seed,
-  nfolds = nfolds,
-  split = split,
-  plotdir = plotdir
-)
-```
-
-```{r eval = FALSE}
-knitr::kable(
-  sigident::compare_diagnostic_models(diagnostic_models)
-)
-```
-
-```{r eval = FALSE}
-knitr::kable(
-  sigident::get_diagnostic_lambda_values(diagnostic_models)
-)
-```
-
-### Validation of the diagnostic signatures 
-
-Some users may validate the resulting models using new independent data sets. This can be conducted running the function `validate_diagnostic_signatures`. First, a list containing meta information on the validation study must be created.
-
-```{r eval = FALSE}
-validationstudylist <- list(
-  "GSE30219" = list(
-    setid = 1, 
-    targetcolname = "source_name_ch1",
-    controllevelname = "Non Tumoral Lung",
-    targetlevelname = "Lung Tumour"
-  ),
-  "GSE33356" = list(
-    setid = 1, 
-    targetcolname = "characteristics_ch1",
-    controllevelname = "tissue: paired normal adjacent",
-    targetlevelname = "tissue: lung cancer"
-  ),
-  "GSE102287" = list(
-    setid = 2, 
-    targetcolname = "characteristics_ch1.6",
-    controllevelname = "tumor_normal status: N",
-    targetlevelname = "tumor_normal status: T"
-  )
-)
-```
-
-```{r eval=FALSE}
-validation_results <- sigident::validate_diagnostic_signatures(
-  validationstudylist = validationstudylist,
-  models = diagnostic_models,
-  genes = genes,
-  idtype = idtype,
-  datadir = datadir
-)
-```
-
-## Run `sigidentPrognostic`-Function 
-
-### First, define meta information lists
-
-```{r eval = FALSE}
-validationstudiesinfo <- list(
-  "GSE30219" = list(
-    setid = 1,
-    timecol = "characteristics_ch1.9",
-    status = list(
-      statuscol = "characteristics_ch1.8",
-      levels = list(alive = "status: ALIVE",
-                    deceased = "status: DEAD",
-                    na = "status: NTL")
-    ),
-    targetcolname = "source_name_ch1",
-    controllevelname = "Non Tumoral Lung",
-    targetlevelname = "Lung Tumour"),
-  
-  "GSE50081" = list(
-    setid = 1,
-    timecol = "characteristics_ch1.8",
-    status = list(
-      statuscol = "characteristics_ch1.9",
-      levels = list(
-        alive = "status: alive",
-        deceased = "status: dead",
-        na = NA)
-    ),
-    targetcolname = "characteristics_ch1.1",
-    targetlevelname = paste(
-      "histology: adenocarcinoma",
-      "histology: adenosquamous carcinoma",
-      "histology: large cell carcinoma",
-      "histology: NSClarge cell carcinoma-mixed",
-      "histology: NSCLC-favor adenocarcinoma",
-      "histology: squamous cell carcinoma",
-      "histology: squamous cell carcinoma X2",
-      sep = "|||"
-    ),
-    controllevelname = NULL)
-)
-# if targetlevelname == NULL, the expression set will not be filtered further
-# but instead, all samples will be used for calculations
-```
-
-### Then run the analysis 
-
-```{r eval = FALSE}
-progn_results <- sigident::sigidentPrognostic(
-  mergeset = mergeset,
-  sample_metadata = sample_metadata,
-  idtype = idtype,
-  genes = genes,
-  discoverystudies_w_timedata = discoverystudies_w_timedata,
-  classifier_studies = c("GSE18842", "GSE19804"),
-  validationstudiesinfo = validationstudiesinfo,
-  datadir = datadir,
-  plotdir = plotdir,
-  csvdir = csvdir
-)
-```
-
-```{r eval = FALSE}
-# create roc plot
-filename <- paste0(plotdir, "GSE30219_Prognostic_Kaplan-Meier_Plot.png")
-```
-
-```{r eval = FALSE}
-knitr::include_graphics(filename)
-```
-
-```{r eval = FALSE}
-# create roc plot
-filename <- paste0(plotdir, "GSE50081_Prognostic_Kaplan-Meier_Plot.png")
-```
-
-```{r eval = FALSE}
 knitr::include_graphics(filename)
 ```

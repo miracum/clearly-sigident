@@ -10,8 +10,12 @@ sigidentDiagnostic(
   diagnosis,
   seed = 111,
   nfolds = 10,
+  repeats = 5,
+  tunelength = 10,
   split = 0.8,
-  plotdir = "./plots/"
+  plotdir = paste0(tempdir(), "/plots/"),
+  colindices = NULL,
+  ncores = 4
 )
 }
 \arguments{
@@ -28,12 +32,23 @@ reproducible. Default: 111.}
 \item{nfolds}{A integer. The number of folds used for cross validation
 (default: 10).}
 
+\item{repeats}{An integer. The number of repeated cross validations
+(default = 5).}
+
+\item{tunelength}{An integer. The caret tuning length (default = 10).}
+
 \item{split}{A numeric value between 0 and 1. The proportion of the data
 to be integrated into the training set for machine learning
 (default: 0.8).}
 
 \item{plotdir}{A character string. Path to the folder to store resulting
-plots. Default: "./plots/".}
+plots (default = paste0(tempdir(), "/plots/")).}
+
+\item{colindices}{A vector of integers. Indices of columns to run the
+validation on (default = NULL).}
+
+\item{ncores}{An integers. The number of CPU cores used for running
+the algorithms (default = 4).}
 }
 \description{
 One function to perform diagnostic signature analysis.

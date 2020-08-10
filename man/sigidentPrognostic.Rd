@@ -14,8 +14,8 @@ sigidentPrognostic(
   classifier_studies,
   validationstudiesinfo,
   datadir,
-  plotdir = "./plots/",
-  csvdir = "./tables/"
+  plotdir = paste0(tempdir(), "/plots/"),
+  csvdir = paste0(tempdir(), "/tables/")
 )
 }
 \arguments{
@@ -47,10 +47,10 @@ the study that contains the validation information.}
 metadata folder.}
 
 \item{plotdir}{A character string. Path to the folder to store resulting
-plots. Default: "./plots/".}
+plots (default = paste0(tempdir(), "/plots/")).}
 
 \item{csvdir}{A character string. Path to the folder to store output
-tables. Default: "./tables/".}
+tables (default = paste0(tempdir(), "/tables/")).}
 }
 \description{
 One function to perform prognostic signature analysis.

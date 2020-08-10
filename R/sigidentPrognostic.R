@@ -16,9 +16,9 @@
 #' @param genes A object. The output of the function
 #'   `sigident.func::identify_degs()`
 #' @param csvdir A character string. Path to the folder to store output
-#'   tables. Default: "./tables/".
+#'   tables (default = paste0(tempdir(), "/tables/")).
 #' @param plotdir A character string. Path to the folder to store resulting
-#'   plots. Default: "./plots/".
+#'   plots (default = paste0(tempdir(), "/plots/")).
 #'
 #' @inheritParams get_survival_time
 #' @inheritParams generate_expression_pattern
@@ -37,10 +37,10 @@ sigidentPrognostic <- function(mergeset, # nolint
                                classifier_studies,
                                validationstudiesinfo,
                                datadir,
-                               plotdir = "./plots/",
-                               csvdir = "./tables/") {
+                               plotdir = paste0(tempdir(), "/plots/"),
+                               csvdir = paste0(tempdir(), "/tables/")) {
   stopifnot(
-    class(mergeset) == "matrix",
+    class(mergeset) == c("matrix", "array"),
     is.character(plotdir),
     is.character(csvdir),
     is.list(discoverystudies_w_timedata),
