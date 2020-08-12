@@ -613,6 +613,53 @@ knitr::include_graphics(filename)
 ```
 
 
+## GBM 
+
+Gradient boosting is a machine learning technique for regression and classification problems, which produces a prediction model in the form of an ensemble of weak prediction models, typically decision trees. It builds the model in a stage-wise fashion like other boosting methods do, and it generalizes them by allowing optimization of an arbitrary differentiable loss function. 
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+diagnostic_gbm <- sigident::sigident_signature(
+  traininglist = training_list,
+  type = "gbm",
+  nfolds = nfolds,
+  seed = seed,
+  ncores = ncores
+)
+gc();gc();
+filename <- paste0(plotdir, "GBM_model.png")
+sigident::plot_grid_model_plot(
+    model = diagnostic_gbm$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "GBM_variable_importance.png")
+sigident::plot_grid_varimp_plot(
+    model = diagnostic_gbm$model,
+    filename = filename
+)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+filename <- paste0(plotdir, "ROC_GBM.png")
+sigident::plot_rocplot(
+    roc = diagnostic_gbm$roc,
+    filename = filename
+)
+gc();gc();
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+
 ## Analysis of diagnostic models 
 
 ### Comparing model performance  
@@ -676,6 +723,13 @@ diagnostic_models <- list(
     "confmat" = diagnostic_knn$confmat,
     "prediction" = diagnostic_knn$prediction,
     "auc" = as.numeric(diagnostic_knn$roc$auc)
+  ),
+
+  "gbm" = list(
+    "model" = diagnostic_gbm$model,
+    "confmat" = diagnostic_gbm$confmat,
+    "prediction" = diagnostic_gbm$prediction,
+    "auc" = as.numeric(diagnostic_gbm$roc$auc)
   )
 )
 ```
@@ -688,7 +742,7 @@ knitr::kable(
 
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 rm(diagnostic_glmgrid, diagnostic_elasticnet, diagnostic_lasso,
-   diagnostic_svm, diagnostic_knn, diagnostic_rf,
+   diagnostic_svm, diagnostic_knn, diagnostic_rf, diagnostic_gbm,
    training_list)
 gc()
 ```
@@ -753,6 +807,12 @@ diagnostic_models$rf$confmat
 
 ```{r}
 diagnostic_models$knn$confmat
+```
+
+#### GBM
+
+```{r}
+diagnostic_models$gbm$confmat
 ```
 
 ### Export selected IDs for some models 
@@ -986,6 +1046,22 @@ sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$knn$roc,
 knitr::include_graphics(filename)
 ```
 
+#### GBM
+
+```{r}
+validation_results[["GSE30219"]]$gbm$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE30219_gbm.png")
+sigident::plot_rocplot(roc = validation_results[["GSE30219"]]$gbm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 validation_results[["GSE30219"]] <- NULL
 gc()
@@ -1121,6 +1197,22 @@ sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$knn$roc,
 knitr::include_graphics(filename)
 ```
 
+#### GBM
+
+```{r}
+validation_results[["GSE33356"]]$gbm$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE33356_gbm.png")
+sigident::plot_rocplot(roc = validation_results[["GSE33356"]]$gbm$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
 ```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
 validation_results[["GSE33356"]] <- NULL
 gc()
@@ -1250,6 +1342,22 @@ validation_results[["GSE102287"]]$knn$confmat
 # create roc plot
 filename <- paste0(plotdir, "ROC_validation_GSE102287_knn.png")
 sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$knn$roc,
+                       filename = filename)
+```
+```{r out.width='80%'}
+knitr::include_graphics(filename)
+```
+
+#### GBM
+
+```{r}
+validation_results[["GSE102287"]]$gbm$confmat
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, error=FALSE}
+# create roc plot
+filename <- paste0(plotdir, "ROC_validation_GSE102287_gbm.png")
+sigident::plot_rocplot(roc = validation_results[["GSE102287"]]$gbm$roc,
                        filename = filename)
 ```
 ```{r out.width='80%'}
