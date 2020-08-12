@@ -49,6 +49,7 @@ Imports:
     plyr,
     survminer,
     randomForest,
+    gbm,
     sigident.preproc,
     sigident.func
 Suggests: 

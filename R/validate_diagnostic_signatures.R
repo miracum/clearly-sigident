@@ -125,7 +125,7 @@ validate_diagnostic_signatures <- function(validationstudylist,
           )
         }
       } else {
-        if (i %in% c("svm", "knn", "rf", "glmnet")) {
+        if (i %in% c("svm", "knn", "rf", "gbm", "glmnet")) {
 
           message(paste0("### Validating signature using model: ", i))
 

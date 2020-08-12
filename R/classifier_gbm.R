@@ -1,6 +1,6 @@
-#' @title knn_classifier
+#' @title gbm_classifier
 #'
-#' @description Helper function to create a knn classifier model
+#' @description Helper function to create a gbm classifier model
 #'
 #' @param traininglist A list object containing the training data. The output
 #'   of the function `create_training_test_split()`.
@@ -8,7 +8,7 @@
 #'
 #' @inheritParams sigidentDiagnostic
 #'
-knn_classifier <- function(
+gbm_classifier <- function(
   traininglist,
   seed,
   nfolds,
@@ -30,7 +30,7 @@ knn_classifier <- function(
     classProbs = TRUE
   )
 
-  outlist$model <- build_predictive_knn(
+  outlist$model <- build_predictive_gbm(
     train_x = traininglist$train$x,
     train_y = paste0("X", traininglist$train$y),
     trn_ctrl = trn_ctrl,
@@ -57,9 +57,9 @@ knn_classifier <- function(
   return(outlist)
 }
 
-#' @title build_predictive_knn
+#' @title build_predictive_gbm
 #'
-#' @description Function builds a knn classifier model based on the given data.
+#' @description Function builds a gbm classifier model based on the given data.
 #'
 #' @param train_x The learning data values.
 #' @param train_y The learning data classes.
@@ -67,7 +67,7 @@ knn_classifier <- function(
 #'
 #' @inheritParams sigidentDiagnostic
 #'
-build_predictive_knn <- function(
+build_predictive_gbm <- function(
   train_x,
   train_y,
   trn_ctrl,
@@ -79,10 +79,12 @@ build_predictive_knn <- function(
   model <- caret::train(
     x = train_x,
     y = as.factor(train_y),
-    method = "knn",
+    method = "gbm",
     trControl = trn_ctrl,
     preProc = c("center", "scale"),
-    tuneLength = tunelength
+    tuneLength = tunelength,
+    #allowParallel = T,
+    verbose = FALSE
   )
 
   return(model)

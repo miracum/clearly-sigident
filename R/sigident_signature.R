@@ -6,8 +6,8 @@
 #'   of the function `create_training_test_split()`.
 #' @param type A character string. The algorihm used to perform calculations.
 #'   Currently implemented are \emph{"glmnet", "lasso", "elastic",
-#'   "svm" (support vector machine), "rf" (random forest) and "knn" (k-nearest
-#'   neighbors)}.
+#'   "svm" (support vector machine), "rf" (random forest), "gbm" (gradient
+#'   boosting machine) and "knn" (k-nearest neighbors)}.
 #'
 #' @param a A numeric between 0 and 1. The elastic net mixing parameter 'alpha'
 #'   passed to `glmnet::glmnet()`.
@@ -30,7 +30,8 @@ sigident_signature <- function(traininglist,
                 "elastic",
                 "svm",
                 "knn",
-                "rf"),
+                "rf",
+                "gbm"),
     is.list(traininglist),
     is.numeric(seed),
     seed > 0,
@@ -88,6 +89,14 @@ sigident_signature <- function(traininglist,
     )
   } else if (type == "rf") {
     outlist <- rf_classifier(
+      traininglist = traininglist,
+      seed = seed,
+      nfolds = nfolds,
+      repeats = repeats,
+      tunelength = tunelength
+    )
+  } else if (type == "gbm") {
+    outlist <- gbm_classifier(
       traininglist = traininglist,
       seed = seed,
       nfolds = nfolds,

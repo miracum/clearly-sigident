@@ -75,6 +75,7 @@ usethis::use_package("survival", type="Imports")
 usethis::use_package("plyr", type="Imports")
 usethis::use_package("survminer", type="Imports")
 usethis::use_package("randomForest", type="Imports")
+usethis::use_package("gbm", type="Imports")
 usethis::use_package("sigident.preproc", type="Imports")
 usethis::use_package("sigident.func", type="Imports")
 
