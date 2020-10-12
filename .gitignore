@@ -36,3 +36,4 @@ docs/
 !/tic.R
 
 .Rproj.user
+.Rhistory
