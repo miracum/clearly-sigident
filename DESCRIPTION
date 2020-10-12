@@ -61,6 +61,6 @@ Suggests:
     knitr,
     lintr
 Remotes: 
-    github::miracum/clearly-sigident.preproc@development,
-    github::miracum/clearly-sigident.func@development
+    github::miracum/clearly-sigident.preproc@v0.0.5,
+    github::miracum/clearly-sigident.func@v0.0.4
 RoxygenNote: 7.1.1
