@@ -245,6 +245,33 @@ sigidentDiagnostic <- function(mergeset, # nolint
     filename = paste0(rv$plotdir, "ROC_KNN.png")
   )
 
+  # GBM
+  rv$diagnostic_gbm <-
+    sigident_signature(
+      traininglist = rv$training_list,
+      type = "gbm",
+      nfolds = rv$nfolds,
+      repeats = rv$repeats,
+      tunelength = rv$tunelength,
+      seed = rv$seed,
+      ncores = rv$ncores
+    )
+  # plot model of gridsearch
+  plot_grid_model_plot(
+    model = rv$diagnostic_gbm$model,
+    filename = paste0(rv$plotdir, "GBM_model.png")
+  )
+  # plot variable importance of gridsearch
+  plot_grid_varimp_plot(
+    model = rv$diagnostic_gbm$model,
+    filename = paste0(rv$plotdir, "GBM_variable_importance.png")
+  )
+  # create roc plot
+  plot_rocplot(
+    roc = rv$diagnostic_gbm$roc,
+    filename = paste0(rv$plotdir, "ROC_GBM.png")
+  )
+
   # compare aucs
   diagnostic_models <- list(
 
@@ -306,6 +333,13 @@ sigidentDiagnostic <- function(mergeset, # nolint
       "confmat" = rv$diagnostic_knn$confmat,
       "prediction" = rv$diagnostic_knn$prediction,
       "auc" = as.numeric(rv$diagnostic_knn$roc$auc)
+    ),
+
+    "gbm" = list(
+      "model" = rv$diagnostic_gbm$model,
+      "confmat" = rv$diagnostic_gbm$confmat,
+      "prediction" = rv$diagnostic_gbm$prediction,
+      "auc" = as.numeric(rv$diagnostic_gbm$roc$auc)
     )
   )
   return(diagnostic_models)

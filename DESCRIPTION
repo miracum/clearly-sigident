@@ -1,6 +1,6 @@
 Package: sigident
 Title: Signature Analyses in Genomic Expression Sets
-Version: 0.1.1.9002
+Version: 0.1.1.9003
 Authors@R: 
     c(person(given = "Lorenz A.",
              family = "Kapsner",
@@ -49,6 +49,7 @@ Imports:
     plyr,
     survminer,
     randomForest,
+    gbm,
     sigident.preproc,
     sigident.func
 Suggests: 

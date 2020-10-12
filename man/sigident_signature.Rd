@@ -21,8 +21,8 @@ of the function `create_training_test_split()`.}
 
 \item{type}{A character string. The algorihm used to perform calculations.
 Currently implemented are \emph{"glmnet", "lasso", "elastic",
-"svm" (support vector machine), "rf" (random forest) and "knn" (k-nearest
-neighbors)}.}
+"svm" (support vector machine), "rf" (random forest), "gbm" (gradient
+boosting machine) and "knn" (k-nearest neighbors)}.}
 
 \item{a}{A numeric between 0 and 1. The elastic net mixing parameter 'alpha'
 passed to `glmnet::glmnet()`.}

@@ -23,7 +23,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.1.1.9002")
+my_desc$set_version("0.1.1.9003")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -75,6 +75,7 @@ usethis::use_package("survival", type="Imports")
 usethis::use_package("plyr", type="Imports")
 usethis::use_package("survminer", type="Imports")
 usethis::use_package("randomForest", type="Imports")
+usethis::use_package("gbm", type="Imports")
 usethis::use_package("sigident.preproc", type="Imports")
 usethis::use_package("sigident.func", type="Imports")
 

@@ -23,7 +23,7 @@ compare_diagnostic_models <- function(modellist) {
                   ))
         }
       }
-    } else if (n %in% c("glmnet", "svm", "knn", "rf")) {
+    } else if (n %in% c("glmnet", "svm", "knn", "rf", "gbm")) {
       outdat <-
         rbind(outdat,
               data.table::data.table(
