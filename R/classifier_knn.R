@@ -6,6 +6,8 @@
 #'   of the function `create_training_test_split()`.
 #' @param seed Intilization state of random number generator
 #'
+#' @importFrom caret knn3
+#'
 #' @inheritParams sigidentDiagnostic
 #'
 knn_classifier <- function(
@@ -18,6 +20,12 @@ knn_classifier <- function(
 
   stopifnot(
     unique(traininglist$train$y) %in% c(0, 1)
+  )
+
+  assign(
+    x = "knn3",
+    value = caret::knn3,
+    pos = -1
   )
 
   # initialize outlist

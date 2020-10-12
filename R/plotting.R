@@ -80,10 +80,17 @@ plot_grid_model_plot <- function(model,
 #'
 #' @inheritParams plot_grid_model_plot
 #'
+#' @importFrom gbm relative.influence
+#'
 #' @export
 plot_grid_varimp_plot <- function(model,
                                   filename) {
 
+  assign(
+    x = "relative.influence",
+    value = gbm::relative.influence,
+    pos = -1
+  )
 
   var_imp <- caret::varImp(model)
 

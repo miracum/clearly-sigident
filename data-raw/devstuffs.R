@@ -23,7 +23,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.1.1.9003")
+my_desc$set_version("0.1.1.9004")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
@@ -90,9 +90,6 @@ usethis::use_package("rmarkdown", type = "Suggests")
 usethis::use_package("qpdf", type = "Suggests")
 usethis::use_package("knitr", type = "Suggests")
 usethis::use_package("lintr", type = "Suggests")
-usethis::use_package("mlr3", type = "Suggests")
-usethis::use_package("mlr3learners", type = "Suggests")
-usethis::use_package("mlr3viz", type = "Suggests")
 
 
 # Development package

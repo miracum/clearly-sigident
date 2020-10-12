@@ -59,6 +59,7 @@ library(sigident.preproc)
 library(sigident.func)
 library(knitr)
 library(caret)
+library(gbm)
 
 # initialize filePath:
 filePath <- tempdir()
