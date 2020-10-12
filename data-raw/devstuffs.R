@@ -23,7 +23,7 @@ my_desc$del("Maintainer")
 # Vignette Builder
 my_desc$set("VignetteBuilder" = "knitr")
 # Set the version
-my_desc$set_version("0.1.1.9001")
+my_desc$set_version("0.1.1.9002")
 # The title of your package
 my_desc$set(Title = "Signature Analyses in Genomic Expression Sets")
 # The description of your package
