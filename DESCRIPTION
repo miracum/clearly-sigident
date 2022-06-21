@@ -1,6 +1,6 @@
 Package: sigident
 Title: Signature Analyses in Genomic Expression Sets
-Version: 0.1.2
+Version: 0.1.2.9001
 Authors@R: 
     c(person(given = "Lorenz A.",
              family = "Kapsner",
@@ -61,6 +61,6 @@ Suggests:
     knitr,
     lintr
 Remotes: 
-    github::miracum/clearly-sigident.preproc@v0.0.5,
-    github::miracum/clearly-sigident.func@v0.0.4
+    github::miracum/clearly-sigident.preproc@development,
+    github::miracum/clearly-sigident.func@development
 RoxygenNote: 7.1.1
